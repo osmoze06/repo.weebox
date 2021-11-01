@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# creation initial par osmoze06 le 09 10 21
+# creation initiale par osmoze06 le 09 10 21
 import shutil
 import xbmc
 
@@ -22,4 +22,4 @@ shutil.copy(source_dir2, destination_dir2)
 # CREATION ARCHIVE ZIP
 shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/skin_save_01')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01')))
 
-xbmc.executebuiltin("Notification(SKIN SAUVEGARDE, Archive ZIP créée !)")
+xbmc.executebuiltin("Notification(SKIN SAUVEGARDE, SLOT 01 - Archive ZIP créée !)")
