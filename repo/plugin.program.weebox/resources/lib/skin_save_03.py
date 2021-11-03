@@ -2,6 +2,7 @@
 # creation initial par osmoze06 le 09 10 21
 import shutil
 import xbmc
+import sys
 
 xbmc.executebuiltin("Notification(PREPARATION DES FICHIERS,Copie en cours...)")
 
@@ -23,3 +24,4 @@ shutil.copy(source_dir2, destination_dir2)
 shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/03/skin_save_03')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/03')))
 
 xbmc.executebuiltin("Notification(SKIN SAUVEGARDE, SLOT 03 - Archive ZIP créée !)")
+sys.exit()

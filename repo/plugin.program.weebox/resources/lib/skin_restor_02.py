@@ -2,6 +2,7 @@
 # creation initiale par osmoze06 le 09 10 21
 import xbmc
 import shutil
+import sys
 
 
 # copie des fichiers sauvegarde
@@ -21,3 +22,4 @@ xbmc.sleep(5000)
 xbmc.executebuiltin("Notification(ACTUALISATION DU SKIN, Sauvegarde SLOT 02...)")
 xbmc.sleep(2000)
 xbmc.executebuiltin('ReloadSkin')
+sys.exit()

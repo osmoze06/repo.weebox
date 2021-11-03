@@ -23,7 +23,7 @@ import sys
 xbmc.executebuiltin("Notification(MISE A JOUR SKIN,Téléchargement en cours...)")
 
 # telechargement et extraction du zip
-zipurl = 'https://github.com/osmoze06/skin_pack/raw/main/weebox_full.zip'
+zipurl = 'https://github.com/osmoze06/skin_pack/raw/main/weebox_tv.zip'
 with urlopen(zipurl) as zipresp:
     with ZipFile(BytesIO(zipresp.read())) as zfile:
         zfile.extractall(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/maj/'))
