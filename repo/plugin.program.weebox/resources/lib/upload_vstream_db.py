@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import xbmc
 import xbmcvfs
 import sys
 
