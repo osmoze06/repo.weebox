@@ -8,7 +8,5 @@ destination_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.
 xbmcvfs.copy(source_dir, destination_dir)
 xbmc.executebuiltin("Notification(BASE DE DONNEES OK,Mise à jour effectuée !)")
 xbmc.sleep(2000)
-xbmc.executebuiltin("Notification(ACTUALISATION, Chargement en cours...)")
-xbmc.sleep(2000)
 xbmc.executebuiltin('ReloadSkin')
 sys.exit()

@@ -3,8 +3,6 @@ import xbmc
 import xbmcvfs
 import sys
 
-xbmc.executebuiltin("Notification(ENVOI SUR SERVEUR,Upload en cours...)")
-
 source_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.video.vstream/vstream.db')
 destination_dir = r"smb://MONITEUR:2929@192.168.8.10/PUBLIC/LIBREELEC/SYNC/vstream.db"
 xbmcvfs.copy(source_dir, destination_dir)
