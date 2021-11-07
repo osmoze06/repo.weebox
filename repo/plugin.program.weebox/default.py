@@ -38,7 +38,7 @@ def main_menu():
     add_dir("[COLOR deepskyblue] RESTAURER - SLOT 02 : [/COLOR] Restauration du Skin.", 'skin_restor_02', 'call_save', artworkPath + 'restore2.png')
     add_dir("[COLOR deepskyblue] RESTAURER - SLOT 03 : [/COLOR] Restauration du Skin.", 'skin_restor_03', 'call_save', artworkPath + 'restore3.png')
     add_dir("------------------------------------------------------------------------------------------------------------------------------", '', 'call_save', artworkPath + '')	
-    add_dir("[COLOR green] SPECIAL : [/COLOR] SELECTIONNER UNE FONCTION (EN COURS...) :", '', 'call_save', artworkPath + 'private0.png')    
+    add_dir("[COLOR red] SPECIAL : [/COLOR] SELECTIONNER UNE FONCTION (EN COURS...) :", '', 'call_save', artworkPath + 'private0.png')    
     add_dir("[COLOR deepskyblue] VSTREAM : [/COLOR] >>> Upload de la Database sur Serveur.", 'upload_vstream_db', 'call_save', artworkPath + 'upload.png')
     add_dir("[COLOR deepskyblue] VSTREAM : [/COLOR] <<< Download de la Database du Serveur.", 'download_vstream_db', 'call_save', artworkPath + 'download.png')
     add_dir("[COLOR red] SKIN : [/COLOR] Sauvegarde du Skin en cours (ZIP sur Serveur).", '', 'call_save', artworkPath + 'save.png')
