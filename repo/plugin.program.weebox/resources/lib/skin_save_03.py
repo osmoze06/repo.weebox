@@ -16,8 +16,12 @@ destination_dir1 = xbmc.translatePath('special://home/userdata/addon_data/plugin
 source_dir2 = xbmc.translatePath('special://home/addons/skin.project.aura/1080i/script-skinshortcuts-includes.xml')
 destination_dir2 = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/03/addons/skin.project.aura/1080i/script-skinshortcuts-includes.xml')
 
+source_dir3 = xbmc.translatePath('special://home/addons/skin.project.aura/extras/icons')
+destination_dir3 = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addons/skin.project.aura/extras/icons')
+
 shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
 shutil.copytree(source_dir1, destination_dir1, dirs_exist_ok=True)
+shutil.copytree(source_dir3, destination_dir3, dirs_exist_ok=True)
 shutil.copy(source_dir2, destination_dir2)
 
 # CREATION ARCHIVE ZIP
