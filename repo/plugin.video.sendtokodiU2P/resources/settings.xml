@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+		<setting id="osVersion" type="text" label="OS"  default="ANDROID (/storage/emulated/0/kodiBase/)"/>
+        <setting id="keyupto" type="text" label="APIUPTO"  default=""/>
+		<setting id="key1fichier" type="text" label="API1FICHIER"  default=""/>
+		<setting id="keyalldebrid" type="text" label="APIALLDEBRID"  default=""/>
+    	<setting id="paste" type="text" label="PASTEBIN"  default=""/>
+        <setting id="resos" type="text" label="RESOS"  default="r=1080,720,2160-timing=0"/>
+        <setting id="thumbnails" type="text" label="THUMBNAILS"  default="0"/>
+</settings>

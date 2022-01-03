@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="plugin.program.weebox" version="0.2.1" name="WEEBOX" provider-name="Osmoze06">
+<addons>
+<addon id="plugin.program.weebox" version="0.2.2" name="WEEBOX" provider-name="Osmoze06">
 	<requires>
 		<import addon="script.module.requests" />
 	</requires>
@@ -16,6 +17,9 @@
         <website>.</website>
         <source>.</source>
     <news>
+[VERSION 0.2.2 - 03/01/2022]
+- Motifications Scripts.
+
 [VERSION 0.2.1 - 21/11/2021]
 - Optimations scripts.
 - Modifications des backgrounds.
@@ -47,6 +51,37 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <screenshot>screenshot-03.jpg</screenshot>
         </assets>		
     </extension>
+</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.5.12" provider-name="noway">
+  <requires>
+    <trycatch>
+      <try>
+          <import addon="xbmc.python" version="3.0.0" />
+      </try>
+      <catch>
+          <import addon="xbmc.python" version="2.25.0" />
+      </catch>
+        </trycatch>
+    <import addon="script.module.requests" version="2.12.4" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="service.py">
+  <provides>video</provides>
+	</extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">U2Pplay</summary>
+    <description lang="en">U2Pplay permet d'importer une base de contenu en 1 clic ou de creer des fichiers strm a partir d'IDs de pastes cryptes puis de les streamer via Kodi. Necessite un compte premium Uptobox ou Alldebrid</description>
+    <disclaimer lang="en" />
+    <platform>all</platform>
+    <license>MIT License</license>
+    <website />
+    <email />
+    <source />
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+	  <screenshot>screenshot-01.jpg</screenshot>
+      <screenshot>screenshot-02.jpg</screenshot>
+    </assets>
+  </extension>
 </addon><addon id="repo.weebox" name="WEEBOX Addons Repository" version="0.0.1" provider-name="Osmoze06">
     <extension point="xbmc.addon.repository" name="WEEBOX Addons Repository">
         <dir>
@@ -65,4 +100,5 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <fanart>fanart.jpg</fanart>
         </assets>
     </extension>
-</addon></addons>
+</addon>
+</addons>
