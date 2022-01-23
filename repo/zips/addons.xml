@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <addons>
-<addon id="plugin.program.weebox" version="0.2.2" name="WEEBOX" provider-name="Osmoze06">
+<addon id="plugin.program.weebox" version="0.2.3" name="WEEBOX" provider-name="Osmoze06">
 	<requires>
 		<import addon="script.module.requests" />
 	</requires>
@@ -17,6 +17,11 @@
         <website>.</website>
         <source>.</source>
     <news>
+[VERSION 0.2.3 - 23/01/2022]
+- Motifications Scripts.
+- Ajout Skin Cosmic
+- Modifications Background
+
 [VERSION 0.2.2 - 03/01/2022]
 - Motifications Scripts.
 
