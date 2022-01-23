@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<settings>
-
-        <setting id="apikey" type="text" label="API"  default="92ab39516970ab9d86396866456ec9b6"/>
-    
-</settings>

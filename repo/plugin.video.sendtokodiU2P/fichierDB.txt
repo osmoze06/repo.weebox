@@ -1,4 +1,0 @@
-full=
-Anime-Japonais=6EOsb
-full-autonome=I8fe8
-best-autonome=I0pU8
