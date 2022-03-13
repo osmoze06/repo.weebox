@@ -1,0 +1,8 @@
+full=
+HK-autonome=zmdeo
+HK-autonome-forced=zmdeo
+Anime-Japonais=6EOsb
+full=PbFWq
+full-autonome=I8fe8
+best-autonome=I0pU8
+skin=4j82p
