@@ -23,6 +23,8 @@ def main_menu():
     add_dir("[COLOR deepskyblue] TV & REPLAY : [/COLOR] Mise à jour", 'script_maj_tvreplay', 'call_save', artworkPath + 'download.png')
     add_dir("[COLOR deepskyblue] STREAMING : [/COLOR] Mise à jour", 'script_maj_streaming', 'call_save', artworkPath + 'download.png')
     add_dir("[COLOR deepskyblue] SKIN : [/COLOR] Mise à jour", 'pack_weebox_cosmic', 'call_save', artworkPath + 'download.png')
+    add_dir("[COLOR deepskyblue] SKIN : [/COLOR] Sauvegarde", 'skin_save_01', 'call_save', artworkPath + 'download.png')
+    add_dir("[COLOR deepskyblue] SKIN : [/COLOR] Restauration", 'skin_restor_01', 'call_save', artworkPath + 'download.png')	
 	
 def callSave(url):
     plugins = __import__('resources.lib.' + url)
