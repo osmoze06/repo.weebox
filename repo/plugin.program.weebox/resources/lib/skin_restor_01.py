@@ -2,8 +2,10 @@
 # creation initiale par osmoze06 le 09 10 21
 import xbmc
 import shutil
-import sys
+import os, sys, stat
 
+#Supression lecture seule du fichier
+os.chmod(xbmc.translatePath('special://home/userdata/addon_data/skin.cosmic/settings.xml'), stat.S_IWRITE)
 
 # copie des fichiers sauvegarde
 source_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data')
