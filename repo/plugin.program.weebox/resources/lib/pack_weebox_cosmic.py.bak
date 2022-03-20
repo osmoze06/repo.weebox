@@ -5,11 +5,19 @@ import xbmc
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
+import os
 import shutil
-import os, sys, stat
 
-#Supression lecture seule du fichier
-os.chmod(xbmc.translatePath('special://home/userdata/addon_data/skin.cosmic/settings.xml'), stat.S_IWRITE)
+#xbmc.executebuiltin("Notification(OPTION DE VSTREAM,Effacement en cours...)")
+
+# suppression du setting de vstream
+# nous devrions vérifier si le fichier existe ou non avant de le supprimer.
+
+#if os.path.isfile(xbmc.translatePath('special://home/userdata/addon_data/plugin.video.vstream/settings.xml')):
+#    os.remove(xbmc.translatePath('special://home/userdata/addon_data/plugin.video.vstream/settings.xml'))
+#else:
+#    print("Impossible de supprimer le fichier car il n'existe pas")
+#xbmc.sleep(2000)
 
 xbmc.executebuiltin("Notification(MISE A JOUR SKIN,Téléchargement en cours...)")
 
