@@ -34,3 +34,4 @@ if __name__ == "__main__":
     else:
         xbmc.executebuiltin('ActivateWindow(10000,return)')
 #xbmc.executebuiltin('RunScript(your_script)')
+sys.exit()

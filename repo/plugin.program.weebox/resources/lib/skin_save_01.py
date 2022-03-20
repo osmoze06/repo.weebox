@@ -25,7 +25,7 @@ shutil.copytree(source_dir3, destination_dir3, dirs_exist_ok=True)
 #shutil.copy(source_dir2, destination_dir2)
 
 # CREATION ARCHIVE ZIP
-shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/skin_save_01')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01')))
+shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/weebox_cosmic')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01')))
 
 xbmc.executebuiltin("Notification(SKIN SAUVEGARDE, SLOT 01 - Archive ZIP créée !)")
 sys.exit()

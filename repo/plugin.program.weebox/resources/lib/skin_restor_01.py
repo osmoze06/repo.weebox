@@ -9,8 +9,8 @@ import sys
 source_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data')
 destination_dir = xbmc.translatePath('special://home/userdata/addon_data')
 
-source_dir2 = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addons/skin.project.aura')
-destination_dir2 = xbmc.translatePath('special://home/addons/skin.project.aura')
+source_dir2 = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addons/skin.cosmic')
+destination_dir2 = xbmc.translatePath('special://home/addons/skin.cosmic')
 
 shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
 shutil.copytree(source_dir2, destination_dir2, dirs_exist_ok=True)
