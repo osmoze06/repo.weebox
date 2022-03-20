@@ -2,7 +2,7 @@
 # creation initiale par osmoze06 le 09 10 21
 import shutil
 import xbmc
-import sys
+import os, sys, stat
 
 xbmc.executebuiltin("Notification(PREPARATION DES FICHIERS,Copie en cours...)")
 
@@ -23,6 +23,9 @@ shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
 shutil.copytree(source_dir1, destination_dir1, dirs_exist_ok=True)
 shutil.copytree(source_dir3, destination_dir3, dirs_exist_ok=True)
 #shutil.copy(source_dir2, destination_dir2)
+
+#Paramètre lecture seule du fichier
+os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.cosmic/settings.xml'), stat.S_IREAD)
 
 # CREATION ARCHIVE ZIP
 shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/weebox_cosmic')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01')))
