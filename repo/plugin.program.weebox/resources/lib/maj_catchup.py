@@ -18,7 +18,7 @@ with urlopen(zipurl) as zipresp:
         zfile.extractall(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/maj/'))
 
 # copie des fichiers extraits
-source_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/maj/plugin.video.catchuptvandmore')
+source_dir = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/maj/plugin.video.catchuptvandmore-dev')
 destination_dir = xbmc.translatePath('special://home/addons/plugin.video.catchuptvandmore')
 shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
 
