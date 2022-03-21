@@ -4,6 +4,9 @@ import shutil
 import xbmc
 import os, sys, stat
 
+#Paramètre lecture seule du fichier
+os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.cosmic/settings.xml'), stat.S_IWRITE)
+
 xbmc.executebuiltin("Notification(PREPARATION DES FICHIERS,Copie en cours...)")
 
 # COPIE DES DOSSIERS ET FICHIERS DU SKIN
