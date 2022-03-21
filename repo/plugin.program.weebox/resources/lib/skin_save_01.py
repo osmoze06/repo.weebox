@@ -4,6 +4,9 @@ import shutil
 import xbmc
 import os, sys, stat
 
+
+xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "pvr.iptvsimple", "enabled": false }}')
+
 #Paramètre lecture seule du fichier
 os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.cosmic/settings.xml'), stat.S_IWRITE)
 
