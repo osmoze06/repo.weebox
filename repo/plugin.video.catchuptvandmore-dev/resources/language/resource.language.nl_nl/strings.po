@@ -64,8 +64,8 @@ msgid "Hide channels"
 msgstr "Verberg kanalen"
 
 msgctxt "#30012"
-msgid "To configure YTDL go settings of script.module.youtube.dl"
-msgstr "Ga naar de instellingen van script.module.youtube.dl om YTDL te configureren"
+msgid "YTDL settings"
+msgstr ""
 
 msgctxt "#30013"
 msgid "Hide countries"
@@ -287,10 +287,6 @@ msgctxt "#30150"
 msgid "Video quality"
 msgstr "Video kwaliteit"
 
-msgctxt "#30151"
-msgid "Video quality (BEST|DEFAULT|DIALOG)"
-msgstr "Video kwaliteit (BEST|DEFAULT|DIALOG)"
-
 msgctxt "#30152"
 msgid "Contents"
 msgstr "Inhoud"
@@ -371,10 +367,6 @@ msgctxt "#30171"
 msgid "BFM Régions: Choose region"
 msgstr ""
 
-msgctxt "#30172"
-msgid "TV5 monde plus: Choose country"
-msgstr ""
-
 msgctxt "#30173"
 msgid "TV5 monde plus: Choose language"
 msgstr ""
@@ -387,6 +379,37 @@ msgctxt "#30175"
 msgid "Equidia Racing: Choose race"
 msgstr ""
 
+msgctxt "#30192"
+msgid "BEST"
+msgstr ""
+
+msgctxt "#30193"
+msgid "DEFAULT"
+msgstr ""
+
+msgctxt "#30194"
+msgid "DIALOG"
+msgstr ""
+
+msgctxt "#30195"
+msgid "WORST"
+msgstr ""
+
+msgctxt "#30196"
+msgid "Maximum stream bitrate [COLOR=gray](0=disabled)[/COLOR]"
+msgstr ""
+
+msgctxt "#30197"
+msgid "Settings - InputStream adaptive"
+msgstr ""
+
+msgctxt "#30198"
+msgid "Use inputstream HLS?"
+msgstr ""
+
+msgctxt "#30199"
+msgid "Use ytdl for stream?"
+msgstr ""
 
 # Download (from 30200 to 30239)
 

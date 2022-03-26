@@ -57,6 +57,15 @@ menu = {
         'enabled': True,
         'order': 6
     },
+    'icirdi': {
+        'resolver': '/resources/lib/channels/ca/icirdi:get_live_url',
+        'label': 'ICI RDI',
+        'thumb': 'channels/ca/icirdi.png',
+        'fanart': 'channels/ca/icirdi_fanart.jpg',
+        'xmltv_id': 'I60327.json.schedulesdirect.org',
+        'enabled': True,
+        'order': 16
+    },
     'ntvca': {
         'resolver': '/resources/lib/channels/ca/ntvca:get_live_url',
         'label': 'NTV',

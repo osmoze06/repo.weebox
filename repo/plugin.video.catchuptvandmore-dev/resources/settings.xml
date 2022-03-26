@@ -27,7 +27,11 @@
 
         <!-- Video quality -->
         <setting label="30150" type="lsep" />
-            <setting label="30151" type="labelenum" id="quality" values="BEST|DEFAULT|DIALOG" default="BEST"/>
+            <setting label="30150" type="enum" id="quality" lvalues="30192|30193|30194|30195" default="1"/>
+            <setting id="stream_bitrate_limit" type="select" label="30196" default="0" values="0|100|250|500|750|1000|1500|2000|2500|4000|8000|20000" />
+            <setting label="30198" type="bool" id="use_ia_hls_stream" default="true" enable="System.HasAddon(inputstream.adaptive)" />
+            <setting label="30197" type="action" subsetting="true"  action="Addon.OpenSettings(inputstream.adaptive)" option="close" enable="eq(-1,true)"/>
+            <setting label="30199" type="bool" id="use_ytdl_stream" default="false" enable="eq(-2,false) + !System.HasAddon(inputstream.adaptive)"/>
 
 
         <!-- Content -->
@@ -51,7 +55,6 @@
                 <setting label="30162" type="labelenum" id="nhkworld.language" values="Outside Japan|In Japan" default="Outside Japan"/>
                 <setting label="30163" type="labelenum" id="cgtn.language" values="FR|EN|AR|ES|RU" default="FR"/>
                 <setting label="30166" type="labelenum" id="rt.language" values="FR|EN|AR|ES" default="FR"/>
-                <setting label="30172" type="labelenum" id="tv5mondeplus.country" values="FR|BE|DE|PT|DK|LT|HR|LV|UA|HU|MD|ME|IE|MK|EE|IL|IM|MT|IS|AL|IT|VA|AM|ES|AQ|AT|AX|AZ|JE|RO|NL|BA|NO|RS|FI|RU|BG|FO|SE|BV|SI|BY|SJ|SK|SM|GB|GE|GG|GI|GL|GR|XK|CY|CZ|PL|LI|TR" default="FR"/>
                 <setting label="30173" type="labelenum" id="tv5mondeplus.language" values="fr|en|de|es-LA" default="fr"/>
 
             <!-- French channels -->
@@ -94,6 +97,7 @@
     <!-- Downloads -->
     <category label="30003">
         <setting label="30012" type="lsep"/>
+        <setting label="30012" type="action" action="Addon.OpenSettings(script.module.youtube.dl)" option="close" enable="System.HasAddon(script.module.youtube.dl)" />
         <setting label="30200" type="folder" id="dl_folder" source="" option="writeable"/>
         <setting label="30201" type="labelenum" id="dl_quality" visible="true" values="SD|720p|1080p|Highest available" default="Highest available"/>
         <setting label="30202" type="bool" id="dl_background" default="false" visible="true"/>

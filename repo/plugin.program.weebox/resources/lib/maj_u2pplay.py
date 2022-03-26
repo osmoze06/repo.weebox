@@ -5,6 +5,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 import shutil
 import os, sys
+import time
 
 
 xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.sendtokodiU2P", "enabled": false }}')
@@ -26,6 +27,14 @@ xbmc.executebuiltin("Notification(EXTRACTION OK,Mise à jour effectuée !)")
 
 xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.sendtokodiU2P", "enabled": true }}')
 
-xbmc.sleep(2000)
+time.sleep(2000)
 xbmc.executebuiltin('ReloadSkin')
+
+xbmc.executebuiltin("Notification(Mise à jour,Database en cours...)")
+
+xbmc.sleep(2000)
+
+xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.ExecuteAddon", "params": { "addonid": "plugin.video.sendtokodiU2P", "params": ["action=maj"]}, "id":2}')
+xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
+
 sys.exit()

@@ -569,15 +569,6 @@ menu = {
         'enabled': True,
         'order': 71
     },
-    'azurtv': {
-        'resolver': '/resources/lib/channels/fr/azurtv:get_live_url',
-        'label': 'Azur TV',
-        'thumb': 'channels/fr/azurtv.png',
-        'fanart': 'channels/fr/azurtv_fanart.jpg',
-        'm3u_group': 'Région',
-        'enabled': True,
-        'order': 72
-    },
     'biptv': {
         'resolver': '/resources/lib/channels/fr/biptv:get_live_url',
         'label': 'BIP TV',
@@ -622,15 +613,6 @@ menu = {
         'm3u_group': 'Satellite/FAI',
         'enabled': False,
         'order': 77
-    },
-    'provenceazurtv': {
-        'resolver': '/resources/lib/channels/fr/azurtv:get_live_url',
-        'label': 'Provence Azur TV',
-        'thumb': 'channels/fr/provenceazurtv.png',
-        'fanart': 'channels/fr/provenceazurtv_fanart.jpg',
-        'm3u_group': 'Région',
-        'enabled': True,
-        'order': 78
     },
     'tebeo': {
         'resolver': '/resources/lib/channels/fr/tebeo:get_live_url',
