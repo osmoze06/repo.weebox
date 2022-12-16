@@ -61,6 +61,7 @@
     </category>
     <!-- bookmak en ligne -->
     <category label="Bookmark Online">
+        <setting id="ochk1" label="On continue ... (visu hk1)" type="bool" default="false" />
         <setting id="bookonline" label="Bookmark en ligne" type="bool" default="false" />
         <setting id="bookonline_name" label="Pass" type="text" default="" visible="eq(-1,true)" />
         <setting id="bookonline_site" label="Site" type="text" default="lesalkodiques.com/u2pplay" visible="eq(-2,true)" />
