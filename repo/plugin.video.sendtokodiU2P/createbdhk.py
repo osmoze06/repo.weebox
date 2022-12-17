@@ -1011,8 +1011,10 @@ def mediasHKSeries(params):
         affMedias(typM, movies, params)
 
     else:
-        choix = [("On continue...", {"action":"suiteSerieHK2"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
-        #choix = [("On continue...", {"action":"mediasHKSeries", "famille": "Mon historique", "offset": "0", "suite": "1"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
+        if ADDON.getSetting("ochk1") != "false" and int(ADDON.getSetting("intmaj")):
+            choix = [("On continue...", {"action":"suiteSerieHK2"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
+        else:
+            choix = [("On continue...", {"action":"mediasHKSeries", "famille": "Mon historique", "offset": "0", "suite": "1"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
         choix += [("Series", {"action":"mediasHKSeries", "famille": "serieserie"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Serie.png', "Liste series hors animation et documentaire")]
         choix += [("Derniers Ajouts", {"action":"mediasHKSeries", "famille": "seriesall"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Serie.png', "Liste series tous genres")]
         choix += [("Liste Aléatoire", {"action":"mediasHKSeries", "famille": "Liste Aléatoire"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Liste Aléatoire.png', "Liste Aléatoire, tous genres")]
