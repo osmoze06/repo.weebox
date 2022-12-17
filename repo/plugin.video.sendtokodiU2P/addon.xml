@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.9.8~beta4" provider-name="noway">
+<addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.9.8~beta5" provider-name="noway">
   <requires>
     <trycatch>
       <try>
