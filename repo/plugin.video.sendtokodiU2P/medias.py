@@ -660,7 +660,8 @@ class TMDB:
       req = requests.get(url1)
       dictInfos = req.json()
       tabEpisodes = []
-      notice(dictInfos)
+      #notice(dictInfos)
+      #https://api.themoviedb.org/3/tv/1405/season/1?api_key=96139384ce46fd4ffac13e1ad770db7a
       try:
         for i, episode in enumerate(dictInfos["episodes"]):
           name = episode.get("name", "")
