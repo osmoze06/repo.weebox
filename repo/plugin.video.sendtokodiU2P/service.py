@@ -33,6 +33,7 @@ except ImportError:
 try:
     # Python 3
     from urllib.parse import parse_qsl
+    from util import *
 except ImportError:
     from urlparse import parse_qsl
 try:
@@ -75,6 +76,8 @@ elif pyVersionM == 10:
 else:
     notice(pyVersion)
     notice(pyVersionM)
+
+    
 from pastebin import Pastebin
 from apiTraktHK import TraktHK
 import createbdhk
@@ -623,8 +626,7 @@ def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, "dbid": media.numId + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu})
+    updateInfoTagVideo(li,media,False,False,False,False,False)
     if "Saison" in name:
         commands = []
         commands.append(('[COLOR yellow]Gestion Vus/Non-Vus[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=vuNonVu&saison=%d&u2p=%s&refresh=1)' %(media.saison, media.numId)))
@@ -857,9 +859,7 @@ def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
     li = xbmcgui.ListItem(label=("%s" %(name)))
     #, "dbid": media.numId + 500000
     #notice(media.episode)
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, 'playcount': media.vu,
-        "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "episode": media.episode, "season": media.saison})
-
+    updateInfoTagVideo(li,media,False,True,False,False,True)
     li.setArt({'icon': media.backdrop,
               "fanart": media.backdrop})
     li.setProperty('IsPlayable', 'true')
@@ -897,6 +897,7 @@ def affLiens2(params):
     tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo" %(colorLiens(dictResos[x.split("#")[0].split("@")[1]][0]), i + 1, dictResos[x.split("#")[0].split("@")[1]][0], (int(dictResos[x.split("#")[0].split("@")[1]][1]) / 1000000000.0)) for i, x in enumerate(paramstring)]
     tabRelease = [dictResos[x.split("#")[0].split("@")[1]][2] for i, x in enumerate(paramstring)]
     tabLiens = [(x, paramstring[i], tabRelease[i]) for i, x in enumerate(tabNomLien)]
+    #web_pdb.set_trace()
     if "poiss" in params.keys():
         uptobox.affLiens(numId, "movie", tabLiens)
     else:
@@ -1023,7 +1024,7 @@ def getParams(paramstring, u2p=0, saisonIn=1):
                     raise StopIteration
     except StopIteration: pass
     # ========================================================================================================================================
-
+    
     selected = 0
     if len(paramstring) == 1:
         result['url'] = paramstring[0].split("#")[0]
@@ -1256,7 +1257,7 @@ def affAlldeb():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1291,7 +1292,7 @@ def affUpto():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1315,7 +1316,7 @@ def affTmdb():
         for ch in sorted(choix):
             name, parameters, picture, texte = ch
             li = xbmcgui.ListItem(label=name)
-            li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+            updateMinimalInfoTagVideo(li,name,texte)
             li.setArt({'thumb': picture,
                       'icon': addon.getAddonInfo('icon'),
                       'icon': addon.getAddonInfo('icon'),
@@ -1340,7 +1341,7 @@ def affPastebin():
         for ch in sorted(choix):
             name, parameters, picture, texte = ch
             li = xbmcgui.ListItem(label=name)
-            li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+            updateMinimalInfoTagVideo(li,name,texte)
             li.setArt({'thumb': picture,
                       'icon': addon.getAddonInfo('icon'),
                       'icon': addon.getAddonInfo('icon'),
@@ -1364,7 +1365,7 @@ def affTrakt():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1426,7 +1427,7 @@ def ventilationHK():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -2334,7 +2335,7 @@ def addCategorieMedia(choix):
         if texte in dictChoix.keys():
             texte = dictChoix[texte]
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         if "http" not in picture and not os.path.isfile(xbmcvfs.translatePath(picture)):
             picture = 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png'
         li.setArt({'thumb': picture,
@@ -2369,7 +2370,7 @@ def filtres(params):
         if texte in dictChoix.keys():
             texte = dictChoix[texte]
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'fanart': addon.getAddonInfo('fanart')})
@@ -2401,7 +2402,7 @@ def affSearch():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'fanart': addon.getAddonInfo('fanart')})
@@ -2485,7 +2486,7 @@ def genres(params):
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'fanart': addon.getAddonInfo('fanart')})
@@ -2550,8 +2551,8 @@ def addDirNext(params):
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     #notice("id addon " + str(addon.getAddonInfo("id")))
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    li.setInfo('video', {"title": "     ", 'plot': "", 'genre': "", "dbid": 500000,
-            "year": "", 'mediatype': "movies", "rating": 0.0})
+    
+    updateEmptyInfoTag(li)
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
               'icon': addon.getAddonInfo('icon'),
@@ -2586,13 +2587,8 @@ def addDirectoryEbook(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=("%s" %(name)))
-    if isFolder:
-        li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu})
-    else:
-        li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu})
-
+    #Suppression du If qui faisait la meme chose...
+    updateInfoTagVideo(li,media,False,False,False,False,False)
     li.setArt({'icon': media.backdrop, 'thumb': media.poster,})
     li.setProperty('IsPlayable', 'true')
 
@@ -2700,12 +2696,8 @@ def addDirectoryFilms(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, "dbid": media.numId + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": media.duration * 60 })
-
+    updateInfoTagVideo(li,media,True,False,True,False,False)
     #liz.setPath("plugin://%s/play/%s" % (ADDON.getAddonInfo("id"),urllib.quote(url, safe='')) )
-
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,
@@ -2807,9 +2799,12 @@ def addDirectoryItemLocal(name, isFolder=True, parameters={}, picture="", texte=
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
 
+    updateMinimalInfoTagVideo(li,name,texte)
+
+    #Overlay ne dispose de method sur le getVideoInfoTag ...
+    #li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video', "overlay": 6})
 
     #'playcount':0, "status": "Continuing"
-    li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video', "overlay": 6})
     li.setArt({'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/%s' %picture,
               'icon': addon.getAddonInfo('icon'),
               #'icon': addon.getAddonInfo('icon'),
@@ -2963,14 +2958,17 @@ def getSeasonU2P(numId, dataBaseKodi , numEpisode):
 
 
 def createListItemFromVideo(video):
-    url = video['url']
-    title = video['title']
-    list_item = xbmcgui.ListItem(title, path=url)
-    if "episode" in video.keys():
-        list_item.setInfo(type='Video', infoLabels={'Title': title, "episode": video['episode'], "season": video['season']})
-    else:
-        list_item.setInfo(type='Video', infoLabels={'Title': title})
-    return list_item
+    try:
+        url = video['url']
+        title = video['title']
+        li = xbmcgui.ListItem(title, path=url)
+        if "episode" in video.keys():
+            updateMinimalInfoTagVideo(li,title,None, video['episode'],video['season'])
+        else:
+            updateMinimalInfoTagVideo(li,title)
+    except Exception as e:
+        notice("Service.py - createListItemFromVideo::createListItemFromVideo " + str(e))
+    return li
 
 def getIDfile(f):
     try:
@@ -2985,14 +2983,14 @@ def getIDfile(f):
 
 
 def prepareUpNext(title, numId, saison, episode):
-    notice(episode)
+    #notice(episode)
     if __addon__.getSetting("actifnewpaste")  != "false":
         link = uptobox.getLinkUpNext(numId, saison, int(episode) + 1)
     elif __addon__.getSetting("actifhk") != "false":
         sql = "SELECT link FROM tvshowEpisodes \
                 WHERE numId={} AND saison='Saison {}' AND episode=='S{}E{}'".format(numId, str(saison).zfill(2), str(saison).zfill(2), str(int(episode) + 1).zfill(2))
         link = extractMedias(sql=sql, unique=1)
-    notice(link)
+    #notice(link)
     next_info = {}
     if link:
         try:
@@ -3074,7 +3072,6 @@ def playEpisode(params):
             if link:
                # params["lien"] = "*".join(link)
                 params["lien"] = link[0]
-
     param = {"u2p": params["u2p"], 'action': "playHK", 'lien': params["lien"], 'episode': params["episode"], "saison": params["saison"], "typMedia": "episode"}
     playMediaHK(param)
 
@@ -3088,12 +3085,8 @@ def mepInfos(numId):
     urlFanart = "http://assets.fanart.tv/fanart/movie/"
 
     li = xbmcgui.ListItem(label=media.title)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, "dbid": media.numId + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": media.duration * 60 })
-
+    updateInfoTagVideo(li,media,True,False,True,False,False)
     #liz.setPath("plugin://%s/play/%s" % (ADDON.getAddonInfo("id"),urllib.quote(url, safe='')) )
-
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,
@@ -3179,7 +3172,6 @@ def nettHistoDB(bd):
 
 
 def playMediaHK(params):
-    notice(params)
 
     typMedia = xbmc.getInfoLabel('ListItem.DBTYPE')
     if not typMedia:
@@ -3211,7 +3203,6 @@ def playMediaHK(params):
             numEpisode = xbmc.getInfoLabel('ListItem.Episode')
             if not numEpisode and 'episode' in params.keys():
                 numEpisode = params['episode']
-        notice("serie " + typMedia +  " " + str(saison) +  " " + str(numEpisode))
         #prepareUpNext(title, numId, saison, numEpisode)
     else:
         saison = 1
@@ -3236,7 +3227,7 @@ def playMediaHK(params):
             else:
                 xbmcplugin.setResolvedUrl(__handle__, True, listitem=listIt)
         except Exception as e:
-            notice("erreur Play " + str(e))
+            notice("playMediaHK - Erreur Play " + str(e))
         threading.Thread(target=gestionThumbnails).start()
         count = 0
         time.sleep(2)
@@ -3283,6 +3274,7 @@ def playMediaHK(params):
                 notice("delete")
         okUpNext = True
         tt = xbmc.Player().getTotalTime()
+        #web_pdb.set_trace()
         notice("typeMedia " + typMedia)
 
         # scrobble
@@ -3387,6 +3379,7 @@ def playMedia(params):
     #notice("fin listem")
 
     result = getParams(params['lien'])
+  
     if result and "url" in result.keys():
         url = str(result['url'])
         showInfoNotification("playing title " + result['title'])
@@ -3398,7 +3391,7 @@ def playMedia(params):
             #xbmc.Player().play(url, listIt)
             #xbmc.executebuiltin('PlayMedia(%s)' %url)
         except Exception as e:
-            notice("erreur Play " + str(e))
+            notice("playMedia - Erreur Play " + str(e))
         threading.Thread(target=gestionThumbnails).start()
         count = 0
         time.sleep(2)
@@ -3410,7 +3403,7 @@ def playMedia(params):
                 time.sleep(1)
         try:
             infoTag = xbmc.Player().getVideoInfoTag()
-            notice(infoTag.getDbId())
+            #notice(infoTag.getDbId())
             #idfile = infoTag.getDbId()
             notice("idFile " + str(idfile))
             #notice(xbmc.Player().getPlayingFile())
@@ -4571,7 +4564,7 @@ def affProfils():
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -4857,8 +4850,8 @@ def intmajbann15():
             addon.setSetting(id="delaimaj", value=d.strip())
         else:
             return
-    notice(intmaj)
-    notice(delaimaj)
+    #notice(intmaj)
+    #notice(delaimaj)
     showInfoNotification(intmaj + " " + delaimaj)
 
 def rskin2():
@@ -4952,9 +4945,10 @@ def router(paramstring):
 
 
 if __name__ == '__main__':
+
     nameExploit = sys.platform
     __addon__ = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
-    notice(nameExploit)
+    #notice(nameExploit)
     # Get the plugin url in plugin:// notation.
     __url__ = sys.argv[0]
     # Get the plugin handle as an integer number.
@@ -4972,6 +4966,7 @@ if __name__ == '__main__':
     __keyTMDB__ = getkeyTMDB()
     __params__ = dict(parse_qsl(sys.argv[2][1:]))
 
+    #
     # assistant
     if __addon__.getSetting("actifhk") != "false":
         if not os.path.exists(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P')):
@@ -4993,13 +4988,12 @@ if __name__ == '__main__':
         with open(__repAddon__ + "service.txt", "w") as f:
             mepAutoStart2()
     createFav()
-    notice(pyVersion)
-    notice(pyVersionM)
+    #notice(pyVersion)
+    #notice(pyVersionM)
     #xbmc.executebuiltin("InstallFromZip")
     #notice(sys.version_info)
     #notice(__url__)
     #notice(__handle__)
-
     router(sys.argv[2][1:])
 
     #Setting most video properties through ListItem.setInfo() is deprecated and might be removed in future Kodi versions. Please use the respective setter in InfoTagVideo.

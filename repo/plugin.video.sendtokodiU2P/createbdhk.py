@@ -391,7 +391,7 @@ def affbacat(params):
     i = 0
     for i, ba in enumerate(liste):
         li = xbmcgui.ListItem(label=ba[0])
-        li.setInfo('video', {"title": ba[0], 'plot': ba[0], 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,ba[0],ba[0])
         li.setArt({"fanart": ba[1], "thumb": ba[1]})
         li.setProperty('IsPlayable', 'true')
         parameters={"action": "playMediabaext", "lien": ba[2]}
@@ -433,9 +433,7 @@ def addCategorieMedia(choix):
         if texte in dictChoix.keys():
             texte = dictChoix[texte]
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
-        #vinfo = li.getVideoInfoTag()
-        #vinfo.setPlot(texte)
+        updateMinimalInfoTagVideo(li,name,texte)
         if "http" not in picture and not os.path.isfile(xbmcvfs.translatePath(picture)):
             picture = 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png'
         li.setArt({'thumb': picture,
@@ -482,6 +480,56 @@ def mediasHKFilms(params):
                 movies = extractMedias(sql=sql)
             else:
                 return
+        #====================================================================================================================================================================================
+        elif famille == "sagas":
+            localLimit = 100
+            sql = "select DISTINCT saga from filmsPub as m where saga != 0 "+ orderDefault + " LIMIT {} OFFSET {}".format(localLimit, offset)
+            notice("createbdhk.py - mediasHKFilms - famille sagas - %s" %sql)
+            #On lit dans la DB
+            cnx = sqlite3.connect(BDREPONEW)
+            cur = cnx.cursor()
+            cur.execute(sql)
+            liste = [x[0] for x in cur.fetchall()]
+            cur.close()
+            cnx.close()
+            
+            #notice("createbdhk.py - mediasHKFilms - famille sagas - " + list2String(liste))
+            
+            a = time.time()
+            mDB = TMDB(KEYTMDB)
+            notice("createbdhk.py - mediasHKFilms - famille sagas - liste - %s" %len(liste))
+            
+            for i,idSaga in enumerate(liste):
+                threading.Thread(name="sagaThread", target=mDB.getSagaDetails, args=(idSaga,)).start()
+                time.sleep(0.01)
+             
+            testThread("sagaThread")
+            
+            #notice("createbdhk.py - mediasHKFilms - famille sagas - %s " %(time.time() - a))
+            #notice("createbdhk.py - mediasHKFilms - famille sagas - mDB.allSaga - %s" %len(mDB.allSaga))
+            #for i,oSaga in enumerate(mDB.allSaga):
+            #    notice("Saga : %s"%oSaga)
+            
+            xbmcplugin.setPluginCategory(HANDLE, "Saga")
+            try:
+                xbmcplugin.setContent(HANDLE, 'Saga')
+            except:
+                xbmcplugin.setContent(HANDLE, 'movies')
+            i = 0
+            for i, media in enumerate(mDB.allSaga):
+                ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":media.numId}, media=media)
+            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+            #xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS, labelMask="Page Suivante")
+            if i >= int(len(mDB.allSaga)) - 1 :
+                addDirNext(params)
+#
+            xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+            
+            params["offset"] = offset
+            #movies = extractMedias(sql=sql)
         #====================================================================================================================================================================================
         elif famille == "cast":
             mdb = TMDB(KEYTMDB)
@@ -723,6 +771,7 @@ def mediasHKFilms(params):
         sql = "SELECT DISTINCT famille FROM filmsRepos"
         liste = extractMedias(sql=sql, unique=1)
         choix += [(x.capitalize(), {"action":"mediasHKFilms", "famille":x, "offset": "0"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/%s.png' %x, x) for x in liste]
+        choix += [("Sagas", {"action":"mediasHKFilms", "famille": "sagas","offset":0,"limit":100}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/sagas.png', "Sagas")]
         choix += [("Liste Aléatoire", {"action":"mediasHKFilms", "famille": "Liste Aléatoire"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Liste Aléatoire.png', "Liste Aléatoire")]
         choix += [("Listes Trakt", {"action":"mediasHKFilms", "famille": "Listes Trakt"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/trakt.png', "Liste trakt de users")]
         choix += [("Listes Spécial Widget", {"action":"mediasHKFilms", "famille": "specialWid"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/films.png', "Liste Spécial Widget")]
@@ -1057,7 +1106,7 @@ def genresHK(params):
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': ADDON.getAddonInfo('icon'),
                   'fanart': ADDON.getAddonInfo('fanart')})
@@ -1272,7 +1321,7 @@ def menu():
     for ch in sorted(choix):
         name, parameters, picture, texte, maj = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1294,11 +1343,11 @@ def detailsmenuRepCrypte(params):
     elif typM == "divers":
         choix = [(u"[%s]" %x.capitalize(), {"action":"folderPub", "offset": "0", "typM": "divers", "repo": x}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Partage alternatif Divers rep publique crypté", 3) for x in listeReposDivers]
 
-    isFolder = True
+    isFolder = True 
     for ch in sorted(choix):
         name, parameters, picture, texte, maj = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1330,7 +1379,7 @@ def menuPastebin():
     for ch in sorted(choix):
         name, parameters, picture, texte, maj = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1379,7 +1428,7 @@ def menuRepCrypte():
     for ch in sorted(choix):
         name, parameters, picture, texte, maj = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -1424,10 +1473,7 @@ def affRepo(params):
 def addDirectory(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, "dbid": media.numId + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": media.duration * 60 })
-
+    updateInfoTagVideo(li,media,True,False,True,False,False)
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,
@@ -1467,8 +1513,7 @@ def affSaisonPastebin(params):
 def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     li = xbmcgui.ListItem(label=name)
     if media:
-        li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
-                "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu})
+        updateInfoTagVideo(li,media,False,False,True,False,False)
         li.setArt({'icon': media.backdrop,
                     "thumb": media.poster,
                     'poster':media.poster,
@@ -1554,11 +1599,7 @@ def affEpisodesPastebin(numId, saison, liste):
 def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=("%s" %(name)))
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, 'playcount': media.vu, "dbid": media.numId + 500000,
-        "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "episode": media.episode, "season": media.saison})
-    #vinfo = li.getVideoInfoTag()
-    #vinfo.setPlot(media.overview)
-
+    updateInfoTagVideo(li,media,False,True,False,False,True)
     li.setArt({'icon': media.backdrop,
               "fanart": media.backdrop,
               "poster": media.backdrop})
@@ -1569,8 +1610,7 @@ def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
 def addDirNext(params):
     isFolder = True
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    li.setInfo('video', {"title": "     ", 'plot': "", 'genre': "", "dbid": 500000,
-            "year": "", 'mediatype': "movies", "rating": 0.0})
+    updateEmptyInfoTag(li)
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
               'icon': ADDON.getAddonInfo('icon'),
@@ -1709,10 +1749,7 @@ def affMedias(typM, medias, params=""):
 def addDirectoryMedia(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, "dbid": media.numId + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": media.duration * 60 })
-
+    updateInfoTagVideo(li,media,True,False,True,False,False)
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,

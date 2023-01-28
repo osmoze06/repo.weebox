@@ -10,11 +10,12 @@ try:
 except: pass
 from urllib.parse import quote, unquote
 import ast
-from util import notice
+from util import notice,list2String
 import ast
 import threading
 import time
 import datetime
+import xbmcvfs
 
 keywords = {'80s action parody':269633,
 'action adventure':253675,
@@ -371,7 +372,8 @@ class Media:
           self.year = ""
           self.duration = ""
           self.popu = ""
-          self.backdrop += ""
+          if argvs[4]:
+            self.backdrop += argvs[4]
           if argvs[3]:
             self.poster += argvs[3]
           self.genre = ""
@@ -446,6 +448,11 @@ class Media:
       addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
       v = addon.getSetting("images_sizes")
       return dictSize[v]
+    
+    def __str__(self):
+      return f"Id : {self.numId} - title : {self.title}"
+    
+    
 
 class TMDB:
     def __init__(self, key):
@@ -455,6 +462,7 @@ class TMDB:
       self.tabMedia = []
       self.tabMediaFinal = []
       self.tabNumIdDiff = []
+      self.allSaga=[]
 
     def getGenre(self, typM="movie"):
       """movie or tv"""
@@ -508,10 +516,36 @@ class TMDB:
     def getSaga(self, numId):
       url1 = self.urlBase + "collection/{}?api_key={}&language={}".format(numId, self.key, self.lang)
       req = requests.get(url1)
+      notice("Medias.py - getSaga - Url - " + url1)
+     
       try:
         return [(x["release_date"], x["id"]) for x in req.json()['parts']]
       except:
         return []
+      
+    def getSagaDetails(self, numId):
+      url1 = self.urlBase + "collection/{}?api_key={}&language={}".format(numId, self.key, self.lang)
+      req = requests.get(url1)
+      #notice("Medias.py - getSagaDetails - numId - %s" %numId)
+      #notice("Medias.py - getSagaDetails - Url - " + url1)
+      #notice("Medias.py - getSagaDetails - json - %s"  %req.json())
+      
+      try:
+        m = Media("saga",req.json()["id"],req.json()["name"].replace(" - Saga", ""),req.json()["overview"],req.json()["poster_path"],req.json()["backdrop_path"])
+        self.allSaga.append(m)
+        return m
+      except:
+        #sql = "select * from filmsPub where saga = %s"%numId
+        #On lit dans la DB
+        #cnx = sqlite3.connect(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd'))
+        #cur = cnx.cursor()
+        #cur.execute(sql)
+        #liste = [x[1] for x in cur.fetchall()]
+        #cur.close()
+        #cnx.close()
+        #notice("Medias.py - getSagaDetails - Url (Unable to get url ) " + list2String(liste))
+        notice("Medias.py - getSagaDetails - Url (Unable to get url ) " + url1)
+        return None
 
     def getListeFilm(self, nom):
         self.tabIdListe = []

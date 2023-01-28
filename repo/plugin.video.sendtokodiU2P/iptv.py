@@ -900,7 +900,7 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
     ''' Add a list item to the XBMC UI.'''
     #notice(parameters)
     li = xbmcgui.ListItem(label=name)
-    li.setInfo('video', {"title": name, 'plot': "",'mediatype': 'video'})
+    updateMinimalInfoTagVideo(li,name,"")
     li.setArt({'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/iptv.png',
               'icon': ADDON.getAddonInfo('icon'),
               'fanart': ADDON.getAddonInfo('fanart')})
@@ -1031,8 +1031,7 @@ def affVod(params):
 def addDirNext(params):
     isFolder = True
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    li.setInfo('video', {"title": "     ", 'plot': "", 'genre': "", "dbid": 500000, 
-            "year": "", 'mediatype': "movies", "rating": 0.0})
+    updateEmptyInfoTag(li)
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
               'icon': ADDON.getAddonInfo('icon'),
@@ -1048,14 +1047,11 @@ def addDirectoryVod(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
     try:
         int(media.duration)
     except:
         media.duration = "0"
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": int(media.duration) * 60 })
-    
+    updateInfoTagVideo(li,media,True,False,True,False,False)
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,
@@ -1245,7 +1241,11 @@ def replay(params):
             li = xbmcgui.ListItem(label=replay[1])
             #('4437032_43982', 'Garde à vue', "Deux fillettes ont été violées", '01:26:00', '02:51:00')
             plot = "%s - %s\n%s" %(replay[3], replay[4], replay[2])
-            li.setInfo('video', {"title": replay[1], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
+            vinfo = updateMinimalInfoTagVideo(li,replay[1],plot)
+            if extractKodiVersion() >=20.0:
+                vinfo.setPlaycount(1)
+            else:
+                li.setInfo('video', {"playcount": 1})
             li.setProperty('IsPlayable', 'true')
             parameters={"action": "playMediaIptv", "replay": replay[0], "lien": replay[0], "iptv": replay[1], "fourn": fournisseur}  
             url = sys.argv[0] + '?' + urlencode(parameters)
@@ -1304,7 +1304,11 @@ def IPTVfav():
                     thumb = poster
                     break
         li = xbmcgui.ListItem(label=nom)
-        li.setInfo('video', {"title": nom, 'plot': plot, 'mediatype': 'video', 'playcount': 1})
+        vinfo = updateMinimalInfoTagVideo(li,nom,plot)
+        if extractKodiVersion() >=20.0:
+            vinfo.setPlaycount(1)
+        else:
+            li.setInfo('video', {"playcount": 1})
         thumb = thumb.replace(" ", "%20")
         poster = poster.replace(" ", "%20")
         li.setArt({
@@ -1390,7 +1394,11 @@ def affChaines(params):
                         break
             
             li = xbmcgui.ListItem(label=chaine[1])
-            li.setInfo('video', {"title": chaine[1], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
+            vinfo = updateMinimalInfoTagVideo(li,chaine[1],plot)
+            if extractKodiVersion() >=20.0:
+                vinfo.setPlaycount(1)
+            else:
+                li.setInfo('video', {"playcount": 1})
             poster = chaine[3].replace(" ", "%20")
             li.setArt({
                   'poster': poster,

@@ -919,8 +919,7 @@ def detailFilmPoiss(params):
 def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     li = xbmcgui.ListItem(label=name)
     if media:
-        li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
-                "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu})
+        updateInfoTagVideo(li,media,False,False,False,False,False)
         li.setArt({'icon': media.backdrop,
                     "thumb": media.poster,
                     'poster':media.poster,
@@ -931,7 +930,7 @@ def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
             commands.append(('[COLOR yellow]Gestion Vus/Non-Vus[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=vuNonVu&saison=%d&u2p=%s&refresh=1&newhk=1)' %(media.saison, media.numId)))
             li.addContextMenuItems(commands, replaceItems=False)
     if not isFolder:
-        li.setInfo('video', {"title": name})
+        updateMinimalInfoTagVideo(li,name,"")
         li.setProperty('IsPlayable', 'true')
 
     url = sys.argv[0] + '?' + urlencode(parameters)
@@ -1173,7 +1172,7 @@ def affEpisodesUptoPoissRelease(numId, saison, liste):
     for ch in sorted(choix):
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
-        li.setInfo('video', {"title": name, 'plot': texte,'mediatype': 'video'})
+        updateMinimalInfoTagVideo(li,name,texte)
         li.setArt({'thumb': picture,
                   'icon': ADDON.getAddonInfo('icon'),
                   'icon': ADDON.getAddonInfo('icon'),
@@ -1358,9 +1357,8 @@ def affUptoboxNewsSerie(typM, medias, params=""):
 def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=("%s" %(name)))
-    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre, 'playcount': media.vu, "dbid": media.numId + 500000,
-        "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "episode": media.episode, "season": media.saison})
-
+    
+    updateInfoTagVideo(li,media,False,True,False,False,True)
     li.setArt({'icon': media.backdrop,
               "fanart": media.backdrop})
     li.setProperty('IsPlayable', 'true')
@@ -1370,9 +1368,23 @@ def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
 def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
-    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-    li.setInfo('video', {"title": media.title.replace("00_", ""), 'plot': media.overview, 'genre': media.genre, "dbid": int(media.numId) + 500000,
-            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": media.duration * 60 })
+    updateInfoTagVideo(li,media,True,False,True,True)
+    # Todo Later : a vérifier si ca marche, pour le moment je n'arrive pas a tester
+    #Ensuite à factoriser
+    #if media.poster[-4:] == ".jpg":
+    #    vinfo.addAvailableArtwork(media.poster,"thumb")
+    #    vinfo.addAvailableArtwork(media.poster,"poster")
+    #else:
+    #    vinfo.addAvailableArtwork(media.backdrop,"thumb")
+    #    vinfo.addAvailableArtwork(media.backdrop,"poster")
+    #    
+    #vinfo.addAvailableArtwork(media.backdrop,"fanart")
+    #vinfo.addAvailableArtwork(media.backdrop,"icon")
+    #if media.clearlogo :
+    #    vinfo.addAvailableArtwork(media.clearlogo,"clearlogo")
+    #if media.clearart :
+    #    vinfo.addAvailableArtwork(media.clearart,"clearart")
+        
     if media.poster[-4:] == ".jpg":
         li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
@@ -1387,11 +1399,6 @@ def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
         li.setArt({'clearlogo': media.clearlogo})
     if media.clearart :
         li.setArt({'clearart': media.clearart})
-    try:
-        if media.vu:
-            li.setInfo('video', {'playcount': media.vu})
-    except:
-        pass
     commands = []
     if parameters["action"] == "playHK" and "poiss" in parameters.keys():
         commands.append(('[COLOR yellow]Add Compte Uptobox[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=addcompte&lien=%s)' %(media.link)))
@@ -1461,8 +1468,7 @@ def playMediabaext(params):
 def addDirNext(params):
     isFolder = True
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    li.setInfo('video', {"title": "     ", 'plot': "", 'genre': "", "dbid": 500000,
-            "year": "", 'mediatype': "movies", "rating": 0.0})
+    updateEmptyInfoTag(li)
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
               'icon': ADDON.getAddonInfo('icon'),
