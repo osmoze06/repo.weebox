@@ -483,54 +483,20 @@ def mediasHKFilms(params):
         #====================================================================================================================================================================================
         elif famille == "sagas":
             localLimit = 100
-            sql = "select DISTINCT saga from filmsPub as m where saga != 0 "+ orderDefault + " LIMIT {} OFFSET {}".format(localLimit, offset)
-            notice("createbdhk.py - mediasHKFilms - famille sagas - %s" %sql)
-            #On lit dans la DB
-            cnx = sqlite3.connect(BDREPONEW)
-            cur = cnx.cursor()
-            cur.execute(sql)
-            liste = [x[0] for x in cur.fetchall()]
-            cur.close()
-            cnx.close()
-            
-            #notice("createbdhk.py - mediasHKFilms - famille sagas - " + list2String(liste))
-            
+            sql = "select DISTINCT saga from filmsPub as m where saga != 0 "+ orderDefault + " LIMIT {} OFFSET {}".format(LIMITSCRAP, offset)
+            listes = extractMedias(sql=sql, unique=1)
+                       
             a = time.time()
             mDB = TMDB(KEYTMDB)
-            notice("createbdhk.py - mediasHKFilms - famille sagas - liste - %s" %len(liste))
-            
-            for i,idSaga in enumerate(liste):
+            for i,idSaga in enumerate(listes):
                 threading.Thread(name="sagaThread", target=mDB.getSagaDetails, args=(idSaga,)).start()
                 time.sleep(0.01)
-             
             testThread("sagaThread")
-            
-            #notice("createbdhk.py - mediasHKFilms - famille sagas - %s " %(time.time() - a))
-            #notice("createbdhk.py - mediasHKFilms - famille sagas - mDB.allSaga - %s" %len(mDB.allSaga))
-            #for i,oSaga in enumerate(mDB.allSaga):
-            #    notice("Saga : %s"%oSaga)
-            
-            xbmcplugin.setPluginCategory(HANDLE, "Saga")
-            try:
-                xbmcplugin.setContent(HANDLE, 'Saga')
-            except:
-                xbmcplugin.setContent(HANDLE, 'movies')
-            i = 0
-            for i, media in enumerate(mDB.allSaga):
-                ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":media.numId}, media=media)
-            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
-            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
-            xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
-            #xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS, labelMask="Page Suivante")
-            if i >= int(len(mDB.allSaga)) - 1 :
-                addDirNext(params)
-#
-            xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
-            
+           
             params["offset"] = offset
-            #movies = extractMedias(sql=sql)
-        #====================================================================================================================================================================================
+            
+            affMedias("saga",mDB.allSaga,params)
+       #====================================================================================================================================================================================
         elif famille == "cast":
             mdb = TMDB(KEYTMDB)
             liste = mdb.person(params["u2p"])
@@ -771,7 +737,7 @@ def mediasHKFilms(params):
         sql = "SELECT DISTINCT famille FROM filmsRepos"
         liste = extractMedias(sql=sql, unique=1)
         choix += [(x.capitalize(), {"action":"mediasHKFilms", "famille":x, "offset": "0"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/%s.png' %x, x) for x in liste]
-        choix += [("Sagas", {"action":"mediasHKFilms", "famille": "sagas","offset":0,"limit":100}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/sagas.png', "Sagas")]
+        choix += [("Sagas", {"action":"mediasHKFilms", "famille": "sagas","offset":0,"limit":LIMITSCRAP}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/sagas.png', "Sagas")]
         choix += [("Liste Aléatoire", {"action":"mediasHKFilms", "famille": "Liste Aléatoire"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Liste Aléatoire.png', "Liste Aléatoire")]
         choix += [("Listes Trakt", {"action":"mediasHKFilms", "famille": "Listes Trakt"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/trakt.png', "Liste trakt de users")]
         choix += [("Listes Spécial Widget", {"action":"mediasHKFilms", "famille": "specialWid"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/films.png', "Liste Spécial Widget")]
@@ -1722,26 +1688,35 @@ def affMedias(typM, medias, params=""):
     i = 0
     for i, media in enumerate(medias):
         try:
-            media = Media(typM, *media[:-1])
+            if type(media) != Media: #si c'est une saga le media est deja un Media (class)
+                media = Media(typM, *media[:-1])
         except:
             media = Media(typM, *media)
+            
         if typM == "movie":
             ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailM", "lien": media.link, "u2p": media.numId}, media=media)
         else:
-            if "suite" in params.keys():
-                #media.title = media.title + ", on continue..."
-                ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "suiteSerieHK", "u2p": media.numId}, media=media)
+            if(typM == "saga"):
+                ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":media.numId}, media=media)
             else:
-                if " (HK)" in media.title:
-                    ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailT", "lien": media.link, "u2p": media.numId}, media=media)
+                if "suite" in params.keys():
+                    #media.title = media.title + ", on continue..."
+                    ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "suiteSerieHK", "u2p": media.numId}, media=media)
                 else:
-                    ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "affSaisonUptofoldercrypt", "u2p": media.numId}, media=media)
+                    if " (HK)" in media.title:
+                        ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailT", "lien": media.link, "u2p": media.numId}, media=media)
+                    else:
+                        ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "affSaisonUptofoldercrypt", "u2p": media.numId}, media=media)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
     #xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS, labelMask="Page Suivante")
-    if i >= int(LIMIT) - 1:
+    lLimit = LIMIT
+    if typM == "saga":
+        lLimit = int(len(medias))
+        
+    if i >= int(lLimit) - 1:
         addDirNext(params)
 
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
