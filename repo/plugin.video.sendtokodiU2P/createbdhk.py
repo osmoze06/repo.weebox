@@ -482,21 +482,22 @@ def mediasHKFilms(params):
                 return
         #====================================================================================================================================================================================
         elif famille == "sagas":
-            localLimit = 100
             sql = "select DISTINCT saga from filmsPub as m where saga != 0 "+ orderDefault + " LIMIT {} OFFSET {}".format(LIMITSCRAP, offset)
-            listes = extractMedias(sql=sql, unique=1)
-                       
+            notice("createbdhk.py - mediasHKFilms - famille sagas - %s" %sql)
+            liste = extractMedias(sql=sql, unique=1)
             a = time.time()
             mDB = TMDB(KEYTMDB)
-            for i,idSaga in enumerate(listes):
+            notice("createbdhk.py - mediasHKFilms - famille sagas - liste - %s" %len(liste))
+
+            for i,idSaga in enumerate(liste):
                 threading.Thread(name="sagaThread", target=mDB.getSagaDetails, args=(idSaga,)).start()
                 time.sleep(0.01)
+
             testThread("sagaThread")
-           
+
             params["offset"] = offset
-            
-            affMedias("saga",mDB.allSaga,params)
-       #====================================================================================================================================================================================
+            affMedias("saga", mDB.allSaga, params)
+        #====================================================================================================================================================================================
         elif famille == "cast":
             mdb = TMDB(KEYTMDB)
             liste = mdb.person(params["u2p"])
@@ -737,7 +738,7 @@ def mediasHKFilms(params):
         sql = "SELECT DISTINCT famille FROM filmsRepos"
         liste = extractMedias(sql=sql, unique=1)
         choix += [(x.capitalize(), {"action":"mediasHKFilms", "famille":x, "offset": "0"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/%s.png' %x, x) for x in liste]
-        choix += [("Sagas", {"action":"mediasHKFilms", "famille": "sagas","offset":0,"limit":LIMITSCRAP}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/sagas.png', "Sagas")]
+        choix += [("Sagas", {"action":"mediasHKFilms", "famille": "sagas","offset":0,"limit":100}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/sagas.png', "Sagas")]
         choix += [("Liste Aléatoire", {"action":"mediasHKFilms", "famille": "Liste Aléatoire"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Liste Aléatoire.png', "Liste Aléatoire")]
         choix += [("Listes Trakt", {"action":"mediasHKFilms", "famille": "Listes Trakt"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/trakt.png', "Liste trakt de users")]
         choix += [("Listes Spécial Widget", {"action":"mediasHKFilms", "famille": "specialWid"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/films.png', "Liste Spécial Widget")]
@@ -1260,8 +1261,10 @@ def extractMedias(bd=BDREPONEW, limit=0, offset=1, sql="", unique=0):
             else:
                 cur.execute("SELECT title, overview, year, poster, link, numId FROM movie ORDER BY title COLLATE NOCASE ASC")
             requete = cur.fetchall()
-    except:
-        notice("Pb extract :" +str(sql))
+    except Exception as e:
+        notice(str(e))
+        notice(bd)
+        notice("Pb extract :" + str(sql))
     cur.close()
     cnx.close()
     return requete
@@ -1309,7 +1312,7 @@ def detailsmenuRepCrypte(params):
     elif typM == "divers":
         choix = [(u"[%s]" %x.capitalize(), {"action":"folderPub", "offset": "0", "typM": "divers", "repo": x}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Partage alternatif Divers rep publique crypté", 3) for x in listeReposDivers]
 
-    isFolder = True 
+    isFolder = True
     for ch in sorted(choix):
         name, parameters, picture, texte, maj = ch
         li = xbmcgui.ListItem(label=name)
@@ -1565,7 +1568,7 @@ def affEpisodesPastebin(numId, saison, liste):
 def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=("%s" %(name)))
-    updateInfoTagVideo(li,media,False,True,False,False,True)
+    updateInfoTagVideo(li, media, False, True, False, False, True)
     li.setArt({'icon': media.backdrop,
               "fanart": media.backdrop,
               "poster": media.backdrop})
@@ -1692,7 +1695,7 @@ def affMedias(typM, medias, params=""):
                 media = Media(typM, *media[:-1])
         except:
             media = Media(typM, *media)
-            
+
         if typM == "movie":
             ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailM", "lien": media.link, "u2p": media.numId}, media=media)
         else:
@@ -1715,7 +1718,7 @@ def affMedias(typM, medias, params=""):
     lLimit = LIMIT
     if typM == "saga":
         lLimit = int(len(medias))
-        
+
     if i >= int(lLimit) - 1:
         addDirNext(params)
 

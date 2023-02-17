@@ -140,38 +140,6 @@ def initBookmark():
     cur.close()
     cnx.close()
 
-def majHkbann():
-    #init addon
-    addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
-    #intervalle
-    addon.setSetting(id="intmaj", value="0|5|15|30|45|60|120|240")
-    addon.setSetting(id="delaimaj", value="0")
-    #recup valeur intmaj
-    intmaj = addon.getSetting("intmaj")
-    #recup delaimaj
-    delaimaj = addon.getSetting("delaimaj")
-    # si vide
-    if not intmaj:
-        dialog = xbmcgui.Dialog()
-        d = dialog.input("Intervalle Maj: ", type=xbmcgui.INPUT_ALPHANUM)
-        if d:
-            intmaj = d
-            addon.setSetting(id="intmaj", value=d.strip())
-        else:
-            return
-    # si delaimaj vide
-    if not delaimaj:
-        dialog = xbmcgui.Dialog()
-        d = dialog.input("Delai Maj: ", type=xbmcgui.INPUT_ALPHANUM)
-        if d:
-            delaimaj = d
-            addon.setSetting(id="delaimaj", value=d.strip())
-        else:
-            return
-    notice(intmaj)
-    notice(delaimaj)
-    showInfoNotification(intmaj + " " + delaimaj)
-    
 def createRepUpto(*argv):
   cnx = sqlite3.connect(BDBOOKMARK)
   cur = cnx.cursor()

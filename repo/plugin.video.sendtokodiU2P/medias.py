@@ -448,11 +448,11 @@ class Media:
       addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
       v = addon.getSetting("images_sizes")
       return dictSize[v]
-    
+
     def __str__(self):
       return f"Id : {self.numId} - title : {self.title}"
-    
-    
+
+
 
 class TMDB:
     def __init__(self, key):
@@ -462,7 +462,7 @@ class TMDB:
       self.tabMedia = []
       self.tabMediaFinal = []
       self.tabNumIdDiff = []
-      self.allSaga=[]
+      self.allSaga = []
 
     def getGenre(self, typM="movie"):
       """movie or tv"""
@@ -517,19 +517,19 @@ class TMDB:
       url1 = self.urlBase + "collection/{}?api_key={}&language={}".format(numId, self.key, self.lang)
       req = requests.get(url1)
       notice("Medias.py - getSaga - Url - " + url1)
-     
+
       try:
         return [(x["release_date"], x["id"]) for x in req.json()['parts']]
       except:
         return []
-      
+
     def getSagaDetails(self, numId):
       url1 = self.urlBase + "collection/{}?api_key={}&language={}".format(numId, self.key, self.lang)
       req = requests.get(url1)
       #notice("Medias.py - getSagaDetails - numId - %s" %numId)
       #notice("Medias.py - getSagaDetails - Url - " + url1)
       #notice("Medias.py - getSagaDetails - json - %s"  %req.json())
-      
+
       try:
         m = Media("saga",req.json()["id"],req.json()["name"].replace(" - Saga", ""),req.json()["overview"],req.json()["poster_path"],req.json()["backdrop_path"])
         self.allSaga.append(m)

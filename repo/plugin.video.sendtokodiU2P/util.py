@@ -69,7 +69,8 @@ def getBdAnotepad(repo):
         r = re.match(motifAnotepad, rec.text, re.MULTILINE|re.DOTALL)
         tx = r.group("txAnote")
         tx = html_parser.unescape(tx)
-    except:
+    except Exception as e:
+        notice(str(e))
         showInfoNotification("pb anotepad pour changer !!!")
         tx = ""
     return tx
@@ -117,19 +118,19 @@ def getBdTextup(repo):
 
 def extractKodiVersion():
     #notice(xbmc.getInfoLabel('System.BuildVersion'))
-    versionFloat = re.findall('(\d{2}[.]\d{1,2})', xbmc.getInfoLabel('System.BuildVersion'))
+    versionFloat = re.findall(r'(\d{2}[.]\d{1,2})', xbmc.getInfoLabel('System.BuildVersion'))
     return float(versionFloat[0])
 
-def updateMinimalInfoTagVideo(li,title, plot=None,episode=None,season=None):
-    if extractKodiVersion() >=20.0:
+def updateMinimalInfoTagVideo(li, title, plot=None, episode=None, season=None):
+    if extractKodiVersion() >= 20.0:
         vinfo = li.getVideoInfoTag()
         vinfo.setMediaType("video")
-        
+
         try:
             vinfo.setTitle(title)
         except Exception as e:
             notice("Util.py - updateMinimalInfoTagVideo::title " + str(e))
-        
+
         if plot!= None:
             try:
                 vinfo.setPlot(plot)
@@ -141,24 +142,24 @@ def updateMinimalInfoTagVideo(li,title, plot=None,episode=None,season=None):
                 vinfo.setEpisode(int(episode))
             except Exception as e:
                 notice("Util.py - updateMinimalInfoTagVideo::episode " + str(e))
-                
+
         if season!= None:
             try:
-                vinfo.setSeason(int(season)) 
+                vinfo.setSeason(int(season))
             except Exception as e:
                 notice("Util.py - updateMinimalInfoTagVideo::season " + str(e))
-           
+
         return vinfo
     else:
         if plot!= None:
             li.setInfo('video', {"title": title, 'plot': plot, 'mediatype': 'video'})
         else:
             li.setInfo('video', {"title": title, 'mediatype': 'video'})
-        if season!= None:    
+        if season!= None:
             li.setInfo('video', {"episode": episode})
         if episode!= None:
             li.setInfo('video', {"season": season})
-            
+
 
 def updateEmptyInfoTag(li):
     if extractKodiVersion() >=20.0:
@@ -192,17 +193,17 @@ def testThread(name):
             break
     return True
 
-def updateInfoTagVideo(li, media,setUniqueId= False, isSerie= False,hasDuration= False,replaceTitle= False,hasPlaycount = False):
-    
-    if extractKodiVersion() >=20.0:
+def updateInfoTagVideo(li, media, setUniqueId= False, isSerie=False, hasDuration=False, replaceTitle=False, hasPlaycount=False):
+
+    if extractKodiVersion() >= 20.0:
         vinfo = li.getVideoInfoTag()
-        
+
         try:
             if setUniqueId:
                 vinfo.setUniqueIDs({ "tmdb" : str(media.numId) }, "tmdb")
         except Exception as e:
             notice("Util.py - updateInfoTagVideo::setUniqueIDs " + str(e))
-        
+
         try:
             if replaceTitle:
                 vinfo.setTitle(media.title.replace("00_", ""))
@@ -210,12 +211,12 @@ def updateInfoTagVideo(li, media,setUniqueId= False, isSerie= False,hasDuration=
                 vinfo.setTitle(media.title)
         except Exception as e:
             notice("Util.py - updateInfoTagVideo::setTitle " + str(e))
-        
+
         try:
             vinfo.setPlot(media.overview)
         except Exception as e:
             notice("Util.py - updateInfoTagVideo::setPlot " + str(e))
-        
+
         try:
             if type(media.genre) == list:
                 vinfo.setGenres(media.genre)
@@ -223,45 +224,45 @@ def updateInfoTagVideo(li, media,setUniqueId= False, isSerie= False,hasDuration=
                 vinfo.setGenres([media.genre])
         except Exception as e:
             notice("Util.py - updateInfoTagVideo::setGenres " + str(e))
-        
+
         try:
-            if hasPlaycount and media.vu != "":
+            if hasPlaycount:
                 vinfo.setPlaycount(int(media.vu))
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setPlaycount " + str(e))  
-        
+            notice("Util.py - updateInfoTagVideo::setPlaycount " + str(e))
+
         try:
             vinfo.setDbId(int(media.numId) + 500000)
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setDbId " + str(e))  
-        
+            notice("Util.py - updateInfoTagVideo::setDbId " + str(e))
+
         try:
             if media.year != "":
-                vinfo.setYear(int(media.year[: 4]))        
+                vinfo.setYear(int(media.year[: 4]))
         except Exception as e:
             vinfo.setYear(0)
-            notice("Util.py - updateInfoTagVideo::setYear " + str(e))       
-        
+            notice("Util.py - updateInfoTagVideo::setYear " + str(e))
+
         try:
-            vinfo.setMediaType(media.typeMedia)      
+            vinfo.setMediaType(media.typeMedia)
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setMediaType " + str(e))  
-        
+            notice("Util.py - updateInfoTagVideo::setMediaType " + str(e))
+
         try:
             if media.popu != "":
-                vinfo.setRating(float(media.popu))      
+                vinfo.setRating(float(media.popu))
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setRating " + str(e)) 
-        
+            notice("Util.py - updateInfoTagVideo::setRating " + str(e))
+
         try:
             if isSerie:
                 vinfo.setEpisode(int(media.episode))
-                vinfo.setSeason(int(media.saison))      
+                vinfo.setSeason(int(media.saison))
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setEpisode/setSeason " + str(e)) 
-            
-        
-        try:    
+            notice("Util.py - updateInfoTagVideo::setEpisode/setSeason " + str(e))
+
+
+        try:
             if hasDuration :
                 if type(media.duration) == int:
                     vinfo.setDuration(media.duration * 60)
@@ -269,40 +270,40 @@ def updateInfoTagVideo(li, media,setUniqueId= False, isSerie= False,hasDuration=
                     if media.duration != "":
                         vinfo.setDuration(int(media.duration) * 60)
         except Exception as e:
-            notice("Util.py - updateInfoTagVideo::setDuration " + str(e)) 
-                
+            notice("Util.py - updateInfoTagVideo::setDuration " + str(e))
+
         return vinfo
     else:
-        
+
         if setUniqueId:
             li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-            
+
         if replaceTitle:
             li.setInfo('video', {"title": media.title.replace("00_", "")})
         else:
             li.setInfo('video', {"title": media.title})
-            
+
         li.setInfo('video', {"plot": media.overview})
-        
+
         if hasPlaycount:
             try:
                 if media.vu:
                     li.setInfo('video', {'playcount': media.vu})
             except:
                 pass
-        
+
         li.setInfo('video', {"genre": media.genre})
         li.setInfo('video', {"dbid": int(media.numId) + 500000})
         li.setInfo('video', {"year": media.year})
         li.setInfo('video', {"mediatype": media.typeMedia})
         li.setInfo('video', {"rating": media.popu})
-        
+
         if isSerie:
             li.setInfo('video', {"episode": media.episode})
             li.setInfo('video', {"season": media.saison})
-            
+
         if hasDuration :
             li.setInfo('video', {"duration": media.duration * 60})
-        
-            
-    
+        return li
+
+

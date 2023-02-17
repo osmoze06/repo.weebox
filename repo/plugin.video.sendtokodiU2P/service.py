@@ -77,7 +77,7 @@ else:
     notice(pyVersion)
     notice(pyVersionM)
 
-    
+
 from pastebin import Pastebin
 from apiTraktHK import TraktHK
 import createbdhk
@@ -1024,7 +1024,7 @@ def getParams(paramstring, u2p=0, saisonIn=1):
                     raise StopIteration
     except StopIteration: pass
     # ========================================================================================================================================
-    
+
     selected = 0
     if len(paramstring) == 1:
         result['url'] = paramstring[0].split("#")[0]
@@ -2551,7 +2551,7 @@ def addDirNext(params):
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     #notice("id addon " + str(addon.getAddonInfo("id")))
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    
+
     updateEmptyInfoTag(li)
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
@@ -3379,7 +3379,7 @@ def playMedia(params):
     #notice("fin listem")
 
     result = getParams(params['lien'])
-  
+
     if result and "url" in result.keys():
         url = str(result['url'])
         showInfoNotification("playing title " + result['title'])
@@ -4958,7 +4958,7 @@ if __name__ == '__main__':
     for bdKodi in bdKodis:
         if os.path.isfile(xbmcvfs.translatePath("special://home/userdata/Database/%s" %bdKodi)):
             __database__ = xbmcvfs.translatePath("special://home/userdata/Database/%s" %bdKodi)
-            break
+            #break
 
     #Deprecated xbmc.translatePath. Moved to xbmcvfs.translatePath
     __repAddon__ = xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/")

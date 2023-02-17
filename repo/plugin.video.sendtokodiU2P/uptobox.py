@@ -70,7 +70,7 @@ class RenameMedia:
             return [nameFinal, year]
 
         else:
-            for m in ["_", " ", "[", "]", "-", "(", ")", "{", "}"]:
+            for m in ["_", " ", "[", "]", "-", "(", ")", "{", "}", ",", ";"]:
                 name = name.replace(m, ".")
             tab_remp = [r'''-|_|iNTERNAL|MULTi|2160p|4k|1080p|720p|480p|WEB-DL|hdlight|WEB|AC3|aac|hdtv|hevc|\d\dbit|subs?\.|vos?t?|x\.?265|STEGNER|x\.?264|FRENCH|DD\+.5.1|DD\+| |SR\.?71|h264|h265|1920x1080''', '.']
             name = re.sub(tab_remp[0], tab_remp[1], name, flags=re.I)
@@ -740,6 +740,7 @@ def getEpisodesSaison(numId):
         liste = []
         renam = RenameMedia()
         for nom, filecode in tabExtract:
+            #notice(nom)
             n = renam.extractInfo(nom, typM="tvshow")
             try:
                 tabFiles.append(("Saison %s" %n[1], int(n[2].split("E")[1]), filecode))
@@ -1357,7 +1358,7 @@ def affUptoboxNewsSerie(typM, medias, params=""):
 def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=("%s" %(name)))
-    
+
     updateInfoTagVideo(li,media,False,True,False,False,True)
     li.setArt({'icon': media.backdrop,
               "fanart": media.backdrop})
@@ -1368,7 +1369,16 @@ def addDirectoryEpisodes(name, isFolder=True, parameters={}, media="" ):
 def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
-    updateInfoTagVideo(li,media,True,False,True,True)
+    #li, media, setUniqueId= False, isSerie=False, hasDuration=False, replaceTitle=False, hasPlaycount=False
+    if "episode" in parameters.keys():
+        vinfo = updateInfoTagVideo(li, media, True, True, True, False, True)
+    else:
+        vinfo = updateInfoTagVideo(li, media, True, False, True, False, False)
+
+    #try:
+    #    vinfo.setPlaycount(int(media.vu))
+    #except: pass
+
     # Todo Later : a vérifier si ca marche, pour le moment je n'arrive pas a tester
     #Ensuite à factoriser
     #if media.poster[-4:] == ".jpg":
@@ -1377,14 +1387,14 @@ def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
     #else:
     #    vinfo.addAvailableArtwork(media.backdrop,"thumb")
     #    vinfo.addAvailableArtwork(media.backdrop,"poster")
-    #    
+    #
     #vinfo.addAvailableArtwork(media.backdrop,"fanart")
     #vinfo.addAvailableArtwork(media.backdrop,"icon")
     #if media.clearlogo :
     #    vinfo.addAvailableArtwork(media.clearlogo,"clearlogo")
     #if media.clearart :
     #    vinfo.addAvailableArtwork(media.clearart,"clearart")
-        
+
     if media.poster[-4:] == ".jpg":
         li.setArt({'icon': media.backdrop,
             'thumb': media.poster,

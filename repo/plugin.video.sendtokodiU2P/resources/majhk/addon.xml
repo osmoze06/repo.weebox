@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.majhk" name="U2P Maj HK²" version="1.2.0" provider-name="CoKodiCo/noway">
-    <requires>
+<addon id="service.majhk"
+       name="maj hk"
+       version="0.2"
+       provider-name="">
+  <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.requests" version="2.12.4"/>
   </requires>
   <extension point="xbmc.service" library="service.py" />
   <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">U2P Maj Rapide HK²</summary>
-        <description lang="en_GB">Maj Rapide db HK² Automatique au lancement Kodi avec reglage delai, puis par intervalle</description>
-        <language></language>
-        <platform>all</platform>
-        <license>Apache-2.0</license>
-        <forum></forum>
-        <website>discord U2Pplay</website>
-        <email></email>
-        <source></source>
-        <news></news>
-        <disclaimer>[COLOR yellow]En cas de bugs, propositions d'améliorations ou ajout de contenus, contactez-nous sur Discord U2Pplay.[/COLOR]</disclaimer>
-        <assets>
-            <icon>resources/icon.png</icon>
-            <fanart>resources/fanart.jpg</fanart>
-            <screenshot>screenshot-01.jpg</screenshot>
-            <screenshot>screenshot-02.jpg</screenshot>
-        </assets>
-    </extension>
+    <platform>all</platform>
+    <summary lang="en"></summary>
+  </extension>
 </addon>
