@@ -193,6 +193,60 @@ def testThread(name):
             break
     return True
 
+def updateInfoTagVideo2(li, media):
+
+    #correction
+    try:
+        media.year = int(str(media.year)[:4])
+    except:
+        media.year = 0
+    try:
+        if media.duration:
+            media.duration = int(media.duration) * 60
+        else:
+            media.duration = 1
+    except:
+        media.duration = 1
+    media.title = media.title.replace("00_", "")
+    tabMedia = [x for x in dir(media) if x in ["title", "overview", "year", "genre", "popu", "duration", "numId", "episode", "saison", "vu", "typeMedia"]]
+    notice(tabMedia)
+
+    if extractKodiVersion() >= 20.0:
+        #kodi 20
+        vinfo = li.getVideoInfoTag()
+        dictSetInfos = {"title": (vinfo.setTitle, str), "overview": (vinfo.setPlot, str), "year": (vinfo.setYear, int),\
+            "genre": (vinfo.setGenres, list), "popu": (vinfo.setRating, float), "duration": (vinfo.setDuration, int),\
+            "numId": (vinfo.setUniqueIDs, dict), "episode": (vinfo.setEpisode, int), "saison": (vinfo.setSeason, int),\
+            "vu": (vinfo.setPlaycount, int), "typeMedia": (vinfo.setMediaType, str)}
+        for a in tabMedia:
+            info = getattr(media, a)
+            if info:
+                if a == "numId":
+                    dictSetInfos[a][0]({"tmdb": str(info)}, "tmdb")
+                    vinfo.setDbId(int(info) + 500000)
+                elif a == "genre":
+                    vinfo.setGenres(info.split(","))
+                else:
+                    dictSetInfos[a][0](dictSetInfos[a][1](info))
+
+    else:
+        #kodi 19
+        li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
+        li.setInfo('video', {"title": media.title})
+        li.setInfo('video', {"plot": media.overview})
+        li.setInfo('video', {"genre": media.genre})
+        li.setInfo('video', {"dbid": int(media.numId) + 500000})
+        li.setInfo('video', {"year": media.year})
+        li.setInfo('video', {"rating": media.popu})
+        li.setInfo('video', {"duration": media.duration * 60})
+        if "typeMedia" in tabMedia:
+            li.setInfo('video', {"mediatype": media.typeMedia})
+        if "episode" in tabMedia and media.episode:
+            li.setInfo('video', {'playcount': media.vu})
+            li.setInfo('video', {"episode": media.episode})
+            li.setInfo('video', {"season": media.saison})
+
+
 def updateInfoTagVideo(li, media, setUniqueId= False, isSerie=False, hasDuration=False, replaceTitle=False, hasPlaycount=False):
 
     if extractKodiVersion() >= 20.0:

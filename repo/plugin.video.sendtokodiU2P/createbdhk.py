@@ -1727,7 +1727,8 @@ def affMedias(typM, medias, params=""):
 def addDirectoryMedia(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
-    updateInfoTagVideo(li,media,True,False,True,False,False)
+    #updateInfoTagVideo(li,media,True,False,True,False,False)
+    updateInfoTagVideo2(li, media)
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,

@@ -75,7 +75,7 @@
         <setting label="Maj HK² & HK" type="lsep" />
         <!-- <setting id="majhk2" label="Activer la Maj au restart" type="bool" default="false" /> -->
         <!-- <setting label="Mise en place de la Maj au restart KODI" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart)"/>-->
-        <setting id="intmaj" label="Interval (mins) Service de MAJ (0=desactivé)" type="labelenum" values="0|15|30|45|60" default="0"/>
+        <setting id="intmaj" label="Interval (mins) Service de MAJ (0=desactivé)" type="labelenum" values="0|15|30|45|60|120|180|240" default="0"/>
         <setting label="Mise en place service de Maj" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart2)"/>
         <setting id="delaimaj" label="Delai 1er MAJ (mins)" type="number" default="0"/>
         <setting id="rskin" label="Refresh skin aprés MAJ" type="bool" default="false" />

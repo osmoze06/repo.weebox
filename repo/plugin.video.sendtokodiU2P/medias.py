@@ -349,7 +349,6 @@ class Media:
           self.numId = argvs[6]
           self.link = ""
 
-
         elif self.typeMedia == "tvshow":
           self.year = argvs[2]
           try:

@@ -8,26 +8,30 @@ import sys
 import unicodedata
 import threading
 import json
-from medias import Media, TMDB
-import sqlite3
-from util import *
-import widget
-from apiTraktHK import TraktHK
-pyVersion = sys.version_info.major
-pyVersionM = sys.version_info.minor
-if pyVersionM == 11:
-    import cryptPaste11 as cryptage
-    import scraperUPTO11 as scraperUPTO
-elif pyVersionM == 8:
-    #import pasteCrypt3 as cryptage
-    import cryptPaste8 as cryptage
-    import scraperUPTO8 as scraperUPTO
-elif pyVersionM == 9:
-    import cryptPaste9 as cryptage
-    import scraperUPTO9 as scraperUPTO
-else:
-    import cryptPaste10 as cryptage
-    import scraperUPTO10 as scraperUPTO
+try:
+    from medias import Media, TMDB
+    import sqlite3
+    from util import *
+    import widget
+    from apiTraktHK import TraktHK
+
+    pyVersion = sys.version_info.major
+    pyVersionM = sys.version_info.minor
+    if pyVersionM == 11:
+        import cryptPaste11 as cryptage
+        import scraperUPTO11 as scraperUPTO
+    elif pyVersionM == 8:
+        #import pasteCrypt3 as cryptage
+        import cryptPaste8 as cryptage
+        import scraperUPTO8 as scraperUPTO
+    elif pyVersionM == 9:
+        import cryptPaste9 as cryptage
+        import scraperUPTO9 as scraperUPTO
+    else:
+        import cryptPaste10 as cryptage
+        import scraperUPTO10 as scraperUPTO
+except: pass
+
 import ast
 
 try:
@@ -221,7 +225,10 @@ class Uptobox:
         url = self.baseurl + "/api/user/public?folder={}&hash={}&limit={}&offset={}".format(folder, hash, limit, offset)
         data = self.getDataJson(url)
         if data['data']["list"]:
-            [tabMedia.append((d['file_created'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
+            if 'file_created' in data['data']["list"][0].keys():
+                [tabMedia.append((d['file_created'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
+            else:
+                [tabMedia.append((d['file_date_inserted'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
             #[tabMedia.append((d['file_name'], d['file_code'])) for d in data['data']["list"]]
         return tabMedia
 
@@ -235,7 +242,11 @@ class Uptobox:
                 r = requests.get(url)
                 data = r.json()
                 if data['data']["list"]:
-                    [tabMedia.append((d['file_created'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
+                    if 'file_created' in data['data']["list"][0].keys():
+                        [tabMedia.append((d['file_created'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
+                    else:
+                        [tabMedia.append((d['file_date_inserted'], d['file_name'], d['file_code'])) for d in data['data']["list"]]
+
                     j += i
                 else:
                     break
@@ -1370,10 +1381,12 @@ def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     li = xbmcgui.ListItem(label=name)
     #li, media, setUniqueId= False, isSerie=False, hasDuration=False, replaceTitle=False, hasPlaycount=False
-    if "episode" in parameters.keys():
-        vinfo = updateInfoTagVideo(li, media, True, True, True, False, True)
-    else:
-        vinfo = updateInfoTagVideo(li, media, True, False, True, False, False)
+    #if "episode" in parameters.keys():
+    #    vinfo = updateInfoTagVideo(li, media, True, True, True, False, True)
+    #else:
+    #    vinfo = updateInfoTagVideo(li, media, True, False, True, False, False)
+
+    updateInfoTagVideo2(li, media)
 
     #try:
     #    vinfo.setPlaycount(int(media.vu))
@@ -1498,6 +1511,7 @@ def getHistoUpto(bd):
     cur2.close()
     cnx2.close()
     mDB = TMDB(KEYTMDB)
+    params = {}
     for i, media in enumerate(bookmark):
         params = dict(parse_qsl(media.split("?")[1]))
         #notice(params)
@@ -1513,7 +1527,8 @@ def getHistoUpto(bd):
     #    time.sleep(0.1)
     testThread()
     medias = mDB.extractListe
-    affUptobox("movie", [x[1:]  for x in medias if x[1] != "Inconnu"], params)
+    if params:
+        affUptobox("movie", [x[1:]  for x in medias if x[1] != "Inconnu"], params)
 
 if __name__ == '__main__':
     pass
