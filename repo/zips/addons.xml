@@ -154,6 +154,24 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <fanart>fanart.jpg</fanart>
         </assets>
     </extension>
+</addon><addon id="script.widget.clearlogos" name="Widget Clearlogos" version="1.0.0" provider-name="NomDeVotreAddon">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0" />
+    </requires>
+    <extension point="xbmc.python.script" library="main.py">
+        <provides>widget</provides>
+    </extension>
+    <metadata>
+        <summary lang="fr">Remplace les titres des widgets par des clearlogos de TMDB</summary>
+        <description lang="fr">Cet addon remplace automatiquement les titres des widgets par des clearlogos récupérés via l'API de TMDB.</description>
+        <disclaimer lang="fr">L'utilisation de cet addon nécessite une clé d'API valide de TMDB.</disclaimer>
+        <platform>all</platform>
+        <icon>resources/icon.png</icon>
+        <fanart>resources/fanart.jpg</fanart>
+        <email>email@example.com</email>
+        <website>https://example.com</website>
+        <license>Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International</license>
+    </metadata>
 </addon><addon id="skin.cosmic" version="1.0.65" name="Cosmic" provider-name="heppen (nfm886)">
   <requires>
     <import addon="xbmc.gui" version="5.15.0" />
