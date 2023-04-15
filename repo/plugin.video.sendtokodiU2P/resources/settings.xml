@@ -35,7 +35,7 @@
         <setting id="numhk" label="Num HK" type="text" default="0000" visible="eq(-1,true)"/>
         <setting label="DataBase HK²" type="lsep" />
         <setting id="actifnewpaste" label="Activer Médiathéque HK²" type="bool" default="false" />
-        <setting id="heberg" label="Hébergeur liste DB" type="labelenum" values="Anotepad|Pastebin|Rentry|Textup|fichier" default="Anotepad"  visible="eq(-1,true)"/>
+        <setting id="heberg" label="Hébergeur liste DB" type="labelenum" values="Anotepad|Pastebin|Rentry|Textup|fichier|RentryC" default="RentryC"  visible="eq(-1,true)"/>
         <setting id="numHeberg" label="Numero Anotepad/Pastebin/Rentry/Textup" type="text" default="" visible="eq(-2,true)"/>
         <setting label="Ajouter contenu" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=folderPastebin&maj=false)" visible="eq(-3,true)"/>
         <setting label="Reset database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=resetBDhkNew)" visible="eq(-4,true)"/>
