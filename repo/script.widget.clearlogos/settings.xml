@@ -1,5 +1,0 @@
-<settings>
-  <setting id="api_key" type="text" label="TMDB API Key" default="bffcdf5a9d140f65de2f50dad6e2a8a4" />
-  <setting id="enabled" type="bool" label="Enabled" default="true" />
-  <setting id="cache_enabled" type="bool" label="Cache Enabled" default="true" />
-</settings>

@@ -79,6 +79,7 @@
         <setting label="Mise en place service de Maj" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart2)"/>
         <setting id="delaimaj" label="Delai 1er MAJ (mins)" type="number" default="0"/>
         <setting id="rskin" label="Refresh skin aprés MAJ" type="bool" default="false" />
+        <setting id="affmaj" label="Bandeau M.A.J" type="bool" default="true" />
         <setting label="Base de données" type="lsep" />
         <setting id="skinhk" label="Num Skin HK" type="text" default="4j82p"/>
         <setting id="epg" label="EPG" type="text" default="lk4Xb"/>
