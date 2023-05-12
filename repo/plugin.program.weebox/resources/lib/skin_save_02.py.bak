@@ -6,7 +6,7 @@ import os, sys, stat
 
 
 #Supression lecture seule du fichier
-#os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.arctic.horizon.2/settings.xml'), 0o755)
+os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.arctic.horizon.2/settings.xml'), 0o755)
 
 xbmc.executebuiltin("Notification(PREPARATION DES FICHIERS,Copie en cours...)")
 
@@ -29,7 +29,7 @@ shutil.copytree(source_dir3, destination_dir3, dirs_exist_ok=True)
 #shutil.copy(source_dir2, destination_dir2)
 
 #Paramètre lecture seule du fichier
-#os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.arctic.horizon.2/settings.xml'), 0o444)
+os.chmod(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01/addon_data/skin.arctic.horizon.2/settings.xml'), 0o444)
 
 # CREATION ARCHIVE ZIP
 shutil.make_archive((xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/skin.arctic.horizon.2')),'zip',(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/01')))
