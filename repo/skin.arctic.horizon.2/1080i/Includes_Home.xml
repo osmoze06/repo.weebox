@@ -197,7 +197,7 @@
             <height>60</height>
             <centertop>50%</centertop>
             <aspectratio>keep</aspectratio>
-            <bordersize>20</bordersize>
+            <bordersize>4</bordersize>
             <texture colordiffuse="main_fg_70">$INFO[Container(300).ListITem.Icon]</texture>
             <visible>Control.HasFocus(302)</visible>
         </control>

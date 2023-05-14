@@ -37,11 +37,9 @@
             <onfocus condition="[System.HasPVRAddon + !PVR.HasTVChannels + !Pvr.HasRadioChannels] | [Skin.HasSetting(Startup.PluginInit) + Container(8000).IsUpdating]">AlarmClock(ReFocus,SetFocus(9001),00:00,silent)</onfocus>
             <onfocus>AlarmClock(RepWin,ReplaceWindow($INFO[System.StartupWindow]),00:01,silent)</onfocus>
         </control>
-<!-- Page d'initialisation - Startup -->
         <control type="group">
             <include>Background_StartUp</include>
-<!-- include>Object_StartUp_Logo</include (Remplacer la ligne en dessous pour rétablir le logo Kodi d'origine (adapatbel dans le fichier Includes_Objects.xml -->
-            <include></include>
+            <include>Object_StartUp_Logo</include>
             <control type="label">
                 <centertop>610</centertop>
                 <height>40</height>
