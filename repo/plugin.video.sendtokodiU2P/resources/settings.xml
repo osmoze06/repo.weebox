@@ -64,7 +64,7 @@
         <setting id="ochk1" label="On continue ... (visu hk1)" type="bool" default="false" />
         <setting id="bookonline" label="Bookmark en ligne" type="bool" default="false" />
         <setting id="bookonline_name" label="Pass" type="text" default="" visible="eq(-1,true)" />
-        <setting id="bookonline_site" label="Site" type="text" default="bookmak.zapto.org:5000" visible="eq(-2,true)" />
+        <setting id="bookonline_site" label="Site" type="text" default="bookmark.zapto.org:5000" visible="eq(-2,true)" />
         <setting label="Créer Profil" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=ajoutP)" visible="eq(-3,true)"/>
         <setting label="Supprimer Profil" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=suppP)" visible="eq(-4,true)"/>
         <setting id="rentry" type="text" label="Code Import Config"  default=""  visible="eq(-5,true)"/>

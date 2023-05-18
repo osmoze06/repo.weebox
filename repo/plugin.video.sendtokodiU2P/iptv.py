@@ -38,7 +38,7 @@ class MyDialog(pyxbmct.AddonDialogWindow):
         self._monitor = xbmc.Monitor()
         self._player = xbmc.Player()
         #self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
-        
+
     def play(self, path):
         self._player.play(path)
         xbmc.sleep(200)  # Wait for the player to start, adjust the timeout if necessary
@@ -55,7 +55,7 @@ class BookmarkIPTV:
         cnx = sqlite3.connect(self.database)
         cur = cnx.cursor()
         #('ffmpeg http://myf-tv.com:8080/zzww6q9eU5krRyM/09gX7NRc93Dup7N/363150', 'FR| PRIME VIDEO Multiplex FHD', '363150', 'http://covers.dragons-ott.com/JAQUETTE/prime-league1.png')
-        
+
         cur.execute("""CREATE TABLE IF NOT EXISTS chaines(
           `id`    INTEGER PRIMARY KEY,
           link TEXT,
@@ -78,7 +78,7 @@ class BookmarkIPTV:
           fournisseur TEXT,
           UNIQUE (numId, num, fournisseur))
             """)
-        
+
         cur.execute("""CREATE TABLE IF NOT EXISTS adresse(
           url TEXT,
           mac TEXT,
@@ -141,13 +141,13 @@ class BookmarkIPTV:
           epg TEXT,
           UNIQUE (url, numId))
             """)
-        
+
         cur.execute("""CREATE TABLE IF NOT EXISTS correctEpg(
           url TEXT,
           correct INTEGER,
           UNIQUE (url))
             """)
-        
+
         cnx.commit()
         cur.close()
         cnx.close()
@@ -182,7 +182,7 @@ class BookmarkIPTV:
         cur.execute(sql)
         liste = cur.fetchall()
         cur.close()
-        cnx.close()   
+        cnx.close()
         return liste
 
     def delFav(self, num="", fournisseur=""):
@@ -194,7 +194,7 @@ class BookmarkIPTV:
             cur.execute("DELETE FROM fav")
         cnx.commit()
         cur.close()
-        cnx.close() 
+        cnx.close()
 
     def insertChaines(self, tab):
         cnx = sqlite3.connect(self.database)
@@ -202,7 +202,7 @@ class BookmarkIPTV:
         cur.executemany("REPLACE INTO chaines (link, nom, num, poster, numId, fournisseur) VALUES (?, ?, ?, ?, ?, ?)", tab)
         cnx.commit()
         cur.close()
-        cnx.close()   
+        cnx.close()
 
     def insertToken(self, *argv):
         cnx = sqlite3.connect(self.database)
@@ -210,7 +210,7 @@ class BookmarkIPTV:
         cur.execute("REPLACE INTO tokens (url, mac, token) VALUES (?, ?, ?)", argv)
         cnx.commit()
         cur.close()
-        cnx.close() 
+        cnx.close()
 
     def recupToken(self, url):
         cnx = sqlite3.connect(self.database)
@@ -228,7 +228,7 @@ class BookmarkIPTV:
         cur.execute("REPLACE INTO mapEpg (url, numId, epg) VALUES (?, ?, ?)", argv)
         cnx.commit()
         cur.close()
-        cnx.close() 
+        cnx.close()
 
     def insertBank(self, kwargv):
         cnx = sqlite3.connect(self.database)
@@ -238,7 +238,7 @@ class BookmarkIPTV:
                 cur.execute("REPLACE INTO bank (nom, url, mac) VALUES (?, ?, ?)", (nom, url, mac,))
         cnx.commit()
         cur.close()
-        cnx.close()  
+        cnx.close()
 
     def getBank(self):
         cnx = sqlite3.connect(self.database)
@@ -259,7 +259,7 @@ class BookmarkIPTV:
             cur.execute("DELETE FROM bank WHERE url=? AND mac=?", argv)
         cnx.commit()
         cur.close()
-        cnx.close()  
+        cnx.close()
 
 
     def getMapEpg(self, url):
@@ -283,7 +283,7 @@ class BookmarkIPTV:
         if liste:
             correct = liste[0]
         else:
-            correct = 0 
+            correct = 0
         return correct
 
     def insertCorrectEpg(self, *argv):
@@ -304,8 +304,8 @@ class BookmarkIPTV:
             cur.execute("DELETE FROM chaines")
         cnx.commit()
         cur.close()
-        cnx.close()    
-    
+        cnx.close()
+
     def lockGroupe(self, url, numId, lock=1):
         cnx = sqlite3.connect(self.database)
         cur = cnx.cursor()
@@ -334,8 +334,8 @@ class BookmarkIPTV:
         cur.execute(sql, (num, fournisseur, ))
         liste = cur.fetchall()
         cur.close()
-        cnx.close()   
-        return liste       
+        cnx.close()
+        return liste
 
     def getNom(self):
         cnx = sqlite3.connect(self.database)
@@ -344,7 +344,7 @@ class BookmarkIPTV:
         cur.execute(sql)
         dictAdr = {x[0]: x[1] for x in cur.fetchall()}
         cur.close()
-        cnx.close()   
+        cnx.close()
         return dictAdr
 
     def insertNom(self, *argv):
@@ -429,9 +429,9 @@ class BookmarkIPTV:
             sql = "SELECT url, mac, user, passwd, ddate FROM adresse"
             cur.execute(sql)
             liste = cur.fetchall()
-        
+
         cur.close()
-        cnx.close()    
+        cnx.close()
         return liste
 
 
@@ -472,13 +472,13 @@ class IPTVMac:
         #self.listGenreUrl = "/portal.php?type={}&action=get_ordered_list&category={}&force_ch_link_check=&fav=0&sortby=number&hd=0&p={}&from_ch_id=0&JsHttpRequest=1-xml"
         self.catUrl = "/portal.php?type={}&action=get_categories&JsHttpRequest=1-xml"  #vod ou series
         self.createLink = "/portal.php?type=itv&action=create_link&cmd={}&series=0&forced_storage=false&disable_ad=false&download=false&force_ch_link_check=false&JsHttpRequest=1-xml"
-        self.createLinkVod = "/server/load.php?action=create_link&type={}&cmd={}&JsHttpRequest=1-xml" 
+        self.createLinkVod = "/server/load.php?action=create_link&type={}&cmd={}&JsHttpRequest=1-xml"
         self.createLinkSerie = "/portal.php?type=vod&action=create_link&cmd={}&series={}&forced_storage=false&disable_ad=false&download=false&force_ch_link_check=false&JsHttpRequest=1-xml"
         #type=tv_archive&action=create_link&cmd=auto%20%2Fmedia%2F16031997_1702.mpg&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml
         self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%2Fmedia%2F{}.mpg&forced_storage=false&disable_ad=false&download=false&force_ch_link_check=false&JsHttpRequest=1-xml"
         #self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%20%2Fmedia%2F36830002_5942.mpg&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml"
         #self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%20%2Fmedia%2F{}.mpg&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml"
-        
+
         #type=epg&action=get_simple_data_table&ch_id=123481&date=2022-07-09&p=2&JsHttpRequest=1-xml
         self.data_table = "/portal.php?type=epg&action=get_simple_data_table&ch_id={}&date={}&p={}&JsHttpRequest=1-xml"
         self.panel ="/panel_api.php"
@@ -490,19 +490,19 @@ class IPTVMac:
         self.listGenreUrlSeries = "/portal.php?type=series&action=get_ordered_list&movie_id=0&category={}&season_id=0&episode_id=0&force_ch_link_check=&from_ch_id=0&fav=0&sortby=added&hd=0&not_ended=0&p={}&JsHttpRequest=1-xml"
         #categorie, genre => numid du groupe
         #"get_live_categories", "get_vod_categories", "get_live_streams", "get_short_epg", "get_simple_data_table", "get_vod_streams", "get_vod_info"
-        
+
     def getInfos(self, compUrl):
         if self.proxyDict:
             print("proxi")
             info = requests.get(self.urlBase + compUrl, proxies=self.proxyDict, headers=self.headers)
-        else: 
+        else:
 
             info = requests.get(self.urlBase + compUrl, headers=self.headers)
         return info
 
-    @property 
+    @property
     def extractUsersPass(self):
-        url5 = self.urlBase + "/portal.php?type=itv&action=create_link&cmd=ffmpeg%20http://localhost/ch/1823_&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml" 
+        url5 = self.urlBase + "/portal.php?type=itv&action=create_link&cmd=ffmpeg%20http://localhost/ch/1823_&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml"
         res = requests.get(url5, headers=self.headers, timeout=15, verify=False)
         try:
             j = json.loads(res.text)["js"]["cmd"]
@@ -510,13 +510,13 @@ class IPTVMac:
         except:
             user, pwd = "", ""
         return user, pwd
-    
+
     def getUrl(self, compUrl):
         print(compUrl)
         if self.proxyDict:
             print("proxi")
             info = requests.get(compUrl, proxies=self.proxyDict, stream=True, allow_redirects=True)
-        else: 
+        else:
             info = requests.get(compUrl, stream=True, allow_redirects=True)
         return info.url
 
@@ -528,10 +528,10 @@ class IPTVMac:
             self.token = self.getInfos(self.tokenUrl).json()['js']['token']
             notice("Token: " + self.token)
             self.headers["Authorization"] = "Bearer %s" %self.token
-            
+
             profile = self.getInfos(self.profileUrl).json()["js"]["id"]
             timez = self.getInfos(self.profileUrl).json()["js"]["default_timezone"]
-            
+
             if profile == None:
                 return False
 
@@ -541,7 +541,7 @@ class IPTVMac:
             try:
                 reste = datetime.datetime.strptime(infoCompte, "%B %d, %Y, %I:%M %p") - datetime.datetime.now()
                 notice("reste: " + str(reste.days) + " jours")
-                
+
                 if int(reste.days):
                     return True
                 else:
@@ -558,7 +558,7 @@ class IPTVMac:
             self.chaines += [(chaine["cmd"], chaine["name"], chaine["id"], chaine["logo"]) for chaine in tmpChaines]
         else:
             self.chaines += [self.extractInfosVod(chaine) for chaine in tmpChaines]
-            
+
     def listeChaines(self, typ, genre):
         i = 1
         #'allow_local_timeshift': '1'
@@ -608,7 +608,7 @@ class IPTVMac:
         #('399532', "FR| Fortress 2: Sniper's Eye", "Le film suit l'histoire d'un lieu", 97, '883502', 'http://myf-tv.com:8080/images/byi8ay0EFKsHxxItmFKAbfwSgBU_big.jpg', '12+', '2022-04-29', '2022-04-28 17:55:50', 'Chad Michael Murray', 'Josh Sternfeld', "FR|_Fortress_2:_Sniper's_Eye", 'N/A')
         if numSerie:
             try:
-                if numSerie.split(":")[0] == numSerie.split(":")[1]: 
+                if numSerie.split(":")[0] == numSerie.split(":")[1]:
                     requete = self.saison.format(numSerie, genre, i)
                 else:
                     requete = self.getsaison.format(quote(numSerie), numSerie, i)
@@ -616,7 +616,7 @@ class IPTVMac:
                 requete = self.getsaison.format(quote(numSerie), numSerie, i)
         else:
             requete = self.listGenreUrl.format(typ, genre, i)
-            
+
         #notice(requete)
         page = self.getInfos(requete).json()
         #notice(page)
@@ -697,7 +697,7 @@ def menu():
     bd = BookmarkIPTV(BDBOOKMARK)
     adrs = bd.getNom()
     for fournisseur, nom in adrs.items():
-        ok = addDirectoryGroupe(nom, isFolder=True, parameters={"action": "loadF", "fourn": fournisseur})                
+        ok = addDirectoryGroupe(nom, isFolder=True, parameters={"action": "loadF", "fourn": fournisseur})
     ok = addDirectoryGroupe("Ajouter adresse", isFolder=True, parameters={"action": "ajoutIPTV"})
     ok = addDirectoryGroupe("Bank", isFolder=True, parameters={"action": "IPTVbank"})
     ok = addDirectoryGroupe("Favoris", isFolder=True, parameters={"action": "IPTVfav"})
@@ -710,10 +710,10 @@ def ajoutIPTV():
     if not ret:
         repo = dialog.input("Num Anotepad/Pastebin/Rentry/TextUp", type=xbmcgui.INPUT_ALPHANUM)
         if repo:
-            heberg = ADDON.getSetting("heberg") 
-            if heberg == "Pastebin": 
+            heberg = ADDON.getSetting("heberg")
+            if heberg == "Pastebin":
                 tx = getBdPastebin(repo)
-            elif heberg == "Rentry":
+            elif "Rentry" in heberg :
                 tx = getBdRentry(repo)
             elif heberg == "Textup":
                 tx = getBdTextup(repo)
@@ -809,7 +809,7 @@ def importCompte(url, mac, nom):
         return 1
     else:
         return 0
-        
+
 def activeMac(params):
     bd = BookmarkIPTV(BDBOOKMARK)
     fournisseur = params["fourn"]
@@ -829,7 +829,7 @@ def activeMac(params):
 
 def load(params):
     ADDON.setSetting("passtmp", "")
-    fournisseur = params["fourn"]    
+    fournisseur = params["fourn"]
     bd = BookmarkIPTV(BDBOOKMARK)
     if fournisseur == "http://activeott.xyz:80":
         bd.deleteChaines(fournisseur)
@@ -849,19 +849,19 @@ def load(params):
         dictCat = {x[0]: x[1] for x in liste if int(x[2]) == 1}
     else:
         dictCat = {genre["title"]: genre["id"] for genre in iptv.getInfos(iptv.genreUrl).json()["js"]}
-    
+
     typM = iptv.tv
-    
+
     groupes = sorted(dictCat.keys())
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, 'files')
     for i, media in enumerate(groupes):
-        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChaine", "numId": dictCat[media], "fourn": fournisseur, "typM": typM })                
+        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChaine", "numId": dictCat[media], "fourn": fournisseur, "typM": typM })
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def gestfourn(params):
     notice(params)
-    fournisseur = params["fourn"]    
+    fournisseur = params["fourn"]
     bd = BookmarkIPTV(BDBOOKMARK)
     liste = bd.getGroupe(fournisseur)
     choix = ["tout"]
@@ -926,7 +926,7 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
 
 def getVodSeries(params):
     ADDON.setSetting("passtmp", "")
-    fournisseur = params["fourn"]   
+    fournisseur = params["fourn"]
     typM =  params["typM"]
     bd = BookmarkIPTV(BDBOOKMARK)
     infosFournisseur = bd.recupToken(fournisseur)
@@ -959,7 +959,7 @@ def getVodSeries(params):
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, 'files')
     for i, media in enumerate(groupes):
-        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVod", "numId": dictCat[media], "fourn": fournisseur, "typM": typM, "offset": 1})                
+        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVod", "numId": dictCat[media], "fourn": fournisseur, "typM": typM, "offset": 1})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def affEpisodes(params):
@@ -1056,7 +1056,7 @@ def addDirectoryVod(name, isFolder=True, parameters={}, media="" ):
             'thumb': media.poster,
             'poster': media.poster,
             'fanart': media.backdrop})
-    li.setProperty('IsPlayable', 'true')    
+    li.setProperty('IsPlayable', 'true')
     url = sys.argv[0] + '?' + urlencode(parameters)
     return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
 
@@ -1072,7 +1072,7 @@ def lock(params):
         if d == "x2015x":
             bd.lockGroupe(fournisseur, numId, 0)
         else:
-            return 
+            return
     else:
         bd.lockGroupe(fournisseur, numId)
 
@@ -1108,7 +1108,7 @@ def verifLock(fournisseur, numId):
             d = dialog.input('Enter secret code', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
             if d == "x2015x":
                 ok = True
-            else: 
+            else:
                 ok = False
             ADDON.setSetting("passtmp", "ok")
     else:
@@ -1146,24 +1146,24 @@ def affChainesNew(params):
     else:
         correct = 0
     ok = verifLock(fournisseur, numId)
-    if ok:  
+    if ok:
         bd = BookmarkIPTV(BDBOOKMARK)
         infosFourniseur = bd.recupToken(fournisseur)
-        site, mac, token = infosFourniseur[0]  
+        site, mac, token = infosFourniseur[0]
         #site = ADDON.getSetting("site1")
         #mac = str.upper(ADDON.getSetting("mac1"))
         #token = ADDON.getSetting("token1")
         iptv = IPTVMac(site, mac, token)
-        dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)} 
+        dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)}
         macs = bd.getAdr(fournisseur)
         chaines = bd.getChaines(fournisseur, numId)
         epg = iptv.getInfos(iptv.epg.format(iptv.tv)).json()["js"]["data"]
         if not chaines:
             chaines = iptv.listeChaines(typM, numId)
             bd.insertChaines([list(x) + [int(numId), fournisseur] for x in chaines])
-        window = feniptv.FenIptv("TV", chaines, epg)    
+        window = feniptv.FenIptv("TV", chaines, epg)
         window.doModal()
-        del window   
+        del window
 
 def removeDB():
     db = xbmcvfs.translatePath("special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db")
@@ -1184,7 +1184,7 @@ def iptvdepfav(params):
         for i, c in enumerate(choix):
             bd.insertFav(i, c[0], c[1], c[2], c[3], c[4], c[5])
     #ADDON.getSetting("mac1")
-    IPTVfav() 
+    IPTVfav()
 
 def supfavIptv(params):
     bd = BookmarkIPTV(BDBOOKMARK)
@@ -1192,7 +1192,7 @@ def supfavIptv(params):
     showInfoNotification("Favori effacé")
     #cmd = "ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=IPTVfav,return)"
     #xbmc.executebuiltin(cmd)
-    
+
 def addFavIptv(params):
     #notice(params)
     #{'action': 'addFavIptv', 'link': 'ffmpeg http://myf-tv.com:8080/4agfk8MyegAWXZy/cfB0nbR5Cwtte0G/136522', 'nom': 'RTL TVI HEVC', 'num': '136522', 'cover': 'http://covers.dragons-ott.com/JAQUETTE/PICON-LOGO/PICON-ALPHA/picon-belge/rtltvihd.png', 'numbouquet': '29', 'fourn': 'http://myf-tv.com:8080'}
@@ -1233,7 +1233,7 @@ def replay(params):
         for i in range(2, nbPages + 1, 1):
             data = iptv.getInfos(iptv.data_table.format(channelId, ddate, i)).json()["js"]
             replays += [(x["id"] , x['name'], x['descr'], x['time'].split(' ')[1], x['time_to'].split(' ')[1]) for x in data["data"]]
-        
+
         xbmcplugin.setPluginCategory(HANDLE, "TV")
         xbmcplugin.setContent(HANDLE, "files")
         #{'id': '4437031_43982', 'mark_archive': 1, 'stop_timestamp': 1657668360, 'mark_rec': 0, 'duration': 4200, 'open': 0, 'actor': '', 'time_to': '2022-07-13 01:26:00', 'descr': "Clara et ses amies aiment l'argent. Elles organisent des parties fines chez les millionnaires et en profitent pour d�pouiller leurs h�tes. Un jour, elles d�cident de tenter un gros coup.", 't_time_to': '01:26', 'start_timestamp': 1657664160, 'correct': '2022-07-13 00:16:00', 'ch_id': '43982', 'name': 'La cambrioleuse', 'time': '2022-07-13 00:16:00', 't_time': '00:16', 'category': '', 'real_id': '43982_1657664160', 'mark_memo': 0, 'director': ''}
@@ -1247,9 +1247,9 @@ def replay(params):
             else:
                 li.setInfo('video', {"playcount": 1})
             li.setProperty('IsPlayable', 'true')
-            parameters={"action": "playMediaIptv", "replay": replay[0], "lien": replay[0], "iptv": replay[1], "fourn": fournisseur}  
+            parameters={"action": "playMediaIptv", "replay": replay[0], "lien": replay[0], "iptv": replay[1], "fourn": fournisseur}
             url = sys.argv[0] + '?' + urlencode(parameters)
-            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)               
+            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
         xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
     else:
         return
@@ -1257,14 +1257,14 @@ def replay(params):
 def IPTVfav():
     bd = BookmarkIPTV(BDBOOKMARK)
     chaines = bd.getFav()
-    
+
     fournisseurs = list(set([x[-1] for x in chaines]))
     dictMacs = {fournisseur: bd.getAdr(fournisseur) for fournisseur in fournisseurs}
     dictEpgNom = {}
     if os.path.isfile(xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/epg.bd")):
         for fournisseur in fournisseurs:
             dictEpgNom[fournisseur] = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)}
-    
+
     epg = {}
     correct = {}
 
@@ -1336,18 +1336,18 @@ def IPTVfav():
                 color = "red"
             commands.append(('[COLOR %s]%s[/COLOR]' %(color, m), 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=activemac&mac=%s&fourn=%s&numId=favs&typM=itv,return)' %(m, fournisseur)))
         li.addContextMenuItems(commands)
-        parameters={"action": "playMediaIptv", "lien": link, "iptv": nom.split("|")[-1].strip(), "fourn": fournisseur}  
+        parameters={"action": "playMediaIptv", "lien": link, "iptv": nom.split("|")[-1].strip(), "fourn": fournisseur}
         url = sys.argv[0] + '?' + urlencode(parameters)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=True)               
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
-     
+
 
 def affChaines(params):
     fournisseur = params["fourn"]
     numId = params["numId"]
     typM = params["typM"]
     ok = verifLock(fournisseur, numId)
-    if ok:    
+    if ok:
         bd = BookmarkIPTV(BDBOOKMARK)
         infosFourniseur = bd.recupToken(fournisseur)
         site, mac, token = infosFourniseur[0]
@@ -1357,7 +1357,7 @@ def affChaines(params):
         iptv = IPTVMac(site, mac, token)
         correct =  bd.getCorrectEpg(site)
         if os.path.isfile(xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/epg.bd")):
-            dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)} 
+            dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)}
         else:
             dictEpgNom = {}
         macs = bd.getAdr(fournisseur)
@@ -1392,7 +1392,7 @@ def affChaines(params):
                             datetime.datetime.fromtimestamp(e['stop_timestamp']).strftime('%H:%M'), e["name"], e["descr"])
                         thumb = chaine[3]
                         break
-            
+
             li = xbmcgui.ListItem(label=chaine[1])
             vinfo = updateMinimalInfoTagVideo(li,chaine[1],plot)
             if extractKodiVersion() >=20.0:
@@ -1425,10 +1425,10 @@ def affChaines(params):
                     color = "red"
                 commands.append(('[COLOR %s]%s[/COLOR]' %(color, m), 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=activemac&mac=%s&fourn=%s&numId=%s&typM=%s,return)' %(m, fournisseur, numId, typM)))
             li.addContextMenuItems(commands)
-            link = chaine[0] 
-            parameters={"action": "playMediaIptv", "lien": link, "iptv": chaine[1], "fourn": fournisseur}  
+            link = chaine[0]
+            parameters={"action": "playMediaIptv", "lien": link, "iptv": chaine[1], "fourn": fournisseur}
             url = sys.argv[0] + '?' + urlencode(parameters)
-            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)               
+            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
         xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
     else:
         return
@@ -1473,11 +1473,11 @@ def mapEpg(params):
         #token = ADDON.getSetting("token1")
         iptv = IPTVMac(site, mac, token)
         numId = params["numId"]
-        listeOk = [x[0] for x in bd.getMapEpg(fournisseur)] 
+        listeOk = [x[0] for x in bd.getMapEpg(fournisseur)]
         chaines = bd.getChaines(fournisseur, numId)
         if not chaines:
             chaines = iptv.listeChaines(typM, numId)
-        tabChannels = [(x[1].split("|")[-1].strip(), x[2]) for x in chaines] 
+        tabChannels = [(x[1].split("|")[-1].strip(), x[2]) for x in chaines]
     for nom, numIdChannel in tabChannels:
         if numIdChannel not in listeOk:
             for i, l in enumerate(liste):
@@ -1491,7 +1491,7 @@ def mapEpg(params):
                 break
 
 
-            
+
 def playMedia(params):
     fournisseur = params["fourn"]
     bd = BookmarkIPTV(BDBOOKMARK)
@@ -1521,7 +1521,7 @@ def playMedia(params):
             #if "localhost" not in linkCMD and "http" in linkCMD:
             #    link = linkCMD.split(" ")[1]
             #else:
-            #    cmd = quote(linkCMD) 
+            #    cmd = quote(linkCMD)
             #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     userAg = "|User-Agent=Mozilla"
     #userAg = ""

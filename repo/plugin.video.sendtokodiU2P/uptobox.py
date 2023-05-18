@@ -213,7 +213,7 @@ class BookmarkUpto:
 class Uptobox:
 
     def __init__(self, key=''):
-        self.baseurl = "https://uptobox.com"
+        self.baseurl = "https://uptobox.eu"
         self.urlFile = self.baseurl + '/api/user/files'
         self.key = key.strip()
         self.totalSize = 0
@@ -371,7 +371,7 @@ class Uptobox:
             dlLink = ""
             statut = "err"
 
-        return dlLink, statut
+        return dlLink.replace("uptobox.com", "uptobox.eu"), statut
 
     def file_search(self, path: str, limit: int, offset: int, search: str):
         url1 = self.baseurl + "/api/user/files?token={}&path={}&limit={}&searchField=file_name&search={}&offset={}".format(self.key, path, limit, search, offset)
@@ -404,7 +404,7 @@ class Alldedrid:
             if media["status"] == "Ready":
                 for link in media["links"]:
                     if link["filename"][-4:] in [".mp4", ".mkv", ".avi", "dixw", ".mp3"]:
-                        tabLinks.append((link["filename"], link["link"].replace("https://uptobox.com/", "")))
+                        tabLinks.append((link["filename"], link["link"].replace("https://uptobox.eu/", "")))
         return tabLinks[::-1]
 
     def extractListe(self, t="history"):
@@ -416,12 +416,12 @@ class Alldedrid:
         tabLinks = []
         for link in dictInfo["data"]["links"]:
             if link["filename"][-4:] in [".mp4", ".mkv", ".avi", "dixw", ".mp3"]:
-                tabLinks.append((link["filename"], link["link"].replace("https://uptobox.com/", "")))
+                tabLinks.append((link["filename"], link["link"].replace("https://uptobox.eu/", "")))
         return tabLinks
 
     def linkDownload(self, lien):
         dlLink = ""
-        url1 = self.urlBase + "/v4/link/unlock?agent=u2p&apikey=%s&link=https://uptobox.com/%s" % (self.key , lien)
+        url1 = self.urlBase + "/v4/link/unlock?agent=u2p&apikey=%s&link=https://uptobox.eu/%s" % (self.key , lien)
         req = requests.get(url1)
         dict_liens = req.json()
         try:
@@ -433,7 +433,7 @@ class Alldedrid:
         except:
             dlLink = ""
             statut = "err"
-        return dlLink, statut
+        return dlLink.replace("uptobox.com", "uptobox.eu"), statut
 
 #===================================================================================== fonctions ==========================================================================
 def actifTrakt():

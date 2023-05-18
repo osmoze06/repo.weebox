@@ -1036,6 +1036,7 @@ def getParams(paramstring, u2p=0, saisonIn=1):
         #    tabNomLien = []
         tabNomLien = []
         paramstring = orderLiens(dictResos, paramstring)
+        #notice(paramstring)
         try:
             tabNomLien += ["#%d (%s - %.2fGo)" %(i + 1, dictResos[x.split("#")[0].split("@")[1]][0], (int(dictResos[x.split("#")[0].split("@")[1]][1]) / 1000000000.0)) for i, x in enumerate(paramstring)]
         except:
@@ -4658,7 +4659,7 @@ def choixliste():
         xbmc.executebuiltin('ReloadSkin')
 
 def testUptobox(key):
-    url = 'https://uptobox.com/api/user/me?token=' + key
+    url = 'https://uptobox.eu/api/user/me?token=' + key
     headers = {'Accept': 'application/json'}
     try:
         data = requests.get(url, headers=headers).json()
