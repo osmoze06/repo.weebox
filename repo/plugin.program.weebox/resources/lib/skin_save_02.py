@@ -26,12 +26,15 @@ destination_dir4 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/
 source_dir5 = xbmcvfs.translatePath('special://home/addons/skin.arctic.horizon.2/fonts')
 destination_dir5 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/addons/skin.arctic.horizon.2/fonts')
 
+source_dir6 = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.program.autowidget')
+destination_dir6 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/addon_data/plugin.program.autowidget')
 
 shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
 shutil.copytree(source_dir1, destination_dir1, dirs_exist_ok=True)
 #shutil.copytree(source_dir3, destination_dir3, dirs_exist_ok=True)
 shutil.copytree(source_dir4, destination_dir4, dirs_exist_ok=True)
 shutil.copytree(source_dir5, destination_dir5, dirs_exist_ok=True)
+shutil.copytree(source_dir6, destination_dir6, dirs_exist_ok=True)
 shutil.copy(source_dir2, destination_dir2)
 
 
