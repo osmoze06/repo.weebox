@@ -10,12 +10,14 @@ try:
 except: pass
 from urllib.parse import quote, unquote
 import ast
-from util import notice,list2String
 import ast
 import threading
 import time
 import datetime
-import xbmcvfs
+try:
+  import xbmcvfs
+  from util import notice,list2String
+except: pass
 
 keywords = {'80s action parody':269633,
 'action adventure':253675,
@@ -906,6 +908,16 @@ class TMDB:
           self.tabMedia.append((pos, rep, dict_serie))
         return dict_serie
 
+    def getNbEpisodes(self, numId):
+      url1 = self.urlBase + "tv/{}?api_key={}".format(numId, self.key)
+      dict_infos = {}
+      try:
+        req = requests.get(url1)
+        dict_infos = req.json()
+        dictSaisons = {x["season_number"]: x["episode_count"] for x in dict_infos["seasons"]}
+      except:
+        dictSaisons = {}
+      return dictSaisons
 
     @property
     def extractListe(self):
@@ -969,6 +981,10 @@ if __name__ == '__main__':
   #https://api.themoviedb.org/3/discover/tv?api_key=96139384ce46fd4ffac13e1ad770db7a&with_keywords=10714&include_adult=true
   #https://www.themoviedb.org/list/8195530
   mdb = TMDB("96139384ce46fd4ffac13e1ad770db7a")
+  dictSaisons = mdb.getNbEpisodes("1405")
+  print(dictSaisons)
+  #range(1, c + 2, 1):
+  #"https://api.themoviedb.org/3/tv/1405/episode_groups?api_key=96139384ce46fd4ffac13e1ad770db7a"
   #https://api.themoviedb.org/3/network/213?api_key=96139384ce46fd4ffac13e1ad770db7a
   #https://api.themoviedb.org/3/discover/tv?with_networks=213&sort_by=popularity.desc&api_key=96139384ce46fd4ffac13e1ad770db7a&language=fr
   #La famille parfaite 2021

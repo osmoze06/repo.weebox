@@ -83,6 +83,11 @@ from apiTraktHK import TraktHK
 import createbdhk
 import random
 import uptobox
+from strm import Strm, configureSTRM
+try:
+    BDMEDIA = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/medias.bd')
+    BDMEDIANew = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd')
+except: pass
 
 
 class FenFilmDetail(pyxbmct.AddonDialogWindow):
@@ -2786,9 +2791,15 @@ def menuPbi():
                   #("14. Création Accés Repertoire Publique Uptobox", {"action":"createRUPTOP"}, "liste.png", "Création Accés repertoire Publique Uptobox"),
 
                   ]
+
     # mon iptv
     if __addon__.getSetting("iptv") != "false" and vIPTV:
         listeChoix.append(("03. IPTV", {"action":"iptvLoad"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/iptv.png', "iptv"))
+
+    #strms
+    if __addon__.getSetting("actifStrm") != "false" and vIPTV:
+        listeChoix.append(("04. Import STRMS", {"action":"strms"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Création strms via listes perso"))
+
     listeChoix.append(("20. Import Config", {"action":"impHK"}, "debrid.png", "Importation d'un config prefaite via rentry"))
     for choix in listeChoix:
         addDirectoryItemLocal(choix[0], isFolder=True, parameters=choix[1], picture=choix[2], texte=choix[3])
@@ -2838,7 +2849,8 @@ def configKeysApi():
         d = dialogApi.input(dictApi[choixApi[selectedApi]][1], type=xbmcgui.INPUT_ALPHANUM, defaultt=key)
         addon.setSetting(id=dictApi[choixApi[selectedApi]][0], value=d)
 
-def makeStrms(clear=0):
+def makeStrmsOld(clear=0):
+
     pDialog = xbmcgui.DialogProgress()
     pDialog.create('Pbi2kodi', 'Extraction Paste... .')
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
@@ -2869,6 +2881,12 @@ def makeStrms(clear=0):
         pDialog.update(0, 'DIVERS')
         pbi.makeDiversNFO(pbi.dictDiversPaste.values(), clear=clear, progress=pDialog, nomRep=nomRep)
     showInfoNotification("strms créés!")
+
+def makeStrms(clear=0):
+    strmC = Strm(BDMEDIANew)
+    strmC.makeStrms()
+    showInfoNotification("strms créés!")
+    xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.Scan", "id": "1"}')
 
 def idPaste(lePaste):
     html_parser = HTMLParser()
@@ -4659,7 +4677,7 @@ def choixliste():
         xbmc.executebuiltin('ReloadSkin')
 
 def testUptobox(key):
-    url = 'https://uptobox.eu/api/user/me?token=' + key
+    url = 'https://%s/api/user/me?token=' %__addon__.getSetting("extupto") + key
     headers = {'Accept': 'application/json'}
     try:
         data = requests.get(url, headers=headers).json()
@@ -4875,7 +4893,7 @@ def router(paramstring):
          # player
         'play': (playMedia, params), 'playHK': (playMediaHK, params), 'playHKEpisode': (playEpisode, params),
         # u2p local
-        'os': (selectOS, ""), 'apiConf': (configKeysApi, ""), 'strms': (makeStrms, ""), 'clearStrms': (makeStrms, 1), 'ePaste': (editPaste, ""), 'groupe': (creaGroupe, ""),
+        'os': (selectOS, ""), 'apiConf': (configKeysApi, ""), 'clearStrms': (makeStrms, 1), 'ePaste': (editPaste, ""), 'groupe': (creaGroupe, ""),
         # config kodi
         'thmn': (editNbThumbnails, ""), 'resos': (editResos, ''), 'rlk': (reloadSkin, ""),
         # database
@@ -4897,6 +4915,8 @@ def router(paramstring):
         "listeAll": (uptobox.listeAllded, params), "affNewsUpto": (newUptoPublic, params), "addcompte": (addCompteUpto, params), "AffCatPoiss": (newUptoPublic2, params), "affSaisonUptoPoiss": (affSaisonUptoPoiss, params),
         "visuEpisodesUptoPoiss": (visuEpisodesUptoPoiss, params), "delcompte": (delcompte, params), "affdetailfilmpoiss": (uptobox.detailFilmPoiss, params), "cryptFolder": (scraperUPTO.cryptFolder, ""),
         "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""),
+        #strm
+        'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""),
         #profils
         'ajoutP': (ajoutProfil, ""), 'choixP': (choixProfil, ""), 'suppP': (suppProfil, ""), 'actifP': (actifProfil, params), 'actifPm': (choixProfil, 1), "affProfils":( affProfils, ""),
         "assistant": (assistant, ""),

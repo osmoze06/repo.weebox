@@ -48,6 +48,7 @@ try:
     BDFLDP = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mymedia.db')
     BDREPONEW = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd')
     NBMEDIA = int(ADDON.getSetting("nbupto"))
+    EXTUPTO = ADDON.getSetting("extupto")
 except: pass
 
 class RenameMedia:
@@ -213,7 +214,7 @@ class BookmarkUpto:
 class Uptobox:
 
     def __init__(self, key=''):
-        self.baseurl = "https://uptobox.eu"
+        self.baseurl = "https://%s" %EXTUPTO
         self.urlFile = self.baseurl + '/api/user/files'
         self.key = key.strip()
         self.totalSize = 0
@@ -371,7 +372,7 @@ class Uptobox:
             dlLink = ""
             statut = "err"
 
-        return dlLink.replace("uptobox.com", "uptobox.eu"), statut
+        return dlLink.replace("uptobox.com", EXTUPTO), statut
 
     def file_search(self, path: str, limit: int, offset: int, search: str):
         url1 = self.baseurl + "/api/user/files?token={}&path={}&limit={}&searchField=file_name&search={}&offset={}".format(self.key, path, limit, search, offset)
@@ -404,7 +405,7 @@ class Alldedrid:
             if media["status"] == "Ready":
                 for link in media["links"]:
                     if link["filename"][-4:] in [".mp4", ".mkv", ".avi", "dixw", ".mp3"]:
-                        tabLinks.append((link["filename"], link["link"].replace("https://uptobox.eu/", "")))
+                        tabLinks.append((link["filename"], link["link"].replace("https://%s/" %EXTUPTO, "").replace("https://uptobox.com/", "")))
         return tabLinks[::-1]
 
     def extractListe(self, t="history"):
@@ -416,12 +417,12 @@ class Alldedrid:
         tabLinks = []
         for link in dictInfo["data"]["links"]:
             if link["filename"][-4:] in [".mp4", ".mkv", ".avi", "dixw", ".mp3"]:
-                tabLinks.append((link["filename"], link["link"].replace("https://uptobox.eu/", "")))
+                tabLinks.append((link["filename"], link["link"].replace("https://%s/" %EXTUPTO, "").replace("https://uptobox.com/", "")))
         return tabLinks
 
     def linkDownload(self, lien):
         dlLink = ""
-        url1 = self.urlBase + "/v4/link/unlock?agent=u2p&apikey=%s&link=https://uptobox.eu/%s" % (self.key , lien)
+        url1 = self.urlBase + "/v4/link/unlock?agent=u2p&apikey=%s&link=https://%s/%s" % (self.key, EXTUPTO, lien)
         req = requests.get(url1)
         dict_liens = req.json()
         try:
@@ -433,7 +434,7 @@ class Alldedrid:
         except:
             dlLink = ""
             statut = "err"
-        return dlLink.replace("uptobox.com", "uptobox.eu"), statut
+        return dlLink.replace("uptobox.com", EXTUPTO), statut
 
 #===================================================================================== fonctions ==========================================================================
 def actifTrakt():

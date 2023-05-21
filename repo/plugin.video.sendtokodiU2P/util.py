@@ -360,4 +360,55 @@ def updateInfoTagVideo(li, media, setUniqueId= False, isSerie=False, hasDuration
             li.setInfo('video', {"duration": media.duration * 60})
         return li
 
+def makeNameRep(title):
+    title = unquote(title)#, encoding='latin-1', errors='replace')
+    title = unicodedata.normalize('NFD', title).encode('ascii','ignore').decode("latin-1")
+    tab_remp = [r'''\\|/|:|\*|\?|"|<|>|\|| {2,}''', ' ']
+    title = re.sub(tab_remp[0], tab_remp[1], title)
+    title = title[:64].strip()
+    return title
 
+def saveFile(fileIn, textOut):
+    if os.path.isfile(fileIn):
+        try:
+            with io.open(fileIn, "r", encoding="utf-8") as f:
+                textIn = f.read()
+        except:
+            with io.open(fileIn, "r", encoding="latin-1") as f:
+                textIn = f.read()
+    else:
+        textIn = ""
+    if textIn != textOut:
+        with open(fileIn, "w") as f:
+            f.write(textOut)
+
+def uExtractMedias(bd=None,limit=0, offset=1, sql="", unique=0):
+    cnx = sqlite3.connect(bd)
+    cur = cnx.cursor()
+    requete = None
+    try:
+        def normalizeTitle(tx):
+            #tx = re.sub(r''' {2,}''', ' ', re.sub(r''':|;|'|"|,''', ' ', tx))
+            tx = re.sub(r''':|;|'|"|,|\-''', ' ', tx)
+            tx = re.sub(r''' {2,}''', ' ', tx)
+            tx = str(tx).lower()
+            return unicodedata.normalize('NFD', tx).encode('ascii','ignore').decode("latin-1")
+        cnx.create_function("normalizeTitle", 1, normalizeTitle)
+        if sql:
+            cur.execute(sql)
+            if unique:
+                requete = [x[0] for x in cur.fetchall()]
+            else:
+                requete = cur.fetchall()
+        else:
+            if limit > 0:
+                cur.execute("SELECT title, overview, year, poster, link, numId FROM movie LIMIT %d OFFSET %d" %(limit, offset))
+            else:
+                cur.execute("SELECT title, overview, year, poster, link, numId FROM movie ORDER BY title COLLATE NOCASE ASC")
+            requete = cur.fetchall()
+    except Exception as e:
+        notice("util.py - uExtractMedias :" +str(sql) + " - " + str(e))
+
+    cur.close()
+    cnx.close()
+    return requete

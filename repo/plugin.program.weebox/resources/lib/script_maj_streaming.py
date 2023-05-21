@@ -1,31 +1,43 @@
-#!/usr/bin/python3
+# -*- coding: ISO-8859-1 -*-
 import xbmc
 import xbmcvfs
 import xbmcgui
 import urllib.request
 import shutil
 
+#ACTUALISATION FICHIERS CONFIGURATION U2P
+
+settings_download = 'http://localhost/libreelec/clients/HOME_Localhost/SETTINGS_U2P/settings.xml'
+settings_loc = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/settings.xml')
+
+#db_download = 'http://localhost/libreelec/clients/HOME_Localhost/SETTINGS_U2P/bookmark.db'
+#db_loc = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/bookmark.db')
+
+urllib.request.urlretrieve(settings_download, settings_loc)
+#urllib.request.urlretrieve(db_download, db_loc)
+
+xbmc.executebuiltin("Notification(EXTRACTION OK,Mise ‡ jour des paramËtres effectuÈe !)")
+xbmc.sleep(2000)
+
+#MISE A JOUR ZIP U2P
 
 pDialog = xbmcgui.DialogProgress()
-pDialog.create('WEEBOX - MISES A JOUR', 'Initialisation des t√©l√©chargements des Extensions...')
+pDialog.create('WEEBOX - MISES A JOUR', 'Initialisation des tÈlÈchargements des Extensions...')
 xbmc.sleep(2000)
 
-pDialog.update(50, 'STREAMING SERVICES...\n\nplugin.video.sendtokodiU2P.zip')
-url = 'https://github.com/osmoze06/addons_updates/raw/master/plugin.video.sendtokodiU2P.zip'
-loc = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.weebox/skin_save/maj/plugin.video.sendtokodiU2P.zip')
+pDialog.update(50, 'STREAMING SERVICES \n\nplugin.video.sendtokodiU2P.zip')
+url = 'http://localhost/libreelec/clients/addons/plugin.video.sendtokodiU2P.zip'
+loc = xbmcvfs.translatePath('special://home/downloads/updates/plugin.video.sendtokodiU2P.zip')
 urllib.request.urlretrieve(url, loc)
 
-pDialog.update(100, 'TELECHARGEMENT, R√©cup√©ration archive ZIP effectu√©e...')
+pDialog.update(100, 'TELECHARGEMENT, RÈcupÈration archive ZIP effectuÈe...')
 xbmc.sleep(2000)
 pDialog.close()
-
-dialog = xbmcgui.Dialog()
-i = dialog.ok("MISE A JOUR DU 27/02/2022","STREAMING :\n\n- Tri Liste S√©ries Documentaire\n- Am√©lioration de la Recherche\n- Retrait Time 70 secondes par d√©faut (Up Next)\n- Retrait Actualisation Skin en Auto-Update\n- Texte par d√©faut si Synopsis absent\nTV ET REPLAY :\n- Replay RMC BFM (compte √† renseigner)\n- Cha√Ænes RMC BFM Live fonctionnelles")
 
 DIALOG = xbmcgui.Dialog()
 
 if __name__ == "__main__":
-    response = DIALOG.yesno('INSTALLER LES MISES A JOUR ?', 'Choisir la source WEEBOX UPDATE - STREAMING et cliquer sur ce ZIP pour mettre a jour.\n\nplugin.video.sendtokodiU2P.zip', yeslabel='INSTALLER', nolabel='Quitter')
+    response = DIALOG.yesno('INSTALLER LES MISES A JOUR ?', 'Choisir la source WEEBOX UPDATES et cliquer sur ce ZIP pour mettre a jour.\n\nplugin.video.sendtokodiU2P.zip', yeslabel='INSTALLER', nolabel='Quitter')
 
     if response:
         # call the script from with kodi
@@ -34,4 +46,3 @@ if __name__ == "__main__":
     else:
         xbmc.executebuiltin('ActivateWindow(10000,return)')
 #xbmc.executebuiltin('RunScript(your_script)')
-sys.exit()

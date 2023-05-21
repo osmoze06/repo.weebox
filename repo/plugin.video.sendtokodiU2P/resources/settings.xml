@@ -75,6 +75,7 @@
         <setting label="Maj HK² & HK" type="lsep" />
         <!-- <setting id="majhk2" label="Activer la Maj au restart" type="bool" default="false" /> -->
         <!-- <setting label="Mise en place de la Maj au restart KODI" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart)"/>-->
+        <setting id="extupto" label="extension Uptobox" type="text" default="uptobox.eu" />
         <setting id="intmaj" label="Interval (mins) Service de MAJ (0=desactivé)" type="labelenum" values="0|15|30|45|60|120|180|240" default="0"/>
         <setting label="Mise en place service de Maj" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart2)"/>
         <setting id="delaimaj" label="Delai 1er MAJ (mins)" type="number" default="0"/>
@@ -89,6 +90,11 @@
         <setting label="Visuels" type="lsep" />
         <setting id="thumbnails" label="Nombre d'images en cache (0 = illimité)" type="number" default="0" />
         <setting label="Gestion des STRM" type="lsep" />
+        <setting id="actifStrm" label="STRM Files" type="bool" default="false" />
+        <setting id="strmFolder" label="Dossier des fichiers STRM" type="folder" visible="eq(-1,true)" />
+        <setting label="Selection widget" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strmSelectWidget)" visible="eq(-2,true)" />
+        <setting label="Création Manuel" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strms)" visible="eq(-3,true)" />
+        <!--<setting label="Gestion des STRM" type="lsep" />
         <setting id="paste" label="Identifiant aNotepad" type="text" default="" />
         <setting id="osVersion" label="Dossier des fichiers STRM" type="folder" />
         <setting label="Créer les fichiers STRM" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strms)"/>
@@ -96,7 +102,7 @@
         <setting label="Actualiser les fichiers STRM" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=clearStrms)"/>
         <setting label="Filtres" type="lsep" />
         <setting label="Importer des catégories" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=choixrepo)" />
-        <setting label="Importer des listes intelligentes" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=choixliste)" />
+        <setting label="Importer des listes intelligentes" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=choixliste)" />-->
     </category>
     <!-- Débrideurs -->
     <category label="Débrideurs">
@@ -133,12 +139,14 @@
         <setting id="token1" type="text" label="Token 1"  default="" visible="false"/>
         <setting id="passtmp" type="text" label="pass"  default="" visible="false"/>
     </category>
+    <!--
     <category label="Poissonnerie">
         <setting label="Ma Poissonnerie" type="lsep" />
         <setting id="poissFolder" label="Folder" type="text" default=""/>
         <setting id="poissHash" label="Hash" type="text" default=""/>
         <setting label="Vider la poissonnerie" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=reinitPoissonnerie)" />
     </category>
+    -->
     <category label="Bande Annonce">
         <setting label="Bande Annonce" type="lsep" />
         <setting id="numba" label="Numero" type="text" default="1yjXN"/>
