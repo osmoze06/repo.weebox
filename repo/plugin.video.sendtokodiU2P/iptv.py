@@ -713,7 +713,7 @@ def ajoutIPTV():
             heberg = ADDON.getSetting("heberg")
             if heberg == "Pastebin":
                 tx = getBdPastebin(repo)
-            elif "Rentry" in heberg :
+            elif heberg == "Rentry":
                 tx = getBdRentry(repo)
             elif heberg == "Textup":
                 tx = getBdTextup(repo)
@@ -900,7 +900,7 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
     ''' Add a list item to the XBMC UI.'''
     #notice(parameters)
     li = xbmcgui.ListItem(label=name)
-    updateMinimalInfoTagVideo(li,name,"")
+    li.setInfo('video', {"title": name, 'plot': "",'mediatype': 'video'})
     li.setArt({'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/iptv.png',
               'icon': ADDON.getAddonInfo('icon'),
               'fanart': ADDON.getAddonInfo('fanart')})
@@ -1031,7 +1031,8 @@ def affVod(params):
 def addDirNext(params):
     isFolder = True
     li = xbmcgui.ListItem(label="[COLOR red]Page Suivante[/COLOR]")
-    updateEmptyInfoTag(li)
+    li.setInfo('video', {"title": "     ", 'plot': "", 'genre': "", "dbid": 500000,
+            "year": "", 'mediatype': "movies", "rating": 0.0})
     li.setArt({
               'thumb': 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/next.png',
               'icon': ADDON.getAddonInfo('icon'),
@@ -1047,11 +1048,14 @@ def addDirectoryVod(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
+    li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
     try:
         int(media.duration)
     except:
         media.duration = "0"
-    updateInfoTagVideo(li,media,True,False,True,False,False)
+    li.setInfo('video', {"title": media.title, 'plot': media.overview, 'genre': media.genre,
+            "year": media.year, 'mediatype': media.typeMedia, "rating": media.popu, "duration": int(media.duration) * 60 })
+
     li.setArt({'icon': media.backdrop,
             'thumb': media.poster,
             'poster': media.poster,
@@ -1158,10 +1162,13 @@ def affChainesNew(params):
         macs = bd.getAdr(fournisseur)
         chaines = bd.getChaines(fournisseur, numId)
         epg = iptv.getInfos(iptv.epg.format(iptv.tv)).json()["js"]["data"]
+        #notice(epg)
         if not chaines:
             chaines = iptv.listeChaines(typM, numId)
             bd.insertChaines([list(x) + [int(numId), fournisseur] for x in chaines])
-        window = feniptv.FenIptv("TV", chaines, epg)
+
+        xbmc.executebuiltin('Dialog.Close(busydialog)')
+        window = feniptv.FenIptv(["TV", chaines, epg])
         window.doModal()
         del window
 
@@ -1241,11 +1248,7 @@ def replay(params):
             li = xbmcgui.ListItem(label=replay[1])
             #('4437032_43982', 'Garde à vue', "Deux fillettes ont été violées", '01:26:00', '02:51:00')
             plot = "%s - %s\n%s" %(replay[3], replay[4], replay[2])
-            vinfo = updateMinimalInfoTagVideo(li,replay[1],plot)
-            if extractKodiVersion() >=20.0:
-                vinfo.setPlaycount(1)
-            else:
-                li.setInfo('video', {"playcount": 1})
+            li.setInfo('video', {"title": replay[1], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
             li.setProperty('IsPlayable', 'true')
             parameters={"action": "playMediaIptv", "replay": replay[0], "lien": replay[0], "iptv": replay[1], "fourn": fournisseur}
             url = sys.argv[0] + '?' + urlencode(parameters)
@@ -1304,11 +1307,7 @@ def IPTVfav():
                     thumb = poster
                     break
         li = xbmcgui.ListItem(label=nom)
-        vinfo = updateMinimalInfoTagVideo(li,nom,plot)
-        if extractKodiVersion() >=20.0:
-            vinfo.setPlaycount(1)
-        else:
-            li.setInfo('video', {"playcount": 1})
+        li.setInfo('video', {"title": nom, 'plot': plot, 'mediatype': 'video', 'playcount': 1})
         thumb = thumb.replace(" ", "%20")
         poster = poster.replace(" ", "%20")
         li.setArt({
@@ -1343,95 +1342,94 @@ def IPTVfav():
 
 
 def affChaines(params):
-    fournisseur = params["fourn"]
-    numId = params["numId"]
-    typM = params["typM"]
-    ok = verifLock(fournisseur, numId)
-    if ok:
-        bd = BookmarkIPTV(BDBOOKMARK)
-        infosFourniseur = bd.recupToken(fournisseur)
-        site, mac, token = infosFourniseur[0]
-        #site = ADDON.getSetting("site1")
-        #mac = str.upper(ADDON.getSetting("mac1"))
-        #token = ADDON.getSetting("token1")
-        iptv = IPTVMac(site, mac, token)
-        correct =  bd.getCorrectEpg(site)
-        if os.path.isfile(xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/epg.bd")):
-            dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)}
-        else:
-            dictEpgNom = {}
-        macs = bd.getAdr(fournisseur)
-        chaines = bd.getChaines(fournisseur, numId)
-        try:
-            epg = iptv.getInfos(iptv.epg.format(iptv.tv)).json()["js"]["data"]
-        except:
-            epg = {}
-        if not chaines:
-            chaines = iptv.listeChaines(typM, numId)
-            bd.insertChaines([list(x) + [int(numId), fournisseur] for x in chaines])
-        #('ffmpeg http://myf-tv.com:8080/zzww6q9eU5krRyM/09gX7NRc93Dup7N/363150', 'FR| PRIME VIDEO Multiplex FHD', '363150', 'http://covers.dragons-ott.com/JAQUETTE/prime-league1.png')
-        xbmcplugin.setPluginCategory(HANDLE, "TV")
-        xbmcplugin.setContent(HANDLE, ADDON.getSetting('contentIptv'))
-        a = time.time() + (3600 * correct)
-        for i, chaine in enumerate(chaines):
-            plot = ""
-            thumb = ""
-            if  chaine[2] in dictEpgNom.keys() and dictEpgNom[chaine[2]] != "Aucun":
-                #'1650781740.0', '1650787200.0', 'Telematin', 'Magazine de services', "overview", 'https://focus.telerama.fr/1111x625/2022/02/13/fefdf6b798a1e61d26429f35178bc4db4f71599a.jpg')
-                progs = getNomEpgExt(dictEpgNom[chaine[2]])
-                for i, prog in enumerate(progs):
-                    if (int(a) + 7200) in range(int(prog[0][:-2]), int(prog[1][:-2]), 1):
-                        plot = "%s-%s\n[COLOR red]%s[/COLOR]\n%s\n%s" %(datetime.datetime.fromtimestamp(int(prog[0][:-2]) - 7200).strftime('%H:%M'), \
-                             datetime.datetime.fromtimestamp(int(prog[1][:-2]) - 7200).strftime('%H:%M'), prog[2], prog[3], prog[4])
-                        thumb = prog[5]
-                        break
-            elif chaine[2] in epg.keys():
-                for e in epg[chaine[2]]:
-                    if e['start_timestamp'] < int(a) and int(a) < e['stop_timestamp']:
-                        plot = "%s-%s\n[COLOR red]%s[/COLOR]\n%s" %(datetime.datetime.fromtimestamp(e['start_timestamp']).strftime('%H:%M'), \
-                            datetime.datetime.fromtimestamp(e['stop_timestamp']).strftime('%H:%M'), e["name"], e["descr"])
-                        thumb = chaine[3]
-                        break
-
-            li = xbmcgui.ListItem(label=chaine[1])
-            vinfo = updateMinimalInfoTagVideo(li,chaine[1],plot)
-            if extractKodiVersion() >=20.0:
-                vinfo.setPlaycount(1)
-            else:
-                li.setInfo('video', {"playcount": 1})
-            poster = chaine[3].replace(" ", "%20")
-            li.setArt({
-                  'poster': poster,
-                  "banner": poster,
-                  'icon': poster,
-                  #'icon': ADDON.getAddonInfo('icon'),
-                  #'fanart': ADDON.getAddonInfo('fanart'),
-                  'fanart': thumb })
-            if thumb:
-                li.setArt({'thumb': thumb})
-            else:
-                li.setArt({'thumb': poster})
-            li.setProperty('IsPlayable', 'false')
-            infChaine = [chaine[0], chaine[1].split("|")[-1].strip(), chaine[2], chaine[3], numId, fournisseur]
-            commands = []
-            commands.append(('[COLOR yellow]Programmes[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=affepgChann&channelId=%s&title=%s&fourn=%s)' %(chaine[2], chaine[1].split("|")[-1].strip(), fournisseur)))
-            commands.append(('[COLOR yellow]Synchro EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mapepg&channelId=%s&fourn=%s&title=%s)' %(chaine[2], fournisseur, chaine[1].split("|")[-1].strip())))
-            commands.append(('[COLOR yellow]Add Favoris[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=addFavIptv&link={}&nom={}&num={}&cover={}&numbouquet={}&fourn={})'.format(*infChaine)))
-            commands.append(('[COLOR yellow]Replay[/COLOR]', 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=iptvreplay&channelId=%s&fourn=%s, return)' %(chaine[2], fournisseur)))
-            for m in macs:
-                if m == mac:
-                    color = "green"
-                else:
-                    color = "red"
-                commands.append(('[COLOR %s]%s[/COLOR]' %(color, m), 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=activemac&mac=%s&fourn=%s&numId=%s&typM=%s,return)' %(m, fournisseur, numId, typM)))
-            li.addContextMenuItems(commands)
-            link = chaine[0]
-            parameters={"action": "playMediaIptv", "lien": link, "iptv": chaine[1], "fourn": fournisseur}
-            url = sys.argv[0] + '?' + urlencode(parameters)
-            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
-        xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+    if ADDON.getSetting("newfeniptv") != "false":
+        affChainesNew(params)
     else:
-        return
+        fournisseur = params["fourn"]
+        numId = params["numId"]
+        typM = params["typM"]
+        ok = verifLock(fournisseur, numId)
+        if ok:
+            bd = BookmarkIPTV(BDBOOKMARK)
+            infosFourniseur = bd.recupToken(fournisseur)
+            site, mac, token = infosFourniseur[0]
+            #site = ADDON.getSetting("site1")
+            #mac = str.upper(ADDON.getSetting("mac1"))
+            #token = ADDON.getSetting("token1")
+            iptv = IPTVMac(site, mac, token)
+            correct =  bd.getCorrectEpg(site)
+            if os.path.isfile(xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/epg.bd")):
+                dictEpgNom = {x[0]: x[1] for x in bd.getMapEpg(fournisseur)}
+            else:
+                dictEpgNom = {}
+            macs = bd.getAdr(fournisseur)
+            chaines = bd.getChaines(fournisseur, numId)
+            try:
+                epg = iptv.getInfos(iptv.epg.format(iptv.tv)).json()["js"]["data"]
+            except:
+                epg = {}
+            if not chaines:
+                chaines = iptv.listeChaines(typM, numId)
+                bd.insertChaines([list(x) + [int(numId), fournisseur] for x in chaines])
+            #('ffmpeg http://myf-tv.com:8080/zzww6q9eU5krRyM/09gX7NRc93Dup7N/363150', 'FR| PRIME VIDEO Multiplex FHD', '363150', 'http://covers.dragons-ott.com/JAQUETTE/prime-league1.png')
+            xbmcplugin.setPluginCategory(HANDLE, "TV")
+            xbmcplugin.setContent(HANDLE, ADDON.getSetting('contentIptv'))
+            a = time.time() + (3600 * correct)
+            for i, chaine in enumerate(chaines):
+                plot = ""
+                thumb = ""
+                if  chaine[2] in dictEpgNom.keys() and dictEpgNom[chaine[2]] != "Aucun":
+                    #'1650781740.0', '1650787200.0', 'Telematin', 'Magazine de services', "overview", 'https://focus.telerama.fr/1111x625/2022/02/13/fefdf6b798a1e61d26429f35178bc4db4f71599a.jpg')
+                    progs = getNomEpgExt(dictEpgNom[chaine[2]])
+                    for i, prog in enumerate(progs):
+                        if (int(a) + 7200) in range(int(prog[0][:-2]), int(prog[1][:-2]), 1):
+                            plot = "%s-%s\n[COLOR red]%s[/COLOR]\n%s\n%s" %(datetime.datetime.fromtimestamp(int(prog[0][:-2]) - 7200).strftime('%H:%M'), \
+                                 datetime.datetime.fromtimestamp(int(prog[1][:-2]) - 7200).strftime('%H:%M'), prog[2], prog[3], prog[4])
+                            thumb = prog[5]
+                            break
+                elif chaine[2] in epg.keys():
+                    for e in epg[chaine[2]]:
+                        if e['start_timestamp'] < int(a) and int(a) < e['stop_timestamp']:
+                            plot = "%s-%s\n[COLOR red]%s[/COLOR]\n%s" %(datetime.datetime.fromtimestamp(e['start_timestamp']).strftime('%H:%M'), \
+                                datetime.datetime.fromtimestamp(e['stop_timestamp']).strftime('%H:%M'), e["name"], e["descr"])
+                            thumb = chaine[3]
+                            break
+
+                li = xbmcgui.ListItem(label=chaine[1])
+                li.setInfo('video', {"title": chaine[1], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
+                poster = chaine[3].replace(" ", "%20")
+                li.setArt({
+                      'poster': poster,
+                      "banner": poster,
+                      'icon': poster,
+                      #'icon': ADDON.getAddonInfo('icon'),
+                      #'fanart': ADDON.getAddonInfo('fanart'),
+                      'fanart': thumb })
+                if thumb:
+                    li.setArt({'thumb': thumb})
+                else:
+                    li.setArt({'thumb': poster})
+                li.setProperty('IsPlayable', 'false')
+                infChaine = [chaine[0], chaine[1].split("|")[-1].strip(), chaine[2], chaine[3], numId, fournisseur]
+                commands = []
+                commands.append(('[COLOR yellow]Programmes[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=affepgChann&channelId=%s&title=%s&fourn=%s)' %(chaine[2], chaine[1].split("|")[-1].strip(), fournisseur)))
+                commands.append(('[COLOR yellow]Synchro EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mapepg&channelId=%s&fourn=%s&title=%s)' %(chaine[2], fournisseur, chaine[1].split("|")[-1].strip())))
+                commands.append(('[COLOR yellow]Add Favoris[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=addFavIptv&link={}&nom={}&num={}&cover={}&numbouquet={}&fourn={})'.format(*infChaine)))
+                commands.append(('[COLOR yellow]Replay[/COLOR]', 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=iptvreplay&channelId=%s&fourn=%s, return)' %(chaine[2], fournisseur)))
+                for m in macs:
+                    if m == mac:
+                        color = "green"
+                    else:
+                        color = "red"
+                    commands.append(('[COLOR %s]%s[/COLOR]' %(color, m), 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=activemac&mac=%s&fourn=%s&numId=%s&typM=%s,return)' %(m, fournisseur, numId, typM)))
+                li.addContextMenuItems(commands)
+                link = chaine[0]
+                parameters={"action": "playMediaIptv", "lien": link, "iptv": chaine[1], "fourn": fournisseur}
+                url = sys.argv[0] + '?' + urlencode(parameters)
+                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
+            xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+        else:
+            return
 
 def getNomEpgExt(tvid=""):
     database = xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/epg.bd")
@@ -1537,5 +1535,12 @@ def playMedia(params):
         #xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
         #notice(result["url"])
         xbmc.Player().play(result["url"], listitem=listIt)
+        #keyb = xbmc.Keyboard('', 'Search')
+        #keyb.doModal()
+        #while xbmc.Player().isPlaying():
+        #    if (keyb.isConfirmed()):
+        #        notice("Keyboard")
+        #        notice(keyb.getText())
+        #    time.sleep(0.1)
 if __name__ == '__main__':
   pass

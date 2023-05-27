@@ -48,6 +48,7 @@
         <setting id="autoplay_delay" label="Délai avant le lancement (en seconde)" type="slider" range="0,1,30" option="int" default="0" subsetting="true" visible="eq(-1,true)" />
         <setting id="filtliens" label="Filtrage des liens" type="bool" default="false" />
         <setting label="Lancer automatiquement l'épisode suivant" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=patch)" />
+        <setting id="newfen" label="New fenêtre info" type="bool" default="false" />
         <setting label="Listes" type="lsep" />
         <setting id="nb_items" label="Nombre d'élements par page" type="number" default="500" />
         <setting id="lists_orderby" label="Trie par défaut" type="labelenum" values="Année|Titre|Popularité|Date Added" default="Date Added" />
@@ -111,6 +112,7 @@
         <setting id="keyalldebrid" label="AllDebrid" type="text" default=""/>
         <setting id="keyrealdebrid" label="RealDebrid" type="text" default=""/>
         <setting id="apikey" type="text" label="TMDB"  default="96139384ce46fd4ffac13e1ad770db7a"/>
+        <setting id="keyfanart" type="text" label="Fanart"  default="a5410a6b423b516c617c0cc8e04339ab"/>
     </category>
     <category label="Trakt">
     	<setting id="clientid" type="text" label="Trakt Client Id"  default="29ed315a4ca3ead741a0844a44d8a3103e00071b89fd107aa54f13dc7795605f"/>
@@ -138,6 +140,7 @@
         <setting id="mac1" type="text" label="Adr 1"  default="" visible="false"/>
         <setting id="token1" type="text" label="Token 1"  default="" visible="false"/>
         <setting id="passtmp" type="text" label="pass"  default="" visible="false"/>
+        <setting id="newfeniptv" label="New fenêtre IPTV chaines" type="bool" default="false" />
     </category>
     <!--
     <category label="Poissonnerie">

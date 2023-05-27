@@ -50,14 +50,6 @@ except ImportError:
     # Python 2
     from HTMLParser import HTMLParser
 
-def notice(content):
-    log(content, xbmc.LOGINFO)
-
-def log(msg, level=xbmc.LOGINFO):
-    addon = xbmcaddon.Addon()
-    addonID = addon.getAddonInfo('id')
-    xbmc.log('%s: %s' % (addonID, msg), level)
-
 pyVersion = sys.version_info.major
 pyVersionM = sys.version_info.minor
 if pyVersionM == 11:
@@ -84,10 +76,348 @@ import createbdhk
 import random
 import uptobox
 from strm import Strm, configureSTRM
+import feninfo
 try:
     BDMEDIA = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/medias.bd')
     BDMEDIANew = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd')
 except: pass
+
+class FenInfo(pyxbmct.AddonFullWindow):
+
+
+    #def __init__(self, numId, title="", typM="film"):
+    def __init__(self, title=""):
+        """Class constructor"""
+        # Call the base class' constructor.
+        self.numId = title.split("*")[0]
+        title = title.split("*")[1]
+        self.typM = "film"
+        super(FenInfo, self).__init__(title)
+        # Set width, height and the grid parameters
+
+
+        self.setGeometry(1250, 700, 50, 30)
+        self.setBackground(xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/resources/png/fond.png'))
+
+        # Call set controls method
+        self.set_controls()
+
+        # Call set navigation method.
+        self.set_navigation()
+
+        # Connect Backspace button to close our addon.
+        self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+
+    def set_controls(self):
+        """Set up UI controls"""
+        notice(self.numId)
+        self.colorMenu = '0xFFFFFFFF'
+        size = self.getTaille()
+
+        sql = "SELECT title, overview, year, genres, backdrop, popu, numId, poster, runtime, saga FROM filmsPub WHERE numId={}".format(self.numId)
+        liste = createbdhk.extractMedias(sql=sql)
+        try:
+            title, overview, year, genre, backdrop, popu, numId, poster, duration, saga = liste[0]
+            backdrop = "http://image.tmdb.org/t/p/" + size[1] + backdrop
+            poster = "http://image.tmdb.org/t/p/" + size[0] + poster
+        except:
+            return
+
+
+        #backdrop
+        #image = pyxbmct.Image(backdrop, colorDiffuse='0x22FFFFFF')
+
+        image = pyxbmct.Image(backdrop)
+        self.placeControl(image, 0, 7, rowspan=42, columnspan=23)
+
+        f = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/resources/png/fond.png')
+        fond = pyxbmct.Image(f)
+        self.placeControl(fond, 0, 0, rowspan=54, columnspan=30)
+
+        #f = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/resources/png/fond.png')
+        #fond = pyxbmct.Image(f)
+        #self.placeControl(fond, 0, 14, rowspan=25, columnspan=15)
+
+
+        logo = ""
+        #logo, clearart, banner = extractFanart(self.numId)
+        #urlFanart = "http://assets.fanart.tv/fanart/movie/"
+
+        #clearlogo ou title
+        if logo:
+            imageLogo = pyxbmct.Image(urlFanart + logo)
+            self.placeControl(imageLogo, 0, 0, rowspan=8, columnspan=7)
+        else:
+            label = pyxbmct.Label(title, font='font_MainMenu')
+            self.placeControl(label, 2, 0, columnspan=15)
+
+        #poster
+        #if clearart:
+        #    imageClearart = pyxbmct.Image(urlFanart + clearart)
+        #    self.placeControl(imageClearart, 35, 25, rowspan=12, columnspan=5)
+        #else:
+
+        #poster = pyxbmct.Image(poster)
+        #self.placeControl(poster, 29, 25, rowspan=24, columnspan=5)
+
+        """
+        #menu
+        paramstring = self.links.split("*")
+        cr = cryptage.Crypt()
+
+        dictResos = cr.extractReso([(x.split("#")[0].split("@")[0], x.split("#")[0].split("@")[1]) for x in paramstring])
+        dictResos = {x.split("#")[0].split("@")[1]: dictResos[x.split("#")[0].split("@")[1]] if dictResos[x.split("#")[0].split("@")[1]] else x.split("#")[1] for x in paramstring}
+        self.paramstring = orderLiens(dictResos, paramstring)
+        tabRelease = [dictResos[x.split("#")[0].split("@")[1]][2] for i, x in enumerate(self.paramstring)]
+        self.tabNomLien = ["#%d [COLOR red][%s - %.2fGo][/COLOR] -- [Release: %s]" %(i + 1, dictResos[x.split("#")[0].split("@")[1]][0], (int(dictResos[x.split("#")[0].split("@")[1]][1]) / 1000000000.0), tabRelease[i]) for i, x in enumerate(self.paramstring)]
+        """
+
+        #labelMenu = pyxbmct.Label('MENU', textColor=self.colorMenu)
+        #self.placeControl(labelMenu, 31, 0, columnspan=10)
+        self.menu = pyxbmct.List('font13', _itemHeight=30, _alignmentY=90)
+        self.placeControl(self.menu, 29, 0, rowspan=12, columnspan=30)
+        #, "Acteurs & Réalisateur"
+        self.menu.addItems(["[COLOR blue]Bande Annonce[/COLOR]", "[COLOR green]Links[/COLOR]", "Saga", "Suggestions", "Similaires", "Studio"])
+        #self.menu.addItems(self.tabNomLien)
+        self.connect(self.menu, lambda: self.listFunction(self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()))
+
+
+        #overview
+        #labelSynop = pyxbmct.Label('SYNOPSIS', textColor=colorMenu)
+        #self.placeControl(labelSynop, 14, 0, columnspan=10)
+        self.synop = pyxbmct.TextBox('font13', textColor='0xFFFFFFFF')
+        self.placeControl(self.synop, 10, 0, rowspan=16, columnspan=18)
+        self.synop.setText("[COLOR green]SYNOPSIS: [/COLOR]" + overview)
+        self.synop.autoScroll(4000, 2000, 3000)
+
+        #============================================================================ ligne notation duree =========================================
+        ligneNot = 26
+        #duree
+        text = "0xFFFFFFFF"
+        current_time = datetime.now()
+        future_time = current_time + timedelta(minutes=duration)
+        heureFin = future_time.strftime('%H:%M')
+
+        label = pyxbmct.Label('%s       %d mns (se termine à %s)' %(year, duration, heureFin), textColor=self.colorMenu)
+        self.placeControl(label, ligneNot, 0, columnspan=12)
+
+
+        #notation
+        label = pyxbmct.Label('%0.1f/10' %float(popu),textColor=self.colorMenu)
+        self.placeControl(label, ligneNot, 12, columnspan=12)
+        #self.slider = pyxbmct.Slider(orientation=xbmcgui.HORIZONTAL)
+        #self.placeControl(self.slider, ligneNot + 1, 14, pad_y=1, rowspan=2, columnspan=4)
+        #self.slider.setPercent(media.popu * 10)
+
+        """
+        #play
+        p = 0
+        self.buttonLinks = pyxbmct.Button("Links")
+        self.placeControl(self.buttonLinks, 31, p, columnspan=3, rowspan=5)
+        self.connect(self.buttonLinks, self.buttonFx)
+
+        p += 3
+        self.buttonBa = pyxbmct.Button("Bande Annonce")
+        self.placeControl(self.buttonBa, 31, p, columnspan=3, rowspan=5)
+
+        p += 3
+        self.buttonSaga = pyxbmct.Button("Saga")
+        self.placeControl(self.buttonSaga, 31, p, columnspan=3, rowspan=5)
+
+        p += 3
+        self.buttonReco = pyxbmct.Button("Recommendations")
+        self.placeControl(self.buttonReco, 31, p, columnspan=3, rowspan=5)
+
+        p += 3
+        self.buttonSimi = pyxbmct.Button("Similaires")
+        self.placeControl(self.buttonSimi, 31, p, columnspan=3, rowspan=5)
+
+        p += 3
+        self.buttonStudio = pyxbmct.Button("Studio")
+        self.placeControl(self.buttonStudio, 31, p, columnspan=3, rowspan=5)
+        """
+
+        #fav HK
+        self.radiobutton = pyxbmct.RadioButton("Ajouter Fav's HK", textColor=self.colorMenu)
+        self.placeControl(self.radiobutton, 26, 25, columnspan=5, rowspan=3)
+        self.connect(self.radiobutton, self.radio_update)
+        if ADDON.getSetting("bookonline") != "false":
+            listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=movies" %(ADDON.getSetting("bookonline_site"), ADDON.getSetting("bookonline_name")))
+            listeM = [int(x) for x in listeM]
+        else:
+            listeM = list(widget.extractFavs())
+        if int(self.numId) in listeM:
+            self.radiobutton.setSelected(True)
+            self.radiobutton.setLabel("Retirer Fav's HK")
+        #=============================================================================================================================================
+
+        #genres
+        label = pyxbmct.FadeLabel()
+        self.placeControl(label, 26, 17, columnspan=5)
+        label.addLabel(genre)
+
+        # sagas
+        self.sagaOk = False
+        #sql = "SELECT s.title, s.poster, s.numId FROM saga AS s WHERE s.numId=(SELECT t.numIdSaga FROM sagaTitle AS t WHERE t.numId={})".format(self.numId)
+        #saga = extractMedias(sql=sql)
+        #notice(saga)
+        saga =0
+        if saga:
+            self.sagaOk = True
+            label = pyxbmct.Label("SAGA", textColor=self.colorMenu)
+            self.placeControl(label, 43, 22, columnspan=4)
+            if saga[0][1]:
+                imFoc = "http://image.tmdb.org/t/p/w92" + saga[0][1]
+            else:
+                imFoc = ""
+            txRea = saga[0][0]
+            self.bSaga = pyxbmct.Button(txRea, focusTexture=imFoc, noFocusTexture=imFoc, font="font10", focusedColor='0xFFFF0000', alignment=pyxbmct.ALIGN_CENTER, shadowColor='0xFF000000')
+            self.placeControl(self.bSaga, 40, 24, rowspan=10, columnspan=2)
+            self.connect(self.bSaga, lambda: self.affSaga(str(saga[0][2])))
+
+        self.setCasting()
+
+        # cast
+        #mdb = TMDB(__keyTMDB__)
+        #liste = mdb.castFilm(self.numId)
+        #notice(liste)
+        #label = pyxbmct.Label('REALISATEUR:',textColor=colorMenu)
+        #self.placeControl(label, 8, 0, columnspan=5)
+        #rea = ", ".join([x[0] for x in liste if x[1] == "Réalisateur"])
+        #label = pyxbmct.Label(rea)
+        #self.placeControl(label, 8, 4, columnspan=8)
+        #label = pyxbmct.Label('ACTEURS:',textColor=colorMenu)
+        #self.placeControl(label, 11, 0, columnspan=5)
+        #acteurs = ", ".join(["%s (%s)" %(x[0], x[1]) for x in liste if x[1] != "Réalisateur"][:3])
+        #label = pyxbmct.FadeLabel(font="font12")
+        #self.placeControl(label, 11, 4, columnspan=10)
+        #label.addLabel(acteurs)
+
+    def buttonFx(self):
+        sql =  "SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId={}".format(self.numId)
+        links = createbdhk.extractMedias(sql=sql, unique=1)[0]
+        #self.close()
+        #affLiens2({"u2p":self.numId, "lien": links})
+
+        #xbmc.executebuiltin('Dialog.Close(busydialog)')
+        #xbmc.executebuiltin("RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=afficheLiens&lien={}&u2p={})".format(links, self.numId), True)
+        #xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=afficheLiens&lien={}&u2p={},return)".format(links, self.numId))
+        #xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=playHK&lien=IBSfuEFS2%404U3iXKqCCQZq%231080.Multi.WEB&u2p=852830,return)")
+
+        #self.close()
+
+    def affSaga(self, numId):
+        showInfoNotification(numId)
+        mediasHK({"famille": "sagaListe", "u2p": numId})
+        self.close()
+
+    def getBa(self, params):
+        numId = params["u2p"]
+        typMedia = params["typM"]
+        mdb = TMDB(KEYTMDB)
+        tabBa = mdb.getNumIdBA(numId, typMedia)
+        if tabBa:
+            dialog = xbmcgui.Dialog()
+            selectedBa = dialog.select("Choix B.A", ["%s (%s)" %(x[0], x[1]) for x in tabBa], 0, 0)
+            if selectedBa  != -1:
+                keyBa = tabBa[selectedBa][2]
+                xbmc.executebuiltin("RunPlugin(plugin://plugin.video.youtube/?action=play_video&videoid={})".format(keyBa), True)
+        self.close()
+
+    def setCasting(self):
+        mdb = TMDB(KEYTMDB)
+        liste = mdb.castFilm(self.numId)
+        nbListe = len(liste)
+        posy = 0
+        self.tabCast = [None] * 20
+        self.tabCast2 = [None] * 20
+        for i, casting1 in enumerate(liste[:10]):
+            self.tabCast2[i] = casting1
+            if self.tabCast2[i][2]:
+                imFoc = "http://image.tmdb.org/t/p/w342" + self.tabCast2[i][2]
+            else:
+                imFoc = ""
+            txRea = "%s (%s)" %(self.tabCast2[i][0], self.tabCast2[i][1])
+            self.tabCast[i] = pyxbmct.Button(txRea, focusTexture=imFoc, noFocusTexture=imFoc, font="font10", focusedColor='0xFFFF0000', alignment=pyxbmct.ALIGN_CENTER, shadowColor='0xFF000000')
+            self.placeControl(self.tabCast[i], 38, posy, rowspan=15, columnspan=3)
+            self.connect(self.tabCast[i], lambda: self.affCastingFilmo(str(self.tabCast2[i][3])))
+            posy += 3
+
+
+    def affCastingFilmo(self, numId):
+        mediasHK({"famille": "cast", "u2p": numId})
+        self.close()
+
+
+
+    def getTaille(self):
+      dictSize = {"Basse": ("w185/", "w780/"),
+                "Moyenne": ("w342/", "w1280/"),
+                "Haute": ("w500/", "original/")}
+      v = ADDON.getSetting("images_sizes")
+      return dictSize[v]
+
+    def setAnimation(self, control):
+        # Set fade animation for all add-on window controls
+        control.setAnimations([('WindowOpen', 'effect=fade start=0 end=100 time=500',),
+                                ('WindowClose', 'effect=fade start=100 end=0 time=500',)])
+
+    def set_navigation(self):
+        """Set up keyboard/remote navigation between controls."""
+        self.menu.controlUp(self.radiobutton)
+
+        if self.tabCast:
+            self.menu.controlDown(self.tabCast[0])
+            self.menu.controlLeft(self.tabCast[0])
+            self.radiobutton.controlUp(self.tabCast[0])
+
+        self.menu.controlRight(self.radiobutton)
+        self.radiobutton.controlRight(self.menu)
+        self.radiobutton.controlLeft(self.menu)
+        self.radiobutton.controlDown(self.menu)
+        self.setFocus(self.menu)
+
+
+        if self.tabCast:
+            for i in range(len([x for x in self.tabCast if x])):
+                self.tabCast[i].controlUp(self.menu)
+                self.tabCast[i].controlDown(self.radiobutton)
+                if (i + 1) < len([x for x in self.tabCast if x]):
+                    self.tabCast[i].controlRight(self.tabCast[i + 1])
+                else:
+                    if self.sagaOk:
+                        self.tabCast[i].controlRight(self.bSaga)
+                if (i - 1) > -1:
+                    self.tabCast[i].controlLeft(self.tabCast[i - 1])
+
+
+
+    def radio_update(self):
+        # Update radiobutton caption on toggle
+        #liste favs
+        if self.radiobutton.isSelected():
+            self.radiobutton.setLabel("Retirer Fav's HK")
+            gestionFavHK({"mode": "ajout", "u2p": self.numId, "typM": "movies"})
+        else:
+            self.radiobutton.setLabel("Ajouter Fav's HK")
+            gestionFavHK({"mode": "sup", "u2p": self.numId, "typM": "movies"})
+
+    def listFunction(self, tx):
+        #lsite fonction du menu
+        #self.close()
+        if "Bande" in tx:
+            self.getBa({"u2p": self.numId, "typM": "movie"})
+        elif "Links" in tx:
+            sql =  "SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId={}".format(self.numId)
+            links = createbdhk.extractMedias(sql=sql, unique=1)[0]
+            #affLiens2({"u2p": self.numId, "lien": links})
+            #xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=playHK&lien=IBSfuEFS2%404U3iXKqCCQZq%231080.Multi.WEB&u2p=852830,return)")
+            #xbmc.executebuiltin("ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=afficheLiens&lien={}&u2p={},return)".format(links, self.numId))
+            playMediaHK({"lien": "IBSfuEFS2@4U3iXKqCCQZq#1080.Multi.WEB", "u2p": "852830"})
+        elif "Simi" in tx:
+            loadSimReco2({"u2p": self.numId, "typ": "Similaires", "typM": "movie"})
+        elif "Sugg" in tx:
+            loadSimReco2({"u2p": self.numId, "typ": "Recommendations", "typM": "movie"})
 
 
 class FenFilmDetail(pyxbmct.AddonDialogWindow):
@@ -305,6 +635,14 @@ def linkDownload1Fichier(key, linkUrl):
     else:
         #key out => No such user
         return url, message
+
+def notice(content):
+    log(content, xbmc.LOGINFO)
+
+def log(msg, level=xbmc.LOGINFO):
+    addon = xbmcaddon.Addon()
+    addonID = addon.getAddonInfo('id')
+    xbmc.log('%s: %s' % (addonID, msg), level)
 
 def showInfoNotification(message):
     xbmcgui.Dialog().notification("U2Pplay", message, xbmcgui.NOTIFICATION_INFO, 5000)
@@ -540,92 +878,109 @@ def gestionListeV(params):
     nom = params["nom"]
     widget.gestionListeVdetail(nom, numId, typMedia, mode)
 
+def detailsMediaNew(params):
+    typMedia = "movie"
+    numId = params["u2p"]
+    sql = "SELECT title, overview, year, genres, backdrop, popu, numId, poster, runtime FROM filmsPub WHERE numId={}".format(numId)
+    liste = createbdhk.extractMedias(sql=sql)
+    try:
+        title, overview, year, genre, backdrop, popu, numId, poster, runtime = liste[0]
+    except:
+        return
+    fenInfo({"u2p": numId, "typM": "movies", "title": title})
+
+
 def detailsMedia(params):
     notice("detailM")
     notice(params)
-    try:
-        links = params["lien"]
-    except:
-        try:
-            if __addon__.getSetting("actifnewpaste") != "false":
-                sql =  "SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId={}".format(params["u2p"])
-                links = createbdhk.extractMedias(sql=sql, unique=1)[0]
-            else:
-                sql = "SELECT link FROM movieLink WHERE numId={}".format(params["u2p"])
-                links = extractMedias(sql=sql, unique=1)[0]
-        except:
-            return False
-    #typMedia = params["typM"]
-    typMedia = "movie"
-    numId = params["u2p"]
-    u2p = params["u2p"]
-    try:
-        sql = "SELECT title, overview, year, genre, backdrop, popu, numId, poster, runtime FROM movie WHERE numId={}".format(numId)
-        liste = extractMedias(sql=sql)
-    except:
-        liste = []
-    if liste:
-        title, overview, year, genre, backdrop, popu, numId, poster, runtime = liste[0]
+    if __addon__.getSetting("newfen") != "false":
+        detailsMediaNew(params)
     else:
-        sql = "SELECT title, overview, year, genres, backdrop, popu, numId, poster, runtime FROM filmsPub WHERE numId={}".format(numId)
-        liste = createbdhk.extractMedias(sql=sql)
         try:
+            links = params["lien"]
+        except:
+            try:
+                if __addon__.getSetting("actifnewpaste") != "false":
+                    sql =  "SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId={}".format(params["u2p"])
+                    links = createbdhk.extractMedias(sql=sql, unique=1)[0]
+                else:
+                    sql = "SELECT link FROM movieLink WHERE numId={}".format(params["u2p"])
+                    links = extractMedias(sql=sql, unique=1)[0]
+            except:
+                return False
+        #typMedia = params["typM"]
+        typMedia = "movie"
+        numId = params["u2p"]
+        u2p = params["u2p"]
+        try:
+            sql = "SELECT title, overview, year, genre, backdrop, popu, numId, poster, runtime FROM movie WHERE numId={}".format(numId)
+            liste = extractMedias(sql=sql)
+        except:
+            liste = []
+        if liste:
             title, overview, year, genre, backdrop, popu, numId, poster, runtime = liste[0]
-        except:
-            return
-    try: int(runtime)
-    except: runtime = 0
-    overview = "%s\nsynopsis: %s \nAnnée: %s\nGenre: %s\nNote: %.2f\nDurée: %.d mns" %(title, overview[:150] + "...", year, genre, popu, runtime)
-    #fnotice(overview)
-    xbmcplugin.setPluginCategory(__handle__, "Menu")
-    xbmcplugin.setContent(__handle__, 'episodes')
-
-    categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": typMedia}), ("[COLOR green]Lire[/COLOR]", {"action": "afficheLiens", "lien": links, "u2p": numId})]
-    if __addon__.getSetting("actifnewpaste")  != "false":
-        sql = "SELECT t.saga FROM filmsPub AS t WHERE t.numId={}".format(u2p)
-        saga = createbdhk.extractMedias(sql=sql, unique=1)
-        if saga and saga[0]:
-            categories += [("Saga", {"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":saga[0]})]
-    elif __addon__.getSetting("actifhk") != "false":
-        sql = "SELECT s.title, s.poster, s.overview, s.numId FROM saga AS s WHERE s.numId=(SELECT t.numIdSaga FROM sagaTitle AS t WHERE t.numId={})".format(u2p)
-        saga = extractMedias(sql=sql)
-        if saga:
-            categories += [("Saga", {"action": "MenuFilm", "famille": "sagaListe", "numIdSaga": saga[0][3]})]
-    categories += [("Acteurs", {"action": "affActeurs", "u2p": numId, "typM": typMedia}),\
-            ("Similaires", {"action": "suggest", "u2p": numId, "typ": "Similaires", "typM": typMedia}), ("Recommandations", {"action": "suggest", "u2p": numId, "typ": "Recommendations", "typM": typMedia})]
-
-    #liste lastview
-    if __addon__.getSetting("bookonline") != "false":
-        listeView = widget.responseSite("http://%s/requete.php?name=%s&type=view&media=movie" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
-        listeView = [int(x) for x in listeView]
-    else:
-        listeView = list(widget.extractIdInVu(t="movies"))
-    if int(numId) in listeView:
-        categories.append(("Retirer Last/View", {"action": "supView", "u2p": numId, "typM": "movies"}))
-
-
-    #liste favs
-    if __addon__.getSetting("bookonline") != "false":
-        listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=movies" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
-        listeM = [int(x) for x in listeM]
-    else:
-        listeM = list(widget.extractFavs(t="movies"))
-    if int(numId) in listeM:
-        categories.append(("Retirer fav's-HK", {"action": "fav", "mode": "sup", "u2p": numId, "typM": "movies"}))
-    else:
-        categories.append(("Ajouter fav's-HK", {"action": "fav", "mode": "ajout", "u2p": numId, "typM": "movies"}))
-
-
-    for cat in categories:
-        if "Saga" in cat[0] and cat[1]["action"] == "MenuFilm":
-            lFinale = [saga[0][0], saga[0][2], year, genre, backdrop, popu, numId, saga[0][1]]
         else:
-            lFinale = [title, overview, year, genre, backdrop, popu, numId, poster]
-        media = Media("menu", *lFinale)
-        media.typeMedia = typMedia
+            sql = "SELECT title, overview, year, genres, backdrop, popu, numId, poster, runtime FROM filmsPub WHERE numId={}".format(numId)
+            liste = createbdhk.extractMedias(sql=sql)
+            try:
+                title, overview, year, genre, backdrop, popu, numId, poster, runtime = liste[0]
+            except:
+                return
+        try: int(runtime)
+        except: runtime = 0
+        overview = "%s\nsynopsis: %s \nAnnée: %s\nGenre: %s\nNote: %.2f\nDurée: %.d mns" %(title, overview[:150] + "...", year, genre, popu, runtime)
+        #fnotice(overview)
+        xbmcplugin.setPluginCategory(__handle__, "Menu")
+        xbmcplugin.setContent(__handle__, 'episodes')
 
-        addDirectoryMenu(cat[0], isFolder=True, parameters=cat[1], media=media)
-    xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True)
+        categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": typMedia}), ("[COLOR green]Lire[/COLOR]", {"action": "afficheLiens", "lien": links, "u2p": numId})]
+        if __addon__.getSetting("actifnewpaste")  != "false":
+            sql = "SELECT t.saga FROM filmsPub AS t WHERE t.numId={}".format(u2p)
+            saga = createbdhk.extractMedias(sql=sql, unique=1)
+            if saga and saga[0]:
+                categories += [("Saga", {"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":saga[0]})]
+        elif __addon__.getSetting("actifhk") != "false":
+            sql = "SELECT s.title, s.poster, s.overview, s.numId FROM saga AS s WHERE s.numId=(SELECT t.numIdSaga FROM sagaTitle AS t WHERE t.numId={})".format(u2p)
+            saga = extractMedias(sql=sql)
+            if saga:
+                categories += [("Saga", {"action": "MenuFilm", "famille": "sagaListe", "numIdSaga": saga[0][3]})]
+        categories += [("Acteurs", {"action": "affActeurs", "u2p": numId, "typM": typMedia}),\
+                ("Similaires", {"action": "suggest", "u2p": numId, "typ": "Similaires", "typM": typMedia}), ("Recommandations", {"action": "suggest", "u2p": numId, "typ": "Recommendations", "typM": typMedia})]
+
+        #liste lastview
+        if __addon__.getSetting("bookonline") != "false":
+            listeView = widget.responseSite("http://%s/requete.php?name=%s&type=view&media=movie" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
+            listeView = [int(x) for x in listeView]
+        else:
+            listeView = list(widget.extractIdInVu(t="movies"))
+        if int(numId) in listeView:
+            categories.append(("Retirer Last/View", {"action": "supView", "u2p": numId, "typM": "movies"}))
+
+
+        #liste favs
+        if __addon__.getSetting("bookonline") != "false":
+            listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=movies" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
+            listeM = [int(x) for x in listeM]
+        else:
+            listeM = list(widget.extractFavs(t="movies"))
+        if int(numId) in listeM:
+            categories.append(("Retirer fav's-HK", {"action": "fav", "mode": "sup", "u2p": numId, "typM": "movies"}))
+        else:
+            categories.append(("Ajouter fav's-HK", {"action": "fav", "mode": "ajout", "u2p": numId, "typM": "movies"}))
+
+        #fenetre information
+        categories.append(("Fenêtre Information", {"action": "feninfo", "u2p": numId, "typM": "movies", "title": title}))
+
+        for cat in categories:
+            if "Saga" in cat[0] and cat[1]["action"] == "MenuFilm":
+                lFinale = [saga[0][0], saga[0][2], year, genre, backdrop, popu, numId, saga[0][1]]
+            else:
+                lFinale = [title, overview, year, genre, backdrop, popu, numId, poster]
+            media = Media("menu", *lFinale)
+            media.typeMedia = typMedia
+
+            addDirectoryMenu(cat[0], isFolder=True, parameters=cat[1], media=media)
+        xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True)
 
 def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
@@ -1387,7 +1742,7 @@ def ventilationHK():
     choix = [
     ("Setting", {"action":"setting"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/setting.png', "Reglages U2P"),
     ("Setting Profils", {"action":"affProfils"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/profil.png', "Choix Profils"),
-    ("Il est frais mon poisson ....", {"action": "affNewsUpto", "offset": "0"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Dernieres news brut....."),
+    #("Il est frais mon poisson ....", {"action": "affNewsUpto", "offset": "0"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Dernieres news brut....."),
     ]
     # bd hk
     if __addon__.getSetting("actifhk") != "false":
@@ -2770,6 +3125,23 @@ def fenMovie(params):
 
     #xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True, cacheToDisc=False)
 
+def fenInfo(params):
+    u2p = params["u2p"]
+    title = params["title"]
+    try:
+        typM = params["typm"]
+    except :
+        typM = "film"
+
+    #xbmc.executebuiltin('Dialog.Close(busydialog)')
+    #window = feninfo.FenInfo(title)
+    #window = FenInfo("%s*%s" %(u2p, title))
+
+    window = feninfo.FenInfo(u2p, title, typM)
+    # Show the created window.
+    window.doModal()
+
+    del window
 
 def menuPbi():
     xbmcplugin.setPluginCategory(__handle__, "Choix U2Pplay")
@@ -4914,7 +5286,7 @@ def router(paramstring):
         "visuEpisodesUpto": (uptobox.affEpisodesUpto, params), "affAlldeb": (affAlldeb, ""), "magnets": (uptobox.magnets, params), "histoupto": (uptobox.getHistoUpto, __database__),
         "listeAll": (uptobox.listeAllded, params), "affNewsUpto": (newUptoPublic, params), "addcompte": (addCompteUpto, params), "AffCatPoiss": (newUptoPublic2, params), "affSaisonUptoPoiss": (affSaisonUptoPoiss, params),
         "visuEpisodesUptoPoiss": (visuEpisodesUptoPoiss, params), "delcompte": (delcompte, params), "affdetailfilmpoiss": (uptobox.detailFilmPoiss, params), "cryptFolder": (scraperUPTO.cryptFolder, ""),
-        "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""),
+        "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""), "feninfo": (fenInfo, params),
         #strm
         'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""),
         #profils
