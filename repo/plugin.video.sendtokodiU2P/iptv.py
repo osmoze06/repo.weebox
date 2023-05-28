@@ -713,7 +713,7 @@ def ajoutIPTV():
             heberg = ADDON.getSetting("heberg")
             if heberg == "Pastebin":
                 tx = getBdPastebin(repo)
-            elif heberg == "Rentry":
+            elif "Rentry" in heberg:
                 tx = getBdRentry(repo)
             elif heberg == "Textup":
                 tx = getBdTextup(repo)

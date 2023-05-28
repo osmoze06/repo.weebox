@@ -83,11 +83,11 @@ class FenIptv(pyxbmct.AddonFullWindow):
         self.epg = epg
         #notice(self.epg.keys())
         #notice(self.chaines[0][2])
-        super(FenIptv, self).__init__(title)
+        super(FenIptv, self).__init__()
         # Set width, height and the grid parameters
         #self.setBackground(back)
 
-        self.setGeometry(1250, 700, 50, 30)
+        self.setGeometry(1250, 700, 50, 30, pos_x=0)
         # Call set controls method
         self.set_controls()
         # Call set navigation method.

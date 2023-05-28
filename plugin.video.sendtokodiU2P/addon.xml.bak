@@ -18,9 +18,10 @@
   <extension point="kodi.context.item">
         <menu id="kodi.core.main">
             <item library="menucontext/play.py">
-                <label>[COLOR yellow]Lecture[/COLOR]</label>
+                <label>[COLOR yellow]Fenêtre Info HK²[/COLOR]</label>
                 <visible>String.IsEqual(ListItem.Property(widgetmovie),true)</visible>
             </item>
+            <!--
             <item library="menucontext/vus.py">
                 <label>[COLOR yellow]Gestions  Vus/Non-Vus[/COLOR]</label>
                 <visible>String.IsEqual(ListItem.Property(widgetEpisodes),true)</visible>
@@ -49,6 +50,7 @@
                 <label>[COLOR yellow]Refresh[/COLOR]</label>
                 <visible>String.IsEqual(ListItem.Property(widget),true)</visible>
             </item>
+          -->
         </menu>
     </extension>
   <extension point="xbmc.addon.metadata">

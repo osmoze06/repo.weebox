@@ -1698,6 +1698,12 @@ def affMedias(typM, medias, params=""):
 
         if typM == "movie":
             ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailM", "lien": media.link, "u2p": media.numId}, media=media)
+
+            #if ADDON.getSetting("newfen") == "false":
+            #    ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailM", "lien": media.link, "u2p": media.numId}, media=media)
+            #else:
+            #    ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "feninfo", "lien": media.link, "u2p": media.numId, 'title': media.title}, media=media)
+
         else:
             if(typM == "saga"):
                 ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "mediasHKFilms", "famille": "sagaListe", "numIdSaga":media.numId}, media=media)
@@ -1746,8 +1752,19 @@ def addDirectoryMedia(name, isFolder=True, parameters={}, media="" ):
     commands.append(('[COLOR yellow]Gestion[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestionMedia&u2p=%s&typM=%s)'%(media.numId, media.typeMedia)))
     commands.append(('[COLOR yellow]Choix Profil[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=actifPm)'))
     commands.append(('[COLOR yellow]Reload Skin[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=rlk)'))
-    li.addContextMenuItems(commands)
 
+    isWidget = xbmc.getInfoLabel('Container.PluginName')
+    if "U2P" not in isWidget:
+        li.setProperty('widget', 'true')
+        if media.typeMedia == "movie":
+            li.setProperty('widgetmovie', 'true')
+            li.setProperty('lire', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=feninfo&u2p=%s&title=%s&lien=%s)' %(media.numId, media.title, media.link))
+    #else:
+        #if media.typeMedia == "movie":
+        #    commands.append(('[COLOR yellow]Fenêtre Infos HK²[/COLOR]', 'ActivateWindow(10025,plugin://plugin.video.sendtokodiU2P/?action=feninfo&u2p=%s&typM=%s,return)'%(media.numId, media.typeMedia)))
+
+
+    li.addContextMenuItems(commands)
     url = sys.argv[0] + '?' + urlencode(parameters)
     return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
 

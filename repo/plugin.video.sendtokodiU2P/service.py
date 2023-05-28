@@ -878,23 +878,52 @@ def gestionListeV(params):
     nom = params["nom"]
     widget.gestionListeVdetail(nom, numId, typMedia, mode)
 
-def detailsMediaNew(params):
-    typMedia = "movie"
-    numId = params["u2p"]
-    sql = "SELECT title, overview, year, genres, backdrop, popu, numId, poster, runtime FROM filmsPub WHERE numId={}".format(numId)
-    liste = createbdhk.extractMedias(sql=sql)
+def fenInfo(params):
+    u2p = params["u2p"]
+    title = ""
     try:
-        title, overview, year, genre, backdrop, popu, numId, poster, runtime = liste[0]
-    except:
-        return
-    fenInfo({"u2p": numId, "typM": "movies", "title": title})
+        typM = params["typm"]
+    except :
+        typM = "film"
 
+    #xbmc.executebuiltin('Dialog.Close(busydialog)')
+    #window = feninfo.FenInfo(title)
+    #window = FenInfo("%s*%s" %(u2p, title))
+
+    window = feninfo.FenInfo([u2p, title, typM])
+    # Show the created window.
+    window.doModal()
+
+    del window
+
+#def detailsMedia(params):
+#    detailsMedia2(params)
+#    time.sleep(0.5)
+#    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
+#    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
+#    xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
+    #xbmc.executebuiltin('ReloadSkin')
+#    xbmc.executebuiltin("Input.Back")
+#    xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Input.Back", "id": 1}')
 
 def detailsMedia(params):
     notice("detailM")
     notice(params)
     if __addon__.getSetting("newfen") != "false":
-        detailsMediaNew(params)
+        typM = "movie"
+        title = ""
+        numId = params["u2p"]
+        #xbmc.executebuiltin('Dialog.Close(busydialog)')
+        #window = feninfo.FenInfo(title)
+        #window = FenInfo("%s*%s" %(u2p, title))
+
+        window = feninfo.FenInfo([numId, title, typM])
+        # Show the created window.
+        window.doModal()
+
+        del window
+        #xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True)
+        #xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
     else:
         try:
             links = params["lien"]
@@ -934,6 +963,7 @@ def detailsMedia(params):
         xbmcplugin.setContent(__handle__, 'episodes')
 
         categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": typMedia}), ("[COLOR green]Lire[/COLOR]", {"action": "afficheLiens", "lien": links, "u2p": numId})]
+        """
         if __addon__.getSetting("actifnewpaste")  != "false":
             sql = "SELECT t.saga FROM filmsPub AS t WHERE t.numId={}".format(u2p)
             saga = createbdhk.extractMedias(sql=sql, unique=1)
@@ -956,7 +986,7 @@ def detailsMedia(params):
         if int(numId) in listeView:
             categories.append(("Retirer Last/View", {"action": "supView", "u2p": numId, "typM": "movies"}))
 
-
+        """
         #liste favs
         if __addon__.getSetting("bookonline") != "false":
             listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=movies" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
@@ -981,6 +1011,7 @@ def detailsMedia(params):
 
             addDirectoryMenu(cat[0], isFolder=True, parameters=cat[1], media=media)
         xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True)
+    return
 
 def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
@@ -3125,23 +3156,7 @@ def fenMovie(params):
 
     #xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True, cacheToDisc=False)
 
-def fenInfo(params):
-    u2p = params["u2p"]
-    title = params["title"]
-    try:
-        typM = params["typm"]
-    except :
-        typM = "film"
 
-    #xbmc.executebuiltin('Dialog.Close(busydialog)')
-    #window = feninfo.FenInfo(title)
-    #window = FenInfo("%s*%s" %(u2p, title))
-
-    window = feninfo.FenInfo(u2p, title, typM)
-    # Show the created window.
-    window.doModal()
-
-    del window
 
 def menuPbi():
     xbmcplugin.setPluginCategory(__handle__, "Choix U2Pplay")

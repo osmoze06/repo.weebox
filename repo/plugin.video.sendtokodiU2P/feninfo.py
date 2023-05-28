@@ -83,12 +83,15 @@ else:
     notice(pyVersionM)
 
 
-class FenInfo(pyxbmct.AddonDialogWindow):
+class FenInfo(pyxbmct.BlankDialogWindow):
 
-    def __init__(self, numId, title="", typM="film"):
+    def __init__(self, argvs):
         """Class constructor"""
+        numId, title, typM = argvs
+        #pyxbmct.skin.estuary = True
+
         # Call the base class' constructor.
-        super(FenInfo, self).__init__(title)
+        super(FenInfo, self).__init__()
         # Set width, height and the grid parameters
         self.numId = numId
         self.typM = typM
@@ -102,6 +105,7 @@ class FenInfo(pyxbmct.AddonDialogWindow):
 
         # Connect Backspace button to close our addon.
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+
 
     def set_controls(self):
 
@@ -398,8 +402,8 @@ class FenInfo(pyxbmct.AddonDialogWindow):
 
     def setAnimation(self, control):
         # Set fade animation for all add-on window controls
-        control.setAnimations([('WindowOpen', 'effect=fade start=0 end=100 time=500',),
-                                ('WindowClose', 'effect=fade start=100 end=0 time=500',)])
+        control.setAnimations([('WindowOpen', 'effect=fade start=0 end=200 time=700',),
+                                ('WindowClose', 'effect=fade start=200 end=0 time=700',)])
 
     def set_navigation(self):
         """Set up keyboard/remote navigation between controls."""
@@ -622,6 +626,7 @@ def addDirectoryFilms(name, isFolder=True, parameters={}, media="" ):
     commands.append(('[COLOR yellow]Reload Skin[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=rlk)'))
     #commands.append(("[COLOR yellow]Refresh[/COLOR]", "Container.Refresh"))
     li.addContextMenuItems(commands)
+    """
     isWidget = xbmc.getInfoLabel('Container.PluginName')
     if "U2P" not in isWidget:
         li.setProperty('widget', 'true')
@@ -635,8 +640,9 @@ def addDirectoryFilms(name, isFolder=True, parameters={}, media="" ):
         li.setProperty('profil', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=actifPm)')
         li.setProperty("reloadSkin", 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=rlk)')
         #li.setProperty("Refresh", "Container.Refresh")
+    """
     li.setProperty('IsPlayable', 'true')
-    url = sys.argv[0] + '?' + urlencode(parameters)
+    url = "plugin://plugin.video.sendtokodiU2P/" + '?' + urlencode(parameters)
     return xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=li, isFolder=isFolder)
 
 def actifTrakt():
