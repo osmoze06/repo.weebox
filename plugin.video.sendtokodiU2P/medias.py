@@ -514,6 +514,14 @@ class TMDB:
         dictMovies["results"][0]["id"] = numId
       self.tabMedia.append((pos, filecode, dictMovies))
 
+    def movieNumIdFull(self, numId):
+      """infos film via numID"""
+      url1 = self.urlBase + "movie/{}?api_key={}&language={}".format(numId, self.key, self.lang)
+      req = requests.get(url1)
+      dictInfos = req.json()
+      return dictInfos
+
+
     def getSaga(self, numId):
       url1 = self.urlBase + "collection/{}?api_key={}&language={}".format(numId, self.key, self.lang)
       req = requests.get(url1)
@@ -659,7 +667,6 @@ class TMDB:
         dictCasts = {"crew": "", "cast": []}
         url = self.urlBase + "tv/{}/credits?api_key={}&language={}".format(numId, self.key, self.lang)
         req = requests.get(url)
-        print(url)
         dict_films_acteurs = req.json()
 
         # acteurs
@@ -983,6 +990,7 @@ if __name__ == '__main__':
   mdb = TMDB("96139384ce46fd4ffac13e1ad770db7a")
   dictSaisons = mdb.getNbEpisodes("1405")
   print(dictSaisons)
+  mdb.movieNumId("", "", 603)
   #range(1, c + 2, 1):
   #"https://api.themoviedb.org/3/tv/1405/episode_groups?api_key=96139384ce46fd4ffac13e1ad770db7a"
   #https://api.themoviedb.org/3/network/213?api_key=96139384ce46fd4ffac13e1ad770db7a

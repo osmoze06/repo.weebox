@@ -976,6 +976,7 @@ def detailsMedia(params):
                 categories += [("Saga", {"action": "MenuFilm", "famille": "sagaListe", "numIdSaga": saga[0][3]})]
         categories += [("Acteurs", {"action": "affActeurs", "u2p": numId, "typM": typMedia}),\
                 ("Similaires", {"action": "suggest", "u2p": numId, "typ": "Similaires", "typM": typMedia}), ("Recommandations", {"action": "suggest", "u2p": numId, "typ": "Recommendations", "typM": typMedia})]
+        """
 
         #liste lastview
         if __addon__.getSetting("bookonline") != "false":
@@ -986,7 +987,7 @@ def detailsMedia(params):
         if int(numId) in listeView:
             categories.append(("Retirer Last/View", {"action": "supView", "u2p": numId, "typM": "movies"}))
 
-        """
+
         #liste favs
         if __addon__.getSetting("bookonline") != "false":
             listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=movies" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name")))
@@ -5405,4 +5406,3 @@ if __name__ == '__main__':
     router(sys.argv[2][1:])
 
     #Setting most video properties through ListItem.setInfo() is deprecated and might be removed in future Kodi versions. Please use the respective setter in InfoTagVideo.
-

@@ -1250,6 +1250,7 @@ def replay(params):
             plot = "%s - %s\n%s" %(replay[3], replay[4], replay[2])
             li.setInfo('video', {"title": replay[1], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
             li.setProperty('IsPlayable', 'true')
+            #notice(replay)
             parameters={"action": "playMediaIptv", "replay": replay[0], "lien": replay[0], "iptv": replay[1], "fourn": fournisseur}
             url = sys.argv[0] + '?' + urlencode(parameters)
             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
@@ -1522,7 +1523,7 @@ def playMedia(params):
             #    cmd = quote(linkCMD)
             #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     userAg = "|User-Agent=Mozilla"
-    #userAg = ""
+    #userAg = "|User-Agent=VLC"
     result = {"url": link + userAg, "title": params["iptv"]}
     notice(link)
     #xbmc.Player().play(link)
@@ -1532,9 +1533,13 @@ def playMedia(params):
         listIt = createListItemFromVideo(result)
         #mplay = MyDialog()
         #mplay.play(result["url"])
-        #xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
+        if "replay" in params.keys():
+            xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
+        else:
+            xbmc.Player().play(result["url"], listitem=listIt)
         #notice(result["url"])
-        xbmc.Player().play(result["url"], listitem=listIt)
+        #result["url"] =  result["url"].replace("myf-tv.com:8080", "mol-2.com:8080")
+        #
         #keyb = xbmc.Keyboard('', 'Search')
         #keyb.doModal()
         #while xbmc.Player().isPlaying():

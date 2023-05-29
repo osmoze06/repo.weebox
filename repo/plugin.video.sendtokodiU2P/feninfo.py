@@ -97,6 +97,7 @@ class FenInfo(pyxbmct.BlankDialogWindow):
         self.typM = typM
         self.setGeometry(1250, 700, 50, 30)
 
+        self.infosComp()
         # Call set controls method
         self.set_controls()
 
@@ -106,6 +107,19 @@ class FenInfo(pyxbmct.BlankDialogWindow):
         # Connect Backspace button to close our addon.
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
 
+    def infosComp(self):
+        mdb = TMDB(KEYTMDB)
+        dictInfos =  mdb.movieNumIdFull(self.numId)
+        self.tagline = dictInfos.get("tagline", "")
+        self.vote_average = dictInfos.get("vote_average", 0)
+        self.vote_count = dictInfos.get("vote_count", 0)
+        original_title = dictInfos.get("original_title", "")
+        self.budget = dictInfos.get("budget", 0)
+        self.revenue = dictInfos.get("revenue", 0)
+        try:
+            production_companies = ", ".join([x["name"] for x in dictInfos["production_companies"]])
+        except:
+            production_companies = ""
 
     def set_controls(self):
 
@@ -130,6 +144,7 @@ class FenInfo(pyxbmct.BlankDialogWindow):
             image = pyxbmct.Image(backdrop)
             self.placeControl(image, 0, 7, rowspan=42, columnspan=23)
 
+
         f = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/resources/png/fond.png')
         fond = pyxbmct.Image(f)
         self.placeControl(fond, 0, 0, rowspan=54, columnspan=30)
@@ -147,16 +162,35 @@ class FenInfo(pyxbmct.BlankDialogWindow):
             label = pyxbmct.Label(title, font='font_MainMenu')
             self.placeControl(label, 2, 0, columnspan=15)
 
+        #budjet
+        labBudj = pyxbmct.FadeLabel()
+        self.placeControl(labBudj, 29, 25, columnspan=5)
+        labBudj.addLabel("Budget: %.2f M$" %(self.budget / 1000000.0))
+
+        #revenue
+        labRev = pyxbmct.FadeLabel()
+        self.placeControl(labRev, 31, 25, columnspan=5)
+        labRev.addLabel("Revenu: %.2f M$" %(self.revenue / 1000000.0))
+
+        #vote nb
+        labNbC = pyxbmct.FadeLabel()
+        self.placeControl(labNbC, 33, 25, columnspan=5)
+        labNbC.addLabel("Nb Votes: %s" %(self.vote_count))
+
+        #note
+        labNote = pyxbmct.FadeLabel()
+        self.placeControl(labNote, 35, 25, columnspan=5)
+        labNote.addLabel("Note: %s" %(self.vote_average))
 
         #labelMenu = pyxbmct.Label('MENU', textColor=self.colorMenu)
         #self.placeControl(labelMenu, 31, 0, columnspan=10)
         self.menu = pyxbmct.List('font13', _itemHeight=30, _alignmentY=90)
-        self.placeControl(self.menu, 29, 0, rowspan=12, columnspan=30)
+        self.placeControl(self.menu, 29, 0, rowspan=12, columnspan=24)
         #, "Acteurs & Réalisateur"
         if self.saga:
-            self.menu.addItems(["[COLOR blue]Bande Annonce[/COLOR]", "[COLOR green]Lire[/COLOR]", "Saga", "Suggestions", "Similaires", "Studio"])
+            self.menu.addItems(["[COLOR blue]Bande Annonce[/COLOR]", "[COLOR green]Lire[/COLOR]", "Saga", "Suggestions", "Similaires"])
         else:
-            self.menu.addItems(["[COLOR blue]Bande Annonce[/COLOR]", "[COLOR green]Lire[/COLOR]", "Suggestions", "Similaires", "Studio"])
+            self.menu.addItems(["[COLOR blue]Bande Annonce[/COLOR]", "[COLOR green]Lire[/COLOR]", "Suggestions", "Similaires"])
         #self.menu.addItems(self.tabNomLien)
         self.connect(self.menu, lambda: self.listFunction(self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()))
 
@@ -164,9 +198,13 @@ class FenInfo(pyxbmct.BlankDialogWindow):
         self.setCasting()
 
         #overview
+        if self.tagline:
+            synopText = "\n[B][I]%s[/I][/B]\n\n[COLOR white]SYNOPSIS: [/COLOR]" %self.tagline
+        else:
+            synopText = "[COLOR red]SYNOPSIS: [/COLOR]"
         self.synop = pyxbmct.TextBox('font13', textColor='0xFFFFFFFF')
         self.placeControl(self.synop, 10, 0, rowspan=16, columnspan=18)
-        self.synop.setText("[COLOR red]SYNOPSIS: [/COLOR]" + overview)
+        self.synop.setText(synopText + overview)
         self.synop.autoScroll(4000, 2000, 3000)
 
         #============================================================================ ligne notation duree =========================================
