@@ -23,13 +23,14 @@ try:
     import xbmcaddon
     import xbmcgui
     import xbmcplugin
-
+    import iptvXtream as iptvx
     ADDON = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     HANDLE = int(sys.argv[1])
     BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db')
+    import pyxbmct
 except: pass
 
-import pyxbmct
+
 
 
 class MyDialog(pyxbmct.AddonDialogWindow):
@@ -701,6 +702,9 @@ def menu():
     ok = addDirectoryGroupe("Ajouter adresse", isFolder=True, parameters={"action": "ajoutIPTV"})
     ok = addDirectoryGroupe("Bank", isFolder=True, parameters={"action": "IPTVbank"})
     ok = addDirectoryGroupe("Favoris", isFolder=True, parameters={"action": "IPTVfav"})
+    nomX = ADDON.getSetting("nomx1")
+    if nomX:
+        ok = addDirectoryGroupe(nomX, isFolder=True, parameters={"action": "loadFX"})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def ajoutIPTV():
@@ -859,6 +863,31 @@ def load(params):
         ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChaine", "numId": dictCat[media], "fourn": fournisseur, "typM": typM })
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def loadX():
+    nomX = ADDON.getSetting("nomx1")
+    #user = ADDON.getSetting("userx1")
+    #passwd = ADDON.getSetting("passwordx1")
+    #server = ADDON.getSetting("serverx1")
+    itv = iptvx.IPTVXtream(1)
+    cc = itv.authenticate()
+    notice(cc)
+    if cc["user_info"]["status"] == "Active":
+        notice('server ok')
+        notice(cc["user_info"]["exp_date"])
+
+        dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.liveType)}
+
+        typM = itv.liveType
+
+        groupes = dictCat.keys()
+        xbmcplugin.setPluginCategory(HANDLE, "files")
+        xbmcplugin.setContent(HANDLE, 'files')
+        for i, media in enumerate(groupes):
+            ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChainex", "numId": dictCat[media], "typM": typM})
+        xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+    else:
+        return
+
 def gestfourn(params):
     notice(params)
     fournisseur = params["fourn"]
@@ -907,6 +936,8 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
     commands = []
     if parameters["action"] == "affVod":
         commands.append(('[COLOR yellow]Gestion Groupes Vod/Series[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestfournVod&fourn=%s&typM=%s)' %(parameters["fourn"], parameters["typM"], )))
+    elif parameters["action"] == "affChainex":
+        pass
     else:
         commands.append(('[COLOR yellow]Maj EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=bdepg)'))
         if "numId" in parameters.keys():
@@ -1341,6 +1372,35 @@ def IPTVfav():
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def affChainesx(params):
+    numId = params["numId"]
+    typM = params["typM"]
+    itv = iptvx.IPTVXtream(1)
+    chaines = itv.streamsByCategory(itv.liveType, numId)
+    #{'num': 2, 'name': 'TF1', 'stream_type': 'live', 'stream_id': 482, 'stream_icon': '/images/DJagQBurpUQ4xR3aG2lwzvhXm58CUJMcpz05mRzzbfi7NSghNmeIr2ZWVq4chRTq.png', 'epg_channel_id': 'TF1.fr', 'added': '1683902974', 'custom_sid': '', 'tv_archive': 0, 'direct_source': '', 'tv_archive_duration': 0, 'category_id': '1', 'category_ids': [1], 'thumbnail': ''}
+    for i, chaine in enumerate(chaines):
+        plot = ""
+        thumb = ""
+        li = xbmcgui.ListItem(label=chaine["name"])
+        li.setInfo('video', {"title": chaine["name"], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
+        poster = chaine['stream_icon'].replace(" ", "%20")
+        li.setArt({
+              'poster': poster,
+              "banner": poster,
+              'icon': poster,
+              #'icon': ADDON.getAddonInfo('icon'),
+              #'fanart': ADDON.getAddonInfo('fanart'),
+              'fanart': thumb })
+        if thumb:
+            li.setArt({'thumb': thumb})
+        else:
+            li.setArt({'thumb': poster})
+        li.setProperty('IsPlayable', 'false')
+        link = itv.link.format(chaine["stream_type"], chaine['stream_id'])
+        parameters={"action": "playMediaIptv", "lien": link, "iptv": chaine["stream_type"], "fourn": "xtream"}
+        url = sys.argv[0] + '?' + urlencode(parameters)
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def affChaines(params):
     if ADDON.getSetting("newfeniptv") != "false":
@@ -1493,35 +1553,38 @@ def mapEpg(params):
 
 def playMedia(params):
     fournisseur = params["fourn"]
-    bd = BookmarkIPTV(BDBOOKMARK)
-    site, mac, token = bd.recupToken(fournisseur)[0]
-    notice(site)
-    #site = ADDON.getSetting("site1")
-    #mac = str.upper(ADDON.getSetting("mac1"))
-    #token = ADDON.getSetting("token1")
-    iptv = IPTVMac(site, mac, token)
-    linkCMD = unquote(params['lien'])
-    if "typM" in params.keys():
-        if params["typM"] == "episode":
-            requete = iptv.createLinkSerie.format(linkCMD, params['numEpisode'])
-            #notice(requete)
-            link = iptv.getInfos(requete).json()["js"]["cmd"].split(" ")[1]
+    if fournisseur != "xtream":
+        bd = BookmarkIPTV(BDBOOKMARK)
+        site, mac, token = bd.recupToken(fournisseur)[0]
+        notice(site)
+        #site = ADDON.getSetting("site1")
+        #mac = str.upper(ADDON.getSetting("mac1"))
+        #token = ADDON.getSetting("token1")
+        iptv = IPTVMac(site, mac, token)
+        linkCMD = unquote(params['lien'])
+        if "typM" in params.keys():
+            if params["typM"] == "episode":
+                requete = iptv.createLinkSerie.format(linkCMD, params['numEpisode'])
+                #notice(requete)
+                link = iptv.getInfos(requete).json()["js"]["cmd"].split(" ")[1]
+            else:
+                link = iptv.getInfos(iptv.createLinkVod.format(params["typM"], linkCMD)).json()["js"]["cmd"].split(" ")[1]
         else:
-            link = iptv.getInfos(iptv.createLinkVod.format(params["typM"], linkCMD)).json()["js"]["cmd"].split(" ")[1]
+            if "replay" in params.keys():
+                iptv = IPTVMac(site, mac, token)
+                link = iptv.getInfos(iptv.createLinkReplay.format(params["replay"].strip())).json()["js"]["cmd"].split(" ")[1]
+            else:
+                notice(linkCMD)
+                n = linkCMD.split("/")[-1]
+                linkCMD = "ffmpeg http://localhost/ch/%s" %n
+                link = iptv.getInfos(iptv.createLink.format(linkCMD)).json()["js"]["cmd"].split(" ")[1]
+                #if "localhost" not in linkCMD and "http" in linkCMD:
+                #    link = linkCMD.split(" ")[1]
+                #else:
+                #    cmd = quote(linkCMD)
+                #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     else:
-        if "replay" in params.keys():
-            iptv = IPTVMac(site, mac, token)
-            link = iptv.getInfos(iptv.createLinkReplay.format(params["replay"].strip())).json()["js"]["cmd"].split(" ")[1]
-        else:
-            notice(linkCMD)
-            n = linkCMD.split("/")[-1]
-            linkCMD = "ffmpeg http://localhost/ch/%s" %n
-            link = iptv.getInfos(iptv.createLink.format(linkCMD)).json()["js"]["cmd"].split(" ")[1]
-            #if "localhost" not in linkCMD and "http" in linkCMD:
-            #    link = linkCMD.split(" ")[1]
-            #else:
-            #    cmd = quote(linkCMD)
-            #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
+        link = params["lien"] + ".ts"
     userAg = "|User-Agent=Mozilla"
     #userAg = "|User-Agent=VLC"
     result = {"url": link + userAg, "title": params["iptv"]}
@@ -1540,12 +1603,5 @@ def playMedia(params):
         #notice(result["url"])
         #result["url"] =  result["url"].replace("myf-tv.com:8080", "mol-2.com:8080")
         #
-        #keyb = xbmc.Keyboard('', 'Search')
-        #keyb.doModal()
-        #while xbmc.Player().isPlaying():
-        #    if (keyb.isConfirmed()):
-        #        notice("Keyboard")
-        #        notice(keyb.getText())
-        #    time.sleep(0.1)
 if __name__ == '__main__':
   pass

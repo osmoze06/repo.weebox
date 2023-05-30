@@ -133,14 +133,22 @@
     </category>
     <category label="TV">
         <setting id="iptv" label="TV" type="bool" default="false" />
-        <setting label="Gestion Fournisseur ou Mac" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=retireriptv)" visible="eq(-1,true)"/>
-        <setting label="Supprimer Base" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=delDB)" visible="eq(-2,true)" />
-        <setting id="contentIptv" label="Choix type de vue chaines" type="labelenum" values="videos|files|episodes|movies" default="videos"  visible="eq(-3,true)"/>
+        <setting label="Stalker" type="lsep"/>
+        <setting label="Gestion Fournisseur ou Mac" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=retireriptv)" visible="eq(-2,true)"/>
+        <setting label="Supprimer Base" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=delDB)" visible="eq(-3,true)" />
         <setting id="site1" type="text" label="Site 1"  default="" visible="false"/>
         <setting id="mac1" type="text" label="Adr 1"  default="" visible="false"/>
         <setting id="token1" type="text" label="Token 1"  default="" visible="false"/>
         <setting id="passtmp" type="text" label="pass"  default="" visible="false"/>
+        <setting label="Xtream" type="lsep"/>
+        <setting id="serverx1" type="text" label="Serveur 1"  default="" visible="eq(-9,true)"/>
+        <setting id="userx1" type="text" label="User 1"  default="" visible="eq(-10,true)"/>
+        <setting id="passx1" type="text" label="Password 1"  default="" visible="eq(-11,true)"/>
+        <setting id="nomx1" type="text" label="Nom 1"  default="" visible="eq(-12,true)"/>
+        <setting label="Affichage" type="lsep" />
         <setting id="newfeniptv" label="New fenêtre IPTV chaines" type="bool" default="false" />
+        <setting id="contentIptv" label="Choix type de vue chaines" type="labelenum" values="videos|files|episodes|movies" default="videos"/>
+
     </category>
     <!--
     <category label="Poissonnerie">
