@@ -28,8 +28,8 @@ try:
     HANDLE = int(sys.argv[1])
     BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db')
     import pyxbmct
-except: pass
-
+except Exception as e:
+    notice(e)
 
 
 
@@ -869,12 +869,33 @@ def loadX():
     #passwd = ADDON.getSetting("passwordx1")
     #server = ADDON.getSetting("serverx1")
     itv = iptvx.IPTVXtream(1)
-    cc = itv.authenticate()
-    notice(cc)
-    if cc["user_info"]["status"] == "Active":
-        notice('server ok')
-        notice(cc["user_info"]["exp_date"])
-
+    try:
+        cc = itv.authenticate()
+        notice(cc)
+        if cc["user_info"]["status"] == "Active":
+            valid = True
+            notice('server ok')
+            notice(cc["user_info"]["exp_date"])
+        else:
+            valid = False
+    except:
+        valid = False
+    if valid:
+        epgF = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml')
+        if os.path.isfile(epgF):
+            crea = os.path.getmtime(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'))
+            a = int(time.time())
+            nbHcache =  int(ADDON.getSetting("cachepg"))
+            if (a - crea) > (nbHcache * 3600):
+                tabEpg = itv.epgArchive()
+                bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+                bd.insertEpgX(tabEpg)
+                open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
+        else:
+            tabEpg = itv.epgArchive()
+            bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+            bd.insertEpgX(tabEpg)
+            open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
         dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.liveType)}
 
         typM = itv.liveType
@@ -1376,11 +1397,33 @@ def affChainesx(params):
     numId = params["numId"]
     typM = params["typM"]
     itv = iptvx.IPTVXtream(1)
+    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+    a = int(time.time())
+    epgs = bd.extractEpgX()
     chaines = itv.streamsByCategory(itv.liveType, numId)
     #{'num': 2, 'name': 'TF1', 'stream_type': 'live', 'stream_id': 482, 'stream_icon': '/images/DJagQBurpUQ4xR3aG2lwzvhXm58CUJMcpz05mRzzbfi7NSghNmeIr2ZWVq4chRTq.png', 'epg_channel_id': 'TF1.fr', 'added': '1683902974', 'custom_sid': '', 'tv_archive': 0, 'direct_source': '', 'tv_archive_duration': 0, 'category_id': '1', 'category_ids': [1], 'thumbnail': ''}
     for i, chaine in enumerate(chaines):
         plot = ""
         thumb = ""
+        if chaine["epg_channel_id"] and chaine["epg_channel_id"] != "None":
+
+            if epgs:
+                epgOk = [(x[1], x[2], x[5], x[6]) for x in epgs if x[0] == chaine["epg_channel_id"]]
+                for epg in epgOk[:2]:
+                    """
+                    d = datetime.datetime.strptime(epg[2], "%Y%m%d%H%M%S %z")
+                    debut = d.strftime("%H:%M")
+                    d = datetime.datetime.strptime(epg[3], "%Y%m%d%H%M%S %z")
+                    fin = d.strftime("%H:%M")
+                    """
+                    debut = epg[2][8:10] + ":" + epg[2][10:12]
+                    fin = epg[3][8:10] + ":" + epg[3][10:12]
+                    if epg[1]:
+                        description = epg[1][:200] + "..."
+                    else:
+                        description = ""
+                    plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n' + "[I]%s[/I]" %description +'\n'
+
         li = xbmcgui.ListItem(label=chaine["name"])
         li.setInfo('video', {"title": chaine["name"], 'plot': plot, 'mediatype': 'video', 'playcount': 1})
         poster = chaine['stream_icon'].replace(" ", "%20")

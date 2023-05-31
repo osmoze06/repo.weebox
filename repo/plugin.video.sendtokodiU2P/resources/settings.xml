@@ -146,6 +146,7 @@
         <setting id="passx1" type="text" label="Password 1"  default="" visible="eq(-11,true)"/>
         <setting id="nomx1" type="text" label="Nom 1"  default="" visible="eq(-12,true)"/>
         <setting label="Affichage" type="lsep" />
+        <setting id="cachepg" label="cache EPG Xtream (heure)" type="text" default="48"/>
         <setting id="newfeniptv" label="New fenêtre IPTV chaines" type="bool" default="false" />
         <setting id="contentIptv" label="Choix type de vue chaines" type="labelenum" values="videos|files|episodes|movies" default="videos"/>
 

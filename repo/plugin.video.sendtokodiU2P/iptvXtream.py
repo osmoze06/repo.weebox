@@ -66,7 +66,7 @@ class BookmarkIPTVXtream:
           user TEXT,
           url TEXT,
           passwd TEXT,
-          UNIQUE (url, mac))
+          UNIQUE (url, user, passwd))
             """)
 
 
@@ -102,6 +102,17 @@ class BookmarkIPTVXtream:
           UNIQUE (url, numId))
             """)
 
+        cur.execute("""CREATE TABLE IF NOT EXISTS epgX(
+          chaine TEXT,
+          title TEXT,
+          plot TEXT,
+          startInt INTEGER,
+          stopInt INTEGER,
+          start TEXT,
+          stop TEXT)
+          """)
+
+
         cur.execute("""CREATE TABLE IF NOT EXISTS mapEpgX(
           url TEXT,
           numId TEXT,
@@ -118,6 +129,27 @@ class BookmarkIPTVXtream:
         cnx.commit()
         cur.close()
         cnx.close()
+
+    def insertEpgX(self, tabEpg):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("DELETE FROM epgX")
+        cnx.commit()
+        notice(tabEpg[0])
+        cur.executemany("REPLACE INTO epgX (chaine, title, plot, startInt, stopInt, start, stop) VALUES (?, ?, ?, ?, ?, ?, ?)", tabEpg)
+        cnx.commit()
+        cur.close()
+        cnx.close()
+
+    def extractEpgX(self):
+        a = int(time.time())
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT chaine, title, plot, startInt, stopInt, start, stop FROM epgX WHERE stopInt >= ?", (a,))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return liste
 
     def retrait(self, fournisseur, mac=""):
         cnx = sqlite3.connect(self.database)
@@ -464,7 +496,7 @@ class IPTVXtream:
         return tree
 
     def epgArchive(self, maj=1):
-        dictEpg = {}
+        tabEpg = []
         if maj:
             root = self.getEpg()
         else:
@@ -472,19 +504,26 @@ class IPTVXtream:
             root = tree.getroot()
         chaines = [movie.attrib["id"] for movie in root.iter('channel')]
         progs = [movie  for movie in root.iter('programme')]
-        a = int(time.time())
         for chaine in chaines:
-            dictEpg[chaine] = []
             epgsChaine = [epg for epg in progs if epg.attrib["channel"] == chaine]
             for epg in epgsChaine:
+                #notice(epg.attrib)
                 #'start': '20230529180001 +0200', 'stop': '20230529210001 +0200'
-                start = int(epg.attrib["start_timestamp"])
-                stop = int(epg.attrib["stop_timestamp"])
+                #try:
+                #    start = int(epg.attrib["start_timestamp"])
+                #    stop = int(epg.attrib["stop_timestamp"])
+                #    startInt = epg.attrib["start"]
+                #    stopInt = epg.attrib["stop"]
+                #except:
+
+                startInt = epg.attrib["start"]
+                stopInt = epg.attrib["stop"]
+                start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
+                stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
+                #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
                 title, desc = epg.getchildren()
-                dictEpg[chaine].append((title, desc, start, stop))
-                #if a in range(start, stop, 1):
-                #    pass
-                #    print(epg.attrib, "===", title.text, "===", desc.text)
+                tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+        return tabEpg
 
 
     def get_authenticate_URL(self):
