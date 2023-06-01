@@ -2,6 +2,7 @@ import xbmc
 import xbmcgui
 import urllib.request
 import xbmcvfs
+import sys
 
 kodi_version = xbmc.getInfoLabel("System.BuildVersion")
 latest_version = "20.1"
@@ -30,3 +31,5 @@ if kodi_version < latest_version:
 else:
     message = "Votre version de Kodi : " + kodi_version + "\nVous utilisez la dernière version de Kodi"
     xbmcgui.Dialog().notification("Info Version Kodi", message, xbmcgui.NOTIFICATION_INFO, 5000)
+
+sys.exit()

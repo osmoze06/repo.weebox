@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="plugin.program.weebox" version="0.3.1" name="WEEBOX" provider-name="Osmoze06">
+<addons><addon id="plugin.program.weebox" version="0.3.2" name="WEEBOX" provider-name="Osmoze06">
 	<requires>
 		<import addon="script.module.requests" />
 	</requires>
@@ -17,7 +17,7 @@
         <source>.</source>
     <news>
 [VERSION 0.3.0 - 01/06/2023]
-- Ajouts Scripts Skin.
+- Ajouts de Scripts Skin.
 
 [VERSION 0.3.0 - 13/05/2023]
 - Motifications Scripts Skin Artic Horizon 2.

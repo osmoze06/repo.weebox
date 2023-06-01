@@ -1,6 +1,7 @@
 import xbmcaddon
 import xbmcgui
 import xbmc
+import sys
 
 addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
 version = addon.getAddonInfo('version')
@@ -17,3 +18,5 @@ else:
     new_version = addon.getAddonInfo('version') #get the new version
     message = "Extension Streaming - Version : " +"[COLOR deepskyblue]" + new_version + "[/COLOR]" + "\nPropulsé par KODI - Version : " +"[COLOR deepskyblue]" + kodi_version + "[/COLOR]" + "[COLOR greenyellow]\n\nL'extension a été mise à jour en version : [/COLOR]"+ version
     xbmcgui.Dialog().ok("VERSION A JOUR", message)
+
+sys.exit()

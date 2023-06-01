@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: ISO-8859-1 -*-
+import sys
 import xbmc
 
 url = 'http://weeclic.ddns.net/libreelec/clients/WBOX_INFOS.jpg'
@@ -11,3 +12,5 @@ xbmc.executebuiltin("Action(Back)")
 #while (1):
     #xbmc.executebuiltin('ShowPicture('+url+')')
     #xbmc.sleep(60000)
+
+sys.exit()
