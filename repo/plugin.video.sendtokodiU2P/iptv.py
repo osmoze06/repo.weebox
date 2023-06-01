@@ -863,6 +863,27 @@ def load(params):
         ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChaine", "numId": dictCat[media], "fourn": fournisseur, "typM": typM })
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def verifEpgX():
+    epgF = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml')
+    if os.path.isfile(epgF):
+        crea = os.path.getmtime(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'))
+        a = int(time.time())
+        nbHcache =  int(ADDON.getSetting("cachepg"))
+        if (a - crea) > (nbHcache * 3600):
+            gEpg = 1
+        else:
+            gEpg = 0
+    else:
+        gEpg =1
+    if gEpg:
+        a = time.time()
+        itv = iptvx.IPTVXtream(1)
+        tabEpg = itv.epgArchive()
+        bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+        bd.insertEpgX(tabEpg)
+        open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
+        showInfoNotification("Mise a jour Epg Ok (%ds)!!" %(time.time() -a))
+
 def loadX():
     nomX = ADDON.getSetting("nomx1")
     #user = ADDON.getSetting("userx1")
@@ -887,15 +908,20 @@ def loadX():
             a = int(time.time())
             nbHcache =  int(ADDON.getSetting("cachepg"))
             if (a - crea) > (nbHcache * 3600):
-                tabEpg = itv.epgArchive()
-                bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
-                bd.insertEpgX(tabEpg)
-                open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
+                gEpg = 1
+            else:
+                gEpg = 0
         else:
+            gEpg =1
+        if gEpg:
+            a = time.time()
+            itv = iptvx.IPTVXtream(1)
             tabEpg = itv.epgArchive()
             bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
             bd.insertEpgX(tabEpg)
             open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
+            showInfoNotification("Mise a jour Epg Ok (%ds)!!" %(time.time() -a))
+
         dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.liveType)}
 
         typM = itv.liveType
@@ -906,8 +932,6 @@ def loadX():
         for i, media in enumerate(groupes):
             ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChainex", "numId": dictCat[media], "typM": typM})
         xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
-    else:
-        return
 
 def gestfourn(params):
     notice(params)
@@ -1394,12 +1418,21 @@ def IPTVfav():
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def affChainesx(params):
+    notice("aff chaines xtream")
     numId = params["numId"]
     typM = params["typM"]
     itv = iptvx.IPTVXtream(1)
-    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
-    a = int(time.time())
-    epgs = bd.extractEpgX()
+    tActif = False
+    for t in threading.enumerate():
+        notice(t.getName())
+        if "getepg" == t.getName():
+            tActif = True
+            break
+    if not tActif:
+        bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+        epgs = bd.extractEpgX()
+    else:
+        epgs = []
     chaines = itv.streamsByCategory(itv.liveType, numId)
     #{'num': 2, 'name': 'TF1', 'stream_type': 'live', 'stream_id': 482, 'stream_icon': '/images/DJagQBurpUQ4xR3aG2lwzvhXm58CUJMcpz05mRzzbfi7NSghNmeIr2ZWVq4chRTq.png', 'epg_channel_id': 'TF1.fr', 'added': '1683902974', 'custom_sid': '', 'tv_archive': 0, 'direct_source': '', 'tv_archive_duration': 0, 'category_id': '1', 'category_ids': [1], 'thumbnail': ''}
     for i, chaine in enumerate(chaines):

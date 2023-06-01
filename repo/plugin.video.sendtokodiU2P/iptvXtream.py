@@ -143,6 +143,8 @@ class BookmarkIPTVXtream:
 
     def extractEpgX(self):
         a = int(time.time())
+        #a = time.strftime("%Y%m%d%H%M%S +0200", time.gmtime())
+        #notice(a)
         cnx = sqlite3.connect(self.database)
         cur = cnx.cursor()
         cur.execute("SELECT chaine, title, plot, startInt, stopInt, start, stop FROM epgX WHERE stopInt >= ?", (a,))
@@ -490,18 +492,31 @@ class IPTVXtream:
         else:
             url1 = self.get_all_epg_URL()
         r = requests.get(url1)
-        #with open("epg.xml", "w", encoding="utf-8") as f:
+        #with open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w", encoding="utf-8") as f:
         #    f.write(r.text)
         tree = ElementTree.fromstring(r.content)
         return tree
 
     def epgArchive(self, maj=1):
         tabEpg = []
+        a = time.time()
         if maj:
             root = self.getEpg()
         else:
             tree = ElementTree.parse('epg.xml')
             root = tree.getroot()
+        for epg in root.iter():
+            if "start" in epg.attrib:
+                startInt = epg.attrib["start"]
+                stopInt = epg.attrib["stop"]
+                chaine = epg.attrib["channel"]
+                start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
+                stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
+                #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
+                title, desc = epg.getchildren()
+                tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+
+        """
         chaines = [movie.attrib["id"] for movie in root.iter('channel')]
         progs = [movie  for movie in root.iter('programme')]
         for chaine in chaines:
@@ -523,6 +538,8 @@ class IPTVXtream:
                 #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
                 title, desc = epg.getchildren()
                 tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+        """
+        notice(len(tabEpg))
         return tabEpg
 
 
