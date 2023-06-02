@@ -28,6 +28,11 @@ BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.vi
 NBMEDIA = 30
 
 
+class MediaSp:
+    def __init__(self, **kwargs):
+        for attr_name, attr_value in kwargs.items():
+            setattr(self, attr_name, attr_value)
+
 def notice(content):
     log(content, xbmc.LOGINFO)
 
@@ -37,6 +42,7 @@ def log(msg, level=xbmc.LOGINFO):
     xbmc.log('%s: %s' % (addonID, msg), level)
 
 def createListItemFromVideo(video):
+    notice("create listItem")
     url = video['url']
     title = video['title']
     list_item = xbmcgui.ListItem(title, path=url)
@@ -208,8 +214,8 @@ def updateInfoTagVideo2(li, media):
     except:
         media.duration = 1
     media.title = media.title.replace("00_", "")
-    tabMedia = [x for x in dir(media) if x in ["title", "overview", "year", "genre", "popu", "duration", "numId", "episode", "saison", "vu", "typeMedia"]]
-    notice(tabMedia)
+    tabMedia = [x for x in dir(media) if x in ["title", "overview", "year", "genre", "popu", "duration", "numId", "episode", "saison", "vu", "typeMedia", "plot"]]
+    #notice(tabMedia)
 
     if extractKodiVersion() >= 20.0:
         #kodi 20
@@ -217,7 +223,7 @@ def updateInfoTagVideo2(li, media):
         dictSetInfos = {"title": (vinfo.setTitle, str), "overview": (vinfo.setPlot, str), "year": (vinfo.setYear, int),\
             "genre": (vinfo.setGenres, list), "popu": (vinfo.setRating, float), "duration": (vinfo.setDuration, int),\
             "numId": (vinfo.setUniqueIDs, dict), "episode": (vinfo.setEpisode, int), "saison": (vinfo.setSeason, int),\
-            "vu": (vinfo.setPlaycount, int), "typeMedia": (vinfo.setMediaType, str)}
+            "vu": (vinfo.setPlaycount, int), "typeMedia": (vinfo.setMediaType, str), "plot": (vinfo.setPlot, str)}
         for a in tabMedia:
             info = getattr(media, a)
             if info:
@@ -227,7 +233,9 @@ def updateInfoTagVideo2(li, media):
                 elif a == "genre":
                     vinfo.setGenres(info.split(","))
                 else:
-                    dictSetInfos[a][0](dictSetInfos[a][1](info))
+                    try:
+                        dictSetInfos[a][0](dictSetInfos[a][1](info))
+                    except: pass
 
     else:
         #kodi 19

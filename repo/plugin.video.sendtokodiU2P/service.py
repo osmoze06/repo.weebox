@@ -5332,7 +5332,8 @@ def router(paramstring):
                     "activemac": (iptv.activeMac, params), "gestfourn": (iptv.gestfourn, params), "lock": (iptv.lock, params), "affepgChann": (iptv.affepgChann, params), "mapepg": (iptv.mapEpg, params),
                     "gestFuseau": (iptv.gestFuseau, params), "getVod": (iptv.getVodSeries, params), "affVod": (iptv.affVod, params), "gestfournVod": (iptv.gestfournVod, params), "affEpisodes": (iptv.affEpisodes, params),
                     "retireriptv": (iptv.retireriptv, ""), "delDB": (iptv.removeDB, ""), "IPTVbank":(iptv.IPTVbank, ""), "addFavIptv": (iptv.addFavIptv, params), "IPTVfav": (iptv.IPTVfav, ""),
-                    "iptvsupfav": (iptv.supfavIptv, params), "iptvdepfav": (iptv.iptvdepfav, params), "iptvreplay": (iptv.replay, params),  "loadFX": (iptv.loadX, ""), "affChainex": (iptv.affChainesx, params)}
+                    "iptvsupfav": (iptv.supfavIptv, params), "iptvdepfav": (iptv.iptvdepfav, params), "iptvreplay": (iptv.replay, params),  "loadFX": (iptv.loadX, ""), "affChainex": (iptv.affChainesx, params),
+                    "fepgx": (iptv.forceMajEpgX, "")}
         dictActions.update(dictActionsIPTV)
     notice(len(dictActions))
     if params:

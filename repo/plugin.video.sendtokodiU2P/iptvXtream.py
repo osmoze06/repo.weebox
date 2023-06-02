@@ -513,38 +513,16 @@ class IPTVXtream:
                 start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
                 stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
                 #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
-                title, desc = epg.getchildren()
+                #title, desc = epg.getchildren()
+                #notice(list(epg))
+                title, desc = list(epg)
                 tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
-
-        """
-        chaines = [movie.attrib["id"] for movie in root.iter('channel')]
-        progs = [movie  for movie in root.iter('programme')]
-        for chaine in chaines:
-            epgsChaine = [epg for epg in progs if epg.attrib["channel"] == chaine]
-            for epg in epgsChaine:
-                #notice(epg.attrib)
-                #'start': '20230529180001 +0200', 'stop': '20230529210001 +0200'
-                #try:
-                #    start = int(epg.attrib["start_timestamp"])
-                #    stop = int(epg.attrib["stop_timestamp"])
-                #    startInt = epg.attrib["start"]
-                #    stopInt = epg.attrib["stop"]
-                #except:
-
-                startInt = epg.attrib["start"]
-                stopInt = epg.attrib["stop"]
-                start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
-                stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
-                #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
-                title, desc = epg.getchildren()
-                tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
-        """
-        notice(len(tabEpg))
         return tabEpg
 
 
     def get_authenticate_URL(self):
         URL = '%s/player_api.php?username=%s&password=%s' % (self.server, self.username, self.password)
+        #notice(URL)
         return URL
 
     def get_live_categories_URL(self, action="get_live_categories"):
