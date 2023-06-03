@@ -505,7 +505,12 @@ class IPTVXtream:
         else:
             tree = ElementTree.parse('epg.xml')
             root = tree.getroot()
-        for epg in root.iter():
+        nbEpg = len([x for x in root.iter()])
+        dial = xbmcgui.DialogProgress()
+        dial.create('U2P - Epg', 'Import EPG ...')
+        for i, epg in enumerate(root.iter()):
+            percentage = int((i / float(nbEpg)) * 100.0)
+            dial.update(percentage, 'Epg %d/%d' %(i, nbEpg))
             if "start" in epg.attrib:
                 startInt = epg.attrib["start"]
                 stopInt = epg.attrib["stop"]
@@ -517,6 +522,7 @@ class IPTVXtream:
                 #notice(list(epg))
                 title, desc = list(epg)
                 tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+        dial.close()
         return tabEpg
 
 

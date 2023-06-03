@@ -1277,13 +1277,12 @@ def affLiens2(params):
     numId = params["u2p"]
     u2p = params["u2p"]
     cr = cryptage.Crypt()
-    #notice(paramstring)
     tabLinkIn = [(x.split("#")[0].split("@")[0], x.split("#")[0].split("@")[1]) for x in paramstring]
-    if len(tabLinkIn) > 100:
-        dictResos = cr.extractReso(tabLinkIn[:100])
-        dictResos.update(cr.extractReso(tabLinkIn[100:]))
-    else:
-        dictResos = cr.extractReso(tabLinkIn)
+    #dictResos = cr.extractReso(tabLinkIn[:100])
+    dictResos = {}
+    for i in range(0, len(tabLinkIn), 100):
+        dictResos.update(cr.extractReso(tabLinkIn[i: i + 100]))
+
     dictResos = {x.split("#")[0].split("@")[1]: dictResos[x.split("#")[0].split("@")[1]] if dictResos[x.split("#")[0].split("@")[1]] else x.split("#")[1] for x in paramstring}
     paramstring = orderLiens(dictResos, paramstring)
     tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo" %(colorLiens(dictResos[x.split("#")[0].split("@")[1]][0]), i + 1, dictResos[x.split("#")[0].split("@")[1]][0], (int(dictResos[x.split("#")[0].split("@")[1]][1]) / 1000000000.0)) for i, x in enumerate(paramstring)]
@@ -3603,7 +3602,10 @@ def playMediaHK(params):
                 title = ""
             numEpisode = params['episode']
             saison = params["saison"]
-            xbmcgui.ListItem().setInfo('video', {"title": title, "episode": numEpisode, "season": saison})
+            li = xbmcgui.ListItem()
+            media = MediaSp(**{"title": title, "episode": numEpisode, "season": saison})
+            updateInfoTagVideo2(li, media)
+            #xbmcgui.ListItem().setInfo('video', {"title": title, "episode": numEpisode, "season": saison})
         else:
             title = xbmc.getInfoLabel('ListItem.TVShowTitle')
             saison = xbmc.getInfoLabel('ListItem.Season')
