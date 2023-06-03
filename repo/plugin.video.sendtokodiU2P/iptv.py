@@ -15,6 +15,7 @@ import datetime
 import sqlite3
 import threading
 import feniptv
+import feniptvx
 from medias import Media, TMDB
 try:
     from util import *
@@ -695,6 +696,14 @@ def connect(t=False):
 def menu():
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, "files")
+    ok = addDirectoryGroupe("Stalker", isFolder=True, parameters={"action": "menus"})
+    ok = addDirectoryGroupe("Xtream", isFolder=True, parameters={"action": "menux"})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+
+def menuStalker():
+    xbmcplugin.setPluginCategory(HANDLE, "files")
+    xbmcplugin.setContent(HANDLE, "files")
     bd = BookmarkIPTV(BDBOOKMARK)
     adrs = bd.getNom()
     for fournisseur, nom in adrs.items():
@@ -702,10 +711,17 @@ def menu():
     ok = addDirectoryGroupe("Ajouter adresse", isFolder=True, parameters={"action": "ajoutIPTV"})
     ok = addDirectoryGroupe("Bank", isFolder=True, parameters={"action": "IPTVbank"})
     ok = addDirectoryGroupe("Favoris", isFolder=True, parameters={"action": "IPTVfav"})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+def menuXtream():
+    xbmcplugin.setPluginCategory(HANDLE, "TV")
+    xbmcplugin.setContent(HANDLE, "files")
+
     nomX = ADDON.getSetting("nomx1")
     if nomX:
-        ok = addDirectoryGroupe(nomX, isFolder=True, parameters={"action": "loadFX"})
-    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+        ok = addDirectoryGroupe(nomX, isFolder=True, parameters={"action": "loadFX", "numId": '1'})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=False)
+
 
 def ajoutIPTV():
     bd = BookmarkIPTV(BDBOOKMARK)
@@ -893,58 +909,69 @@ def forceMajEpgX():
     open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
     showInfoNotification("Mise a jour Epg Ok (%ds)!!" %(time.time() -a))
 
-def loadX():
+def loadNewFX(params):
     nomX = ADDON.getSetting("nomx1")
-    #user = ADDON.getSetting("userx1")
-    #passwd = ADDON.getSetting("passwordx1")
-    #server = ADDON.getSetting("serverx1")
-    itv = iptvx.IPTVXtream(1)
-    try:
-        cc = itv.authenticate()
-        notice(cc)
-        if cc["user_info"]["status"] == "Active":
-            valid = True
-            notice('server ok')
-            notice(cc["user_info"]["exp_date"])
-        else:
-            valid = False
-    except Exception as e:
-        valid = False
-        notice(e)
-        dialog = xbmcgui.Dialog()
-        dialog.ok("Compte Out", str(e))
-    if valid:
-        if int(ADDON.getSetting("cachepg")):
-            epgF = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml')
-            if os.path.isfile(epgF):
-                crea = os.path.getmtime(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'))
-                a = int(time.time())
-                nbHcache =  int(ADDON.getSetting("cachepg"))
-                if (a - crea) > (nbHcache * 3600):
-                    gEpg = 1
-                else:
-                    gEpg = 0
+    xbmc.executebuiltin('Dialog.Close(busydialog)')
+    window = feniptvx.FenIptvX(10146)
+    window.doModal()
+    del window
+    menuXtream()
+
+def loadX(params):
+    if ADDON.getSetting("newfeniptv") != "false":
+        loadNewFX(params)
+    else:
+        nomX = ADDON.getSetting("nomx1")
+        #user = ADDON.getSetting("userx1")
+        #passwd = ADDON.getSetting("passwordx1")
+        #server = ADDON.getSetting("serverx1")
+        itv = iptvx.IPTVXtream(1)
+        try:
+            cc = itv.authenticate()
+            notice(cc)
+            if cc["user_info"]["status"] == "Active":
+                valid = True
+                notice('server ok')
+                notice(cc["user_info"]["exp_date"])
             else:
-                gEpg =1
-            if gEpg:
-                a = time.time()
-                itv = iptvx.IPTVXtream(1)
-                tabEpg = itv.epgArchive()
-                bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
-                bd.insertEpgX(tabEpg)
-                open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
-                showInfoNotification("Mise a jour Epg Ok (%ds)!!" %(time.time() -a))
+                valid = False
+        except Exception as e:
+            valid = False
+            notice(e)
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Compte Out", str(e))
+        if valid:
+            if int(ADDON.getSetting("cachepg")):
+                epgF = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml')
+                if os.path.isfile(epgF):
+                    crea = os.path.getmtime(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'))
+                    a = int(time.time())
+                    nbHcache =  int(ADDON.getSetting("cachepg"))
+                    if (a - crea) > (nbHcache * 3600):
+                        gEpg = 1
+                    else:
+                        gEpg = 0
+                else:
+                    gEpg =1
+                if gEpg:
+                    a = time.time()
+                    #itv = iptvx.IPTVXtream(1)
+                    tabEpg = itv.epgArchive()
+                    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+                    bd.insertEpgX(tabEpg)
+                    open(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/epg.xml'), "w")
+                    showInfoNotification("Mise a jour Epg Ok (%ds)!!" %(time.time() -a))
 
-        dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.liveType)}
+            dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.liveType)}
 
-        typM = itv.liveType
+            typM = itv.liveType
 
-        groupes = dictCat.keys()
-        xbmcplugin.setPluginCategory(HANDLE, "files")
-        xbmcplugin.setContent(HANDLE, 'files')
-        for i, media in enumerate(groupes):
-            ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChainex", "numId": dictCat[media], "typM": typM})
-        xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+            groupes = dictCat.keys()
+            xbmcplugin.setPluginCategory(HANDLE, "files")
+            xbmcplugin.setContent(HANDLE, 'files')
+            for i, media in enumerate(groupes):
+                ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChainex", "numId": dictCat[media], "typM": typM})
+            xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def gestfourn(params):
     #notice(params)
@@ -1382,7 +1409,7 @@ def IPTVfav():
         correct[fournisseur] =  bd.getCorrectEpg(site)
         epg[fournisseur] = iptv.getInfos(iptv.epg.format(iptv.tv)).json()["js"]["data"]
     """
-    xbmcplugin.setPluginCategory(HANDLE, "TV")
+    xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, ADDON.getSetting('contentIptv'))
     for i, (pos, link, nom, numChaine, poster, IdGroupe, fournisseur) in enumerate(chaines):
         infosFourniseur = bd.recupToken(fournisseur)
