@@ -912,9 +912,14 @@ def forceMajEpgX():
 def loadNewFX(params):
     nomX = ADDON.getSetting("nomx1")
     xbmc.executebuiltin('Dialog.Close(busydialog)')
-    window = feniptvx.FenIptvX(10146)
+    wid = xbmcgui.getCurrentWindowId()
+    #notice(wid)
+    #window = feniptvx.FenIptvX(10146)
+    window = feniptvx.FenIptvX(wid)
     window.doModal()
     del window
+    #time.sleep(0.5)
+    #xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
     menuXtream()
 
 def loadX(params):

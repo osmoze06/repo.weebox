@@ -118,7 +118,7 @@ class FenIptvX(pyxbmct.AddonFullWindow):
 
     def insertChaines(self):
 
-        self.menu = pyxbmct.List('font10', _itemHeight=125, _imageWidth=60, _imageHeight=60, _space=2)
+        self.menu = pyxbmct.List('font10', _itemHeight=30, _imageWidth=35, _imageHeight=35, _space=2)
         self.placeControl(self.menu, 0, 0, rowspan=58, columnspan=24)
         #noms = [x['name'] for x in self.chaines]
         noms = []
@@ -126,7 +126,7 @@ class FenIptvX(pyxbmct.AddonFullWindow):
             plot = ""
             if self.epgs:
                 epgOk = [(x[1], x[2], x[5], x[6]) for x in self.epgs if x[0] == chaine["epg_channel_id"]]
-                for i, epg in enumerate(epgOk[:2]):
+                for i, epg in enumerate(epgOk[:4]):
                     debut = epg[2][8:10] + ":" + epg[2][10:12]
                     fin = epg[3][8:10] + ":" + epg[3][10:12]
                     if epg[1]:
@@ -134,10 +134,13 @@ class FenIptvX(pyxbmct.AddonFullWindow):
                     else:
                         description = ""
                     if i == 0:
-                        plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n' + "[I]%s[/I]" %description +'\n'
+                        #plot += " " * (40 - len(str(chaine["name"])))
+                        plot += "[B][COLOR green] #[/COLOR][COLOR white]%s[/B][/COLOR]" %str(epg[0]) + ' ' + debut + " - " + fin + '[COLOR white] [/COLOR] '
+                        #plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n' + "[I]%s[/I]" %description +'\n'
                     else:
-                        plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n'
-            icon = xbmcgui.ListItem(label=chaine["name"] + "\n" + plot)
+                        #【】
+                        plot += "[B][COLOR red] #[/COLOR][COLOR white]%s[/B][/COLOR]" %str(epg[0]) + ' ' + debut + " - " + fin + '[COLOR white] [/COLOR] '
+            icon = xbmcgui.ListItem(label=chaine["name"] + "  " + plot)
             icon.setArt({"icon": chaine['stream_icon'], "thumb": chaine['stream_icon']})
             noms.append(icon)
 
@@ -208,9 +211,11 @@ class FenIptvX(pyxbmct.AddonFullWindow):
     def listFunction(self, nom):
         if xbmc.Player().isPlaying():
             xbmc.Player().stop()
-        nom = nom.split("\n")[0]
-        num = [(x["stream_type"], x['stream_id']) for x in self.chaines if nom == x["name"]][0]
-        link = self.itv.link.format(num[0], num[1]) + ".ts"
+        #nom = nom.split("\n")[0]
+        notice(nom)
+        nom = nom.split("[B][COLOR")[0]
+        num = [(x["stream_type"], x['stream_id']) for x in self.chaines if nom.strip() == x["name"]][0]
+        link = self.itv.link.format(num[0], num[1])
         result = {"url": link + "|User-Agent=Mozilla", "title": nom}
         if result and "url" in result.keys():
             listIt = createListItemFromVideo(result)

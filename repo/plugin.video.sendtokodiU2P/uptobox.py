@@ -747,8 +747,8 @@ def getEpisodesSaison(numId):
     cnx.close()
     eRep = scraperUPTO.ExtractRep()
     tabExtract = eRep.extractAll(liste)
+    tabFiles = []
     if tabExtract:
-        tabFiles = []
         liste = []
         renam = RenameMedia()
         for nom, filecode in tabExtract:
@@ -759,7 +759,6 @@ def getEpisodesSaison(numId):
                 liste.append(("Saison %s" %n[1], int(n[2].split("E")[1])))
             except:
                 notice(n)
-
     dictSaisons = {}
     for saison in list(set([x[0] for x in liste])):
         nbTotal = len([x for x in list(set(liste)) if x[0] == saison])

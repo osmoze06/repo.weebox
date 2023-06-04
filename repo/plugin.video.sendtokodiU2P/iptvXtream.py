@@ -498,6 +498,8 @@ class IPTVXtream:
         return tree
 
     def epgArchive(self, maj=1):
+        dial = xbmcgui.DialogProgress()
+        dial.create('U2P - Epg', 'Import EPG ...')
         tabEpg = []
         a = time.time()
         if maj:
@@ -506,8 +508,6 @@ class IPTVXtream:
             tree = ElementTree.parse('epg.xml')
             root = tree.getroot()
         nbEpg = len([x for x in root.iter()])
-        dial = xbmcgui.DialogProgress()
-        dial.create('U2P - Epg', 'Import EPG ...')
         for i, epg in enumerate(root.iter()):
             percentage = int((i / float(nbEpg)) * 100.0)
             dial.update(percentage, 'Epg %d/%d' %(i, nbEpg))
