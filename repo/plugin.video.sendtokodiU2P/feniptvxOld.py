@@ -215,7 +215,7 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         notice(nom)
         nom = nom.split("[B][COLOR")[0]
         num = [(x["stream_type"], x['stream_id']) for x in self.chaines if nom.strip() == x["name"]][0]
-        link = self.itv.link.format(num[0], num[1])
+        link = self.itv.link.format(num[0], num[1]) + ".ts"
         result = {"url": link + "|User-Agent=Mozilla", "title": nom}
         if result and "url" in result.keys():
             listIt = createListItemFromVideo(result)

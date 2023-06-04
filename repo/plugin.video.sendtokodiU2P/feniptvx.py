@@ -214,6 +214,15 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         result = {"url": link + "|User-Agent=Mozilla", "title": nom}
         if result and "url" in result.keys():
             listIt = createListItemFromVideo(result)
-            xbmc.Player().play(link, listIt)
+            xbmc.Player().play(result["url"], listIt)
 
 
+def createListItemFromVideo(video):
+    try:
+        url = video['url']
+        title = video['title']
+        li = xbmcgui.ListItem(title, path=url)
+        updateMinimalInfoTagVideo(li,title)
+    except Exception as e:
+        notice("feniptvx.py - createListItemFromVideo::createListItemFromVideo " + str(e))
+    return li

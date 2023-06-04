@@ -512,16 +512,18 @@ class IPTVXtream:
             percentage = int((i / float(nbEpg)) * 100.0)
             dial.update(percentage, 'Epg %d/%d' %(i, nbEpg))
             if "start" in epg.attrib:
-                startInt = epg.attrib["start"]
-                stopInt = epg.attrib["stop"]
-                chaine = epg.attrib["channel"]
-                start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
-                stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
-                #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
-                #title, desc = epg.getchildren()
-                #notice(list(epg))
-                title, desc = list(epg)
-                tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+                try:
+                    startInt = epg.attrib["start"]
+                    stopInt = epg.attrib["stop"]
+                    chaine = epg.attrib["channel"]
+                    start = time.strptime(epg.attrib["start"], "%Y%m%d%H%M%S %z")
+                    stop = time.strptime(epg.attrib["stop"], "%Y%m%d%H%M%S %z")
+                    #{'start': '20230530175000 +0200', 'stop': '20230530184000 +0200', 'channel': '13thStreet.de'}
+                    #title, desc = epg.getchildren()
+                    #notice(list(epg))
+                    title, desc = list(epg)
+                    tabEpg.append((chaine, title.text, desc.text, time.mktime(start), time.mktime(stop), startInt, stopInt))
+                except: pass
         dial.close()
         return tabEpg
 
