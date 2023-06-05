@@ -56,14 +56,14 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         # Set width, height and the grid parameters
         self.title = "XTREAM U2Pplay"
 
-        self.setGeometry(1250, 700, 50, 30, pos_x=0)
+        self.setGeometry(1290, 820, 50, 30, pos_x=0)
         #self.setBackground('special://home/addons/plugin.video.sendtokodiU2P/fanart.jpg')
 
 
         f = 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/fond.png'
         #f = 'special://home/addons/plugin.video.sendtokodiU2P/fanart.jpg'
-        #fond = pyxbmct.Image(f)
-        #self.placeControl(fond, 0, 0, rowspan=54, columnspan=30)
+        fond = pyxbmct.Image(f)
+        self.placeControl(fond, -1, -1, rowspan=58, columnspan=32)
 
         self.getEpg()
 
@@ -85,13 +85,13 @@ class FenIptvX(pyxbmct.AddonFullWindow):
 
     def getChaines(self, num):
         self.chaines = self.itv.streamsByCategory(self.itv.liveType, num)
-        notice(self.chaines)
+        #notice(self.chaines)
 
     def aut(self, num=1):
         self.itv = iptvx.IPTVXtream(num)
         try:
             cc = self.itv.authenticate()
-            notice(cc)
+            #notice(cc)
             if cc["user_info"]["status"] == "Active":
                 valid = True
                 notice('server ok')
@@ -117,31 +117,49 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         self.epgs = bd.extractEpgX()
 
     def insertChaines(self):
-
-        self.menu = pyxbmct.List('font10', _itemHeight=125, _imageWidth=60, _imageHeight=60, _space=2)
-        self.placeControl(self.menu, 0, 0, rowspan=58, columnspan=24)
-        #noms = [x['name'] for x in self.chaines]
         noms = []
+        a = time.time()
         for chaine in self.chaines:
             plot = ""
             if self.epgs:
-                epgOk = [(x[1], x[2], x[5], x[6]) for x in self.epgs if x[0] == chaine["epg_channel_id"]]
+                epgOk = [(x[1], x[2], x[5], x[6], x[3], x[4]) for x in self.epgs if x[0] == chaine["epg_channel_id"]]
                 for i, epg in enumerate(epgOk[:2]):
                     debut = epg[2][8:10] + ":" + epg[2][10:12]
                     fin = epg[3][8:10] + ":" + epg[3][10:12]
                     if epg[1]:
-                        description = epg[1][:110] + "..."
+                        description = epg[1].replace("\n", " ")[:100] + "..."
                     else:
                         description = ""
                     if i == 0:
-                        plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n' + "[I]%s[/I]" %description +'\n'
-                    else:
-                        plot += "[B]%s[/B]" %str(epg[0]) + '\n' + debut + " - " + fin + '\n'
-            icon = xbmcgui.ListItem(label=chaine["name"] + "\n" + plot)
-            icon.setArt({"icon": chaine['stream_icon'], "thumb": chaine['stream_icon']})
-            noms.append(icon)
+                        positionEmission = (a - float(epg[4])) / (float(epg[5]) - epg[4]) * 100
+                        plot += "[B]%s[/B]" %str(epg[0].replace("\n", " ")[:80]) + ' ' + debut + " - " + fin + ' ([B][COLOR green]%d%%[/B][/COLOR])\n' %positionEmission + "[I]%s[/I]\n" %description
 
+                    else:
+                        plot += "[B]%s[/B]" %str(epg[0].replace("\n", " ")[:80]) + ' ' + debut + " - " + fin + '\n'
+            icon = xbmcgui.ListItem(label=chaine["name"] + "\n" + plot)
+            icon.setArt({"icon": chaine['stream_icon'].replace("https", "http"), "thumb": chaine['stream_icon'].replace("https", "http")})
+            noms.append(icon)
+        notice(time.time() - a)
+        self.menu.reset()
         self.menu.addItems(noms)
+
+
+    def listFunctionCat(self, nom):
+        self.getChaines(self.categoriesx[nom])
+        self.insertChaines()
+        self.setFocus(self.menu)
+
+
+    def set_controls(self):
+        """Set up UI controls"""
+        self.A = pyxbmct.Label('font5', alignment=2)
+        self.placeControl(self.A, 1, 0, rowspan=3, columnspan=29)
+        self.A.setLabel("[B]XTREAM[/B] [I]U2Pplay[/I]")
+
+        self.colorMenu = '0x00000000'
+        self.menu = pyxbmct.List('font10', _itemHeight=125, _imageWidth=60, _imageHeight=60, _space=2)
+        self.placeControl(self.menu, 4, 0, rowspan=52, columnspan=24)
+
         self.connect(self.menu, lambda: self.listFunction(self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()))
         self.connectEventList([pyxbmct.ACTION_MOVE_UP,
                                pyxbmct.ACTION_MOVE_DOWN,
@@ -151,20 +169,9 @@ class FenIptvX(pyxbmct.AddonFullWindow):
                               self.chaine_update)
 
 
-    def listFunctionCat(self, nom):
-        self.getChaines(self.categoriesx[nom])
-        self.removeControl(self.menu)
-        self.insertChaines()
-        self.set_navigation()
-
-
-    def set_controls(self):
-        """Set up UI controls"""
-
-        self.colorMenu = '0x00000000'
         self.menuCat = pyxbmct.List('font10', _itemHeight=30, _imageWidth=35, _imageHeight=35)
-        self.placeControl(self.menuCat, 0, 24, rowspan=58, columnspan=6)
-        #self.menuCat.columnspan = 1
+        self.placeControl(self.menuCat, 4, 24, rowspan=46, columnspan=6)
+        self.menuCat.columnspan = 1
         noms = []
         for chaine in list(self.categoriesx.keys()):
             icon = xbmcgui.ListItem(label=chaine)
@@ -175,8 +182,6 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         self.connect(self.menuCat, lambda: self.listFunctionCat(self.menuCat.getListItem(self.menuCat.getSelectedPosition()).getLabel()))
         self.insertChaines()
 
-
-
     def chaine_update(self):
         nom = self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()
 
@@ -185,6 +190,15 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         nom = self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()
         chaine = [x for x in self.chaines if nom == x[1]]
         notice(chaine)
+
+    def affEpg(self):
+        nom = self.menu.getListItem(self.menu.getSelectedPosition()).getLabel()
+        nom = nom.split("\n")[0]
+        prog = getSynop(nom)
+        dialog = xbmcgui.Dialog()
+        dialog.textviewer(nom, prog)
+
+        #self.menu.focus()
 
     def set_navigation(self):
         """Set up keyboard/remote navigation between controls."""
@@ -195,34 +209,42 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         self.menuCat.controlRight(self.menu)
         self.setFocus(self.menu)
 
-
-
-    def radio_update(self):
-        if self.radiobutton.isSelected():
-            self.radiobutton.setLabel("Retirer Fav's HK")
-            gestionFavHK({"mode": "ajout", "u2p": self.numId, "typM": "movies"})
-        else:
-            self.radiobutton.setLabel("Ajouter Fav's HK")
-            gestionFavHK({"mode": "sup", "u2p": self.numId, "typM": "movies"})
+    def getSynop(self, nom):
+        prog = ""
+        if self.epgs:
+            chaine = [x for x in self.chaines if x["name"] == nom.strip()][0]
+            epgOk = [(x[1], x[2], x[5], x[6]) for x in self.epgs if x[0] == chaine["epg_channel_id"]]
+            if epgOk:
+                epg = epgOk[0]
+                debut = epg[2][8:10] + ":" + epg[2][10:12]
+                fin = epg[3][8:10] + ":" + epg[3][10:12]
+                if epg[1]:
+                    description = epg[1] + "..."
+                else:
+                    description = ""
+                prog = "[B]%s[/B]" %epg[0] + " " + debut + "-" + fin + "\n\n[I]%s[/I]" %description
+        return prog
 
     def listFunction(self, nom):
         if xbmc.Player().isPlaying():
             xbmc.Player().stop()
+        #nom = nom.split("\n")[0]
+        #notice(nom)
         nom = nom.split("\n")[0]
-        num = [(x["stream_type"], x['stream_id']) for x in self.chaines if nom == x["name"]][0]
+        num = [(x["stream_type"], x['stream_id']) for x in self.chaines if nom.strip() == x["name"]][0]
         link = self.itv.link.format(num[0], num[1]) + ".ts"
-        result = {"url": link + "|User-Agent=Mozilla", "title": nom}
+        result = {"url": link + "|User-Agent=Mozilla", "title": nom, "plot": self.getSynop(nom)}
         if result and "url" in result.keys():
-            listIt = createListItemFromVideo(result)
-            xbmc.Player().play(result["url"], listIt)
+            listIt = createListItemFromVideox(result, self.chaines)
+            xbmc.Player().play(link, listIt)
 
-
-def createListItemFromVideo(video):
+def createListItemFromVideox(video, chaines):
     try:
-        url = video['url']
-        title = video['title']
-        li = xbmcgui.ListItem(title, path=url)
-        updateMinimalInfoTagVideo(li,title)
+        media = MediaSp(**video)
+        li = xbmcgui.ListItem(media.title, path=media.url)
+        updateInfoTagVideo2(li, media)
+        chaine = [x for x in chaines if x["name"] == media.title.strip()][0]
+        li.setArt({"icon": chaine['stream_icon'], "thumb": chaine['stream_icon']})
     except Exception as e:
         notice("feniptvx.py - createListItemFromVideo::createListItemFromVideo " + str(e))
     return li

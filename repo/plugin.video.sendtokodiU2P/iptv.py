@@ -918,6 +918,8 @@ def loadNewFX(params):
     window = feniptvx.FenIptvX(wid)
     window.doModal()
     del window
+    #window.show()
+    #window.close()
     #time.sleep(0.5)
     #xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
     menuXtream()
