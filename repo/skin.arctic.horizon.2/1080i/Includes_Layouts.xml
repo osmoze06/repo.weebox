@@ -1871,7 +1871,7 @@
                         <include condition="$PARAM[selected]">Color_SelectedText</include>
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>main_fg_70</textcolor>
-                        <font>font_mini_bold</font>
+                        <font>font_mini</font>
                         <left>20</left>
                         <right>20</right>
                         <align>center</align>
@@ -1884,7 +1884,7 @@
                         <include condition="$PARAM[selected]">Color_SelectedText</include>
                         <label>$INFO[ListItem.Label]</label>
                         <textcolor>main_fg_70</textcolor>
-                        <font>font_mini_bold</font>
+                        <font>font_mini</font>
                         <bottom>20</bottom>
                         <height>20</height>
                         <left>20</left>
@@ -1900,7 +1900,7 @@
                                 <param name="icon_keep">$PARAM[icon]</param>
                                 <param name="diffuse">$PARAM[diffuse]</param>
                                 <param name="is_keep">String.StartsWith(ListItem.Icon,Default)</param>
-                                <param name="icon_default_bordersize">16</param>
+                                <param name="icon_default_bordersize">0</param>
                                 <param name="icon_default_aspectratio">keep</param>
                                 <param name="icon_keep_bordersize">4</param>
                                 <param name="icon_other_bordersize">16</param>
@@ -1931,7 +1931,7 @@
                         <label>$INFO[ListItem.TrackNumber,,. ]$INFO[ListItem.Title]</label>
                         <textcolor>main_fg_70</textcolor>
                         <selectedcolor>main_fg_70</selectedcolor>
-                        <font>font_mini_bold</font>
+                        <font>font_mini</font>
                         <right>80</right>
                         <align>left</align>
                     </control>
