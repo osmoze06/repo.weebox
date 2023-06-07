@@ -239,20 +239,30 @@ def updateInfoTagVideo2(li, media):
 
     else:
         #kodi 19
-        li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
-        li.setInfo('video', {"title": media.title})
-        li.setInfo('video', {"plot": media.overview})
-        li.setInfo('video', {"genre": media.genre})
-        li.setInfo('video', {"dbid": int(media.numId) + 500000})
-        li.setInfo('video', {"year": media.year})
-        li.setInfo('video', {"rating": media.popu})
-        li.setInfo('video', {"duration": media.duration * 60})
+        if "numId" in tabMedia:
+            li.setUniqueIDs({ 'tmdb' : media.numId }, "tmdb")
+            li.setInfo('video', {"dbid": int(media.numId) + 500000})
+        if "title" in tabMedia:
+            li.setInfo('video', {"title": media.title})
+        if "overview" in tabMedia or "plot" in tabMedia:
+            li.setInfo('video', {"plot": media.overview})
+        if "genre" in tabMedia:
+            li.setInfo('video', {"genre": media.genre})
+        if "duration" in tabMedia:
+            li.setInfo('video', {"duration": media.duration * 60})
+        if "year" in tabMedia:
+            li.setInfo('video', {"year": media.year})
+        if "popu" in tabMedia:
+            li.setInfo('video', {"rating": media.popu})
         if "typeMedia" in tabMedia:
             li.setInfo('video', {"mediatype": media.typeMedia})
-        if "episode" in tabMedia and media.episode:
+        if "vu" in tabMedia:
             li.setInfo('video', {'playcount': media.vu})
+        if "episode" in tabMedia and media.episode:
             li.setInfo('video', {"episode": media.episode})
-            li.setInfo('video', {"season": media.saison})
+            try:
+                li.setInfo('video', {"season": media.saison})
+            except: pass
 
 
 def updateInfoTagVideo(li, media, setUniqueId= False, isSerie=False, hasDuration=False, replaceTitle=False, hasPlaycount=False):

@@ -3603,7 +3603,7 @@ def playMediaHK(params):
             numEpisode = params['episode']
             saison = params["saison"]
             li = xbmcgui.ListItem()
-            media = MediaSp(**{"title": title, "episode": numEpisode, "season": saison})
+            media = MediaSp(**{"title": title, "episode": numEpisode, "season": saison, "numId": numId, "typMedia": typMedia})
             updateInfoTagVideo2(li, media)
             #xbmcgui.ListItem().setInfo('video', {"title": title, "episode": numEpisode, "season": saison})
         else:

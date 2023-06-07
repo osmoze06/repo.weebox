@@ -137,7 +137,11 @@ class FenIptvX(pyxbmct.AddonFullWindow):
                     else:
                         plot += "[B]%s[/B]" %str(epg[0].replace("\n", " ")[:80]) + ' ' + debut + " - " + fin + '\n'
             icon = xbmcgui.ListItem(label=chaine["name"] + "\n" + plot)
-            icon.setArt({"icon": chaine['stream_icon'].replace("https", "http"), "thumb": chaine['stream_icon'].replace("https", "http")})
+            if "never-" not in chaine['stream_icon']:
+                iconIm = chaine['stream_icon'].replace("https", "http")
+            else:
+                iconIm = chaine['stream_icon']
+            icon.setArt({"icon": iconIm, "thumb": iconIm})
             noms.append(icon)
         notice(time.time() - a)
         self.menu.reset()
