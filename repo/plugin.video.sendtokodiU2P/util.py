@@ -244,8 +244,10 @@ def updateInfoTagVideo2(li, media):
             li.setInfo('video', {"dbid": int(media.numId) + 500000})
         if "title" in tabMedia:
             li.setInfo('video', {"title": media.title})
-        if "overview" in tabMedia or "plot" in tabMedia:
+        if "overview" in tabMedia:
             li.setInfo('video', {"plot": media.overview})
+        if "plot" in tabMedia:
+            li.setInfo('video', {"plot": media.plot})
         if "genre" in tabMedia:
             li.setInfo('video', {"genre": media.genre})
         if "duration" in tabMedia:

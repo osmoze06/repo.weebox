@@ -82,6 +82,7 @@
         <setting id="delaimaj" label="Delai 1er MAJ (mins)" type="number" default="0"/>
         <setting id="rskin" label="Refresh skin aprés MAJ" type="bool" default="false" />
         <setting id="affmaj" label="Bandeau M.A.J" type="bool" default="true" />
+        <setting id="majlecture" label="lancement M.A.J si lecture" type="bool" default="true"/>
         <setting label="Base de données" type="lsep" />
         <setting id="skinhk" label="Num Skin HK" type="text" default="4j82p"/>
         <setting id="epg" label="EPG" type="text" default="lk4Xb"/>
@@ -94,7 +95,7 @@
         <setting id="actifStrm" label="STRM Files" type="bool" default="false" />
         <setting id="strmFolder" label="Dossier des fichiers STRM" type="folder" visible="eq(-1,true)" />
         <setting label="Selection widget" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strmSelectWidget)" visible="eq(-2,true)" />
-        <setting label="Création Manuel" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strms)" visible="eq(-3,true)" />
+        <setting label="Création Manuel Full" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strmsc)" visible="eq(-3,true)" />
         <!--<setting label="Gestion des STRM" type="lsep" />
         <setting id="paste" label="Identifiant aNotepad" type="text" default="" />
         <setting id="osVersion" label="Dossier des fichiers STRM" type="folder" />

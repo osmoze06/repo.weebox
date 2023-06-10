@@ -240,7 +240,7 @@ class FenIptvX(pyxbmct.AddonFullWindow):
         result = {"url": link + "|User-Agent=Mozilla", "title": nom, "plot": self.getSynop(nom)}
         if result and "url" in result.keys():
             listIt = createListItemFromVideox(result, self.chaines)
-            xbmc.Player().play(link, listIt)
+            xbmc.Player().play(link, listIt, False)
 
 def createListItemFromVideox(video, chaines):
     try:

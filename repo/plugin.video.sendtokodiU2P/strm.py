@@ -67,6 +67,7 @@ def configureSTRM():
 
 class Strm():
     BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/bookmark.db')
+    NEWSERIES = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/newserie.txt')
     def __init__(self, bdd=None):
         self.limitPerWidget = 1000
         self.bd = bdd
@@ -75,6 +76,7 @@ class Strm():
 
         self.addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
         self.strmFolder = self.addon.getSetting("strmFolder")
+
 
         if "WIN" in self.strmFolder:
             self.repKodiName = "D:\\kodiBase\\"
@@ -160,9 +162,10 @@ class Strm():
         cnx.close()
         return listes
 
-    def makeStrms(self):
-        self.pDialog = xbmcgui.DialogProgress()
+    def makeStrms(self, clear=0):
+        self.pDialog = xbmcgui.DialogProgressBG()
         self.pDialog.create('U2P - STRM Generation', 'STRM Generation ...')
+
 
         listeRep = list(self.internalExtractList(t="film"))
         for widgetName in listeRep:
@@ -173,7 +176,8 @@ class Strm():
         listSeries = list(self.internalExtractList(t="serie"))
         for widgetSName in listSeries:
             series = self.getSerieList(widgetSName)
-            self.makeSeriesSTRM(liste=series,nomRep=widgetSName)
+            self.makeSeriesSTRM(liste=series, nomRep=widgetSName, clear=clear)
+        self.pDialog.close()
 
     def getSerieList(self, widgetName=""):
         sql = widget.getListe(widgetName, "serie")
@@ -239,11 +243,11 @@ class Strm():
 
         nb = len(liste)
         for i, movie in enumerate(liste):
-            if self.pDialog.iscanceled() or i >= maxItem:
+            if i >= maxItem:
                  break
             #notice(movie)
             percentage = int((i/(float)(maxItem))*100.0)
-            self.pDialog.update(percentage, 'Films %s/%s' % (i,maxItem))
+            self.pDialog.update(percentage, 'Films %s/%s' % (i, maxItem))
             time.sleep(0.001)
             title=movie[0]
             numId=movie[4]
@@ -275,10 +279,10 @@ class Strm():
 http://www.themoviedb.org/movie/{0}""".format(numId)
                 self.saveFile(repNFO, textNFO)
 
+
     def makeSeriesSTRM(self, liste, clear=0, nomRep=""):
-
+        notice(clear)
         nomRep = makeNameRep(nomRep)
-
         if nomRep:
             repSerie = os.path.join(self.repKodiName+"/Series/", nomRep + "/")
             try:
@@ -291,12 +295,6 @@ http://www.themoviedb.org/movie/{0}""".format(numId)
 
         #notice("makeSeriesSTRM - repSerie : %s"%repSerie)
 
-        if clear == 1:
-            try:
-                shutil.rmtree(repSerie, ignore_errors=True)
-            except:
-                pass
-
         try:
             os.makedirs(repSerie)
         except Exception as e:
@@ -305,8 +303,20 @@ http://www.themoviedb.org/movie/{0}""".format(numId)
         maxItem = min(len(liste),self.limitPerWidget)
 
         dictSerie  = {}
+        fNewSerie = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/newserie.txt')
+        if os.path.exists(fNewSerie) and not clear:
+            with open(fNewSerie, "r") as f:
+                tx = f.read()
+            tx = [int(x) for x in tx.split("\n") if x]
+            liste = [x for x in liste if x[4] in tx]
+            notice(tx)
+        else:
+            if not clear:
+                liste = []
+
+
         for i, movie in enumerate(liste[::-1]):
-            if self.pDialog.iscanceled() or i >= maxItem:
+            if i >= maxItem:
                 break
 
             serieDir = os.path.join(repSerie , self.makeNameRep(movie[0]) + "/")
@@ -321,11 +331,13 @@ http://www.themoviedb.org/movie/{0}""".format(numId)
             #notice(movie)
             #notice(serieDir)
             percentage = int((i/(float)(maxItem))*100.0)
-            self.pDialog.update(percentage, '%s (%s/%s)' % (movie[0],i,maxItem))
+            self.pDialog.update(percentage, 'STRMS Series', message='%s (%s/%s)' % (movie[0],i,maxItem))
 
             #notice("----------------------------------------------------------------")
             #notice("-------------------------------%s---------------------------------"%movie[0])
             numId = movie[4]
+
+            notice("maj strms :: %d" %int(numId))
             repNFO = os.path.join(serieDir, "tvshow.nfo")
             repNFO = os.path.normpath(repNFO)
             textNFO = u"""<?xml version="1.0" encoding="utf-8" standalone="yes"?>
@@ -352,9 +364,8 @@ https://www.themoviedb.org/tv/{0}&islocal=True""".format(numId)
                         pass
                     self.createEpisodeSTRM(numId,numSaison,dictSaison[saison],serieDir,saisonDir)
 
+
     def createEpisodeSTRM(self,numId,saison, episodes,SerieDir,saisonDir):
-        if self.pDialog.iscanceled():
-            return
 
         Tsaison = str(saison).zfill(2)
 

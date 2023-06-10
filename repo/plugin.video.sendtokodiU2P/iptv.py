@@ -1301,6 +1301,7 @@ def affChainesNew(params):
         window = feniptv.FenIptv(["TV", chaines, epg])
         window.doModal()
         del window
+        #2load(params)
 
 def removeDB():
     db = xbmcvfs.translatePath("special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db")

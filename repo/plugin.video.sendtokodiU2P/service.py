@@ -3185,7 +3185,7 @@ def menuPbi():
 
     #strms
     if __addon__.getSetting("actifStrm") != "false" and vIPTV:
-        listeChoix.append(("04. Import STRMS", {"action":"strms"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Création strms via listes perso"))
+        listeChoix.append(("04. Import STRMS Maj", {"action":"strms"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Création strms via listes perso"))
 
     listeChoix.append(("20. Import Config", {"action":"impHK"}, "debrid.png", "Importation d'un config prefaite via rentry"))
     for choix in listeChoix:
@@ -3198,7 +3198,7 @@ def addDirectoryItemLocal(name, isFolder=True, parameters={}, picture="", texte=
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
 
-    updateMinimalInfoTagVideo(li,name,texte)
+    updateMinimalInfoTagVideo(li, name, texte)
 
     #Overlay ne dispose de method sur le getVideoInfoTag ...
     #li.setInfo('video', {"title": name, 'plot': texte, 'mediatype': 'video', "overlay": 6})
@@ -3268,12 +3268,17 @@ def makeStrmsOld(clear=0):
         pDialog.update(0, 'DIVERS')
         pbi.makeDiversNFO(pbi.dictDiversPaste.values(), clear=clear, progress=pDialog, nomRep=nomRep)
     showInfoNotification("strms créés!")
+    return True
 
 def makeStrms(clear=0):
     strmC = Strm(BDMEDIANew)
-    strmC.makeStrms()
+    strmC.makeStrms(clear=clear)
     showInfoNotification("strms créés!")
     xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.Scan", "id": "1"}')
+    fNewSerie = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/newserie.txt')
+    if os.path.exists(fNewSerie):
+        os.remove(fNewSerie)
+    return True
 
 def idPaste(lePaste):
     html_parser = HTMLParser()
@@ -5306,7 +5311,7 @@ def router(paramstring):
         "visuEpisodesUptoPoiss": (visuEpisodesUptoPoiss, params), "delcompte": (delcompte, params), "affdetailfilmpoiss": (uptobox.detailFilmPoiss, params), "cryptFolder": (scraperUPTO.cryptFolder, ""),
         "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""), "feninfo": (fenInfo, params),
         #strm
-        'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""),
+        'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""), 'strmsc': (makeStrms, 1),
         #profils
         'ajoutP': (ajoutProfil, ""), 'choixP': (choixProfil, ""), 'suppP': (suppProfil, ""), 'actifP': (actifProfil, params), 'actifPm': (choixProfil, 1), "affProfils":( affProfils, ""),
         "assistant": (assistant, ""),
