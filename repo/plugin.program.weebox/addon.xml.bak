@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.program.weebox" version="0.3.2" name="WEEBOX" provider-name="Osmoze06">
+	<requires>
+		<import addon="script.module.requests" />
+	</requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Outils Weebox</summary>
+        <description lang="en">Boîte à outils pour votre Weebox.</description>
+        <disclaimer lang="en">En cas de bugs, propositions d'améliorations ou ajout de contenus, contactez-nous sur weeclic.assistance@gmail.com.</disclaimer>
+        <language>en</language>
+        <platform>all</platform>
+        <forum>.</forum>
+        <website>.</website>
+        <source>.</source>
+    <news>
+[VERSION 0.3.0 - 01/06/2023]
+- Ajouts de Scripts Skin.
+
+[VERSION 0.3.0 - 13/05/2023]
+- Motifications Scripts Skin Artic Horizon 2.
+
+[VERSION 0.2.9 - 12/05/2023]
+- Motifications Scripts Skin Artic Horizon 2.
+
+[VERSION 0.2.8 - 21/03/2022]
+- Motifications Scripts.
+	
+[VERSION 0.2.6 - 20/03/2022]
+- Motifications Scripts.
+- Ajout Update Catchup TV Dev.
+- Ajout Update U2PPlay.
+
+[VERSION 0.2.4 - 13/03/2022]
+- Motifications Scripts.
+- Ajout Update Catchup TV Dev.
+- Ajout Update U2PPlay.
+
+[VERSION 0.2.3 - 23/01/2022]
+- Motifications Scripts.
+- Ajout Skin Cosmic.
+- Modifications Background.
+
+[VERSION 0.2.2 - 03/01/2022]
+- Motifications Scripts.
+
+[VERSION 0.2.1 - 21/11/2021]
+- Optimations scripts.
+- Modifications des backgrounds.
+- Ajout Skin Films.
+
+[VERSION 0.2.0 - 07/11/2021]
+- Optimations scripts.
+- Modifications des thumbails.
+- Changement splash screen.
+
+[VERSION 0.1.3 - 04/11/2021]
+- Correction de bugs.
+
+[VERSION 0.1.2 - 03/11/2021]
+- Correction bugs scripts et messages d'erreur d'execution.
+
+[VERSION 0.1.1 - 01/11/2021]
+- Ajout de scripts et icones.
+
+[VERSION 0.1.0 - 30/10/2021]
+- Création initiale
+Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
+    </news>		
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>screenshot-01.jpg</screenshot>
+            <screenshot>screenshot-02.jpg</screenshot>
+            <screenshot>screenshot-03.jpg</screenshot>
+        </assets>		
+    </extension>
+</addon>

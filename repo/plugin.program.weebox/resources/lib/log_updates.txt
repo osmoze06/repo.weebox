@@ -1,0 +1,24 @@
+[COLOR deepskyblue]10/06/2023 - VERSION 0.9.22.beta9[/COLOR]
+- KODI 19 : Fix pb setinfos
+- Mise a jour inhibée via config si player actif
+- Mise a jour automatique des strms
+- 2 modes pour création via config la totalité choisie au démarrage et menu uniquement maj
+---------------------------------------------------------------------------------------
+[COLOR deepskyblue]07/06/2023 - VERSION 0.9.22.beta6[/COLOR]
+- KODI 19 : Correction Série
+---------------------------------------------------------------------------------------
+[COLOR deepskyblue]05/06/2023 - VERSION 0.9.22.beta5[/COLOR]
+- Révision nouvelle fenêtre IPTV
+- Correction affichage logos fournisseur NOOS
+---------------------------------------------------------------------------------------
+[COLOR deepskyblue]04/06/2023 - VERSION 0.9.22.beta3[/COLOR]
+- IPTV (Xtream) : EPG ignoré si mauvaises données reçues
+---------------------------------------------------------------------------------------
+[COLOR deepskyblue]04/06/2023 - VERSION 0.9.22.beta2[/COLOR]
+- IPTV (Xtream) : Correctifs EPG
+---------------------------------------------------------------------------------------
+[COLOR deepskyblue]03/06/2023 - VERSION 0.9.22.beta1[/COLOR]
+- IPTV : Séparation Stalker / Xtream
+- IPTV : Nouvelle fenêtre (modèle 1)
+(Ne pas oublier de valider dans config la nouvelle fenêtre IPTV)
+---------------------------------------------------------------------------------------
