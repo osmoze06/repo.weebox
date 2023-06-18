@@ -1,6 +1,7 @@
 import xbmcgui
 import os
 import xbmcvfs
+import sys
 
 # Chemin vers le fichier texte
 path = xbmcvfs.translatePath('special://home/addons/plugin.program.weebox/resources/lib/log_updates.txt')
@@ -12,3 +13,5 @@ with open(path, 'r', encoding='utf-8') as f:
 # Création de la fenêtre Kodi
 dialog = xbmcgui.Dialog()
 dialog.textviewer('[COLOR deepskyblue]WEEBOX[/COLOR] - MISE A JOUR', content)
+
+sys.exit()

@@ -11,4 +11,4 @@ with open(path, 'r', encoding='utf-8') as f:
 
 # Création de la fenêtre Kodi
 dialog = xbmcgui.Dialog()
-dialog.textviewer('[COLOR deepskyblue]WEEBOX[/COLOR] - MISE A JOUR', content)
+dialog.textviewer('[COLOR deepskyblue]WEEBOX[/COLOR] - INFORMATIONS', content)
