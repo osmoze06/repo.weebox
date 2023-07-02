@@ -22,6 +22,7 @@ def main_menu():
     add_dir("Version_KODI", 'script_verif_kodi', 'call_save', artworkPath + 'download.png')
     add_dir("Infos Versions", 'log_updates', 'call_save', artworkPath + 'download.png')    
     add_dir("SCRIPT", 'weebox_news', 'call_save', artworkPath + 'download.png')
+    add_dir("SCRIPT", 'recup_profil', 'call_save', artworkPath + 'download.png')
 
 def callSave(url):
     plugins = __import__('resources.lib.' + url)

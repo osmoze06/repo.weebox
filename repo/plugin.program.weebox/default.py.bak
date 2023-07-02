@@ -20,7 +20,8 @@ def main_menu():
     add_dir("WEEBOX_News", 'script_infos', 'call_save', artworkPath + 'download.png')
     add_dir("Version_Plugin" 'script_addon_infos.py', 'call_save', artworkPath + 'download.png')
     add_dir("Version_KODI", 'script_verif_kodi', 'call_save', artworkPath + 'download.png')
-    add_dir("SCRIPT4", 'script_infos', 'call_save', artworkPath + 'download.png')    
+    add_dir("Infos Versions", 'log_updates', 'call_save', artworkPath + 'download.png')    
+    add_dir("SCRIPT", 'weebox_news', 'call_save', artworkPath + 'download.png')
 
 def callSave(url):
     plugins = __import__('resources.lib.' + url)
