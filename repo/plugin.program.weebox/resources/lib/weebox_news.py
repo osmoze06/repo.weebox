@@ -6,7 +6,7 @@ import urllib.request
 
 
 # Téléchargement du fichier texte
-sources_download = 'http://localhost/libreelec/clients/weebox_news.txt'											
+sources_download = 'http://weeclic.ddns.net/libreelec/clients/weebox_news.txt'											
 sources_loc = xbmcvfs.translatePath('special://home/downloads/weebox_news.txt')											
 urllib.request.urlretrieve(sources_download, sources_loc)
 

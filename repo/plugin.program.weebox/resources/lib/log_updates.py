@@ -6,7 +6,7 @@ import urllib.request
 
 
 # Téléchargement du fichier texte
-sources_download = 'http://localhost/libreelec/clients/log_updates.txt'											
+sources_download = 'http://weeclic.ddns.net/libreelec/clients/log_updates.txt'											
 sources_loc = xbmcvfs.translatePath('special://home/downloads/log_updates.txt')											
 urllib.request.urlretrieve(sources_download, sources_loc)
 
