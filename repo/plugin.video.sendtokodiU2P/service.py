@@ -864,6 +864,9 @@ def gestionMedia(params):
         else:
             dictA["Ajouter à %s" %l] = (gestionListeV, {"mode": "ajout", "u2p": numId, "typM": typMedia, "nom": l})
     dictA["Correction Certification"] = (correctCertif, {"u2p": numId, "typM": typMedia})
+
+    dictA['Vider Historique'] = (delView, {"typM": media})
+    dictA['Vider Favoris HK'] = (supFavHK, {"typM": media})
     tab = list(dictA.keys())
     dialog = xbmcgui.Dialog()
     ret = dialog.contextmenu(tab)
@@ -4751,8 +4754,28 @@ def choixSkin():
     except:
         showInfoNotification("Import skin à faire en 1er => import Database => skin ")
 
+def delView(params):
+    if params["typM"] == "movies":
+        typM = "movie"
+    else:
+        typM = "tvshow2"
+    if __addon__.getSetting("bookonline") != "false":
+        listeView = widget.responseSite("http://%s/requete.php?name=%s&type=view&media=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), typM))
+        for l in listeView:
+            #notice("id {}, {}".format(l, params["typM"]))
+            #notice("http://%s/requete.php?name=%s&type=supview&media=%s&numid=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), params["typM"], l))
+            widget.pushSite("http://%s/requete.php?name=%s&type=supview&media=%s&numid=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), params["typM"], l))
+            time.sleep(0.1)
+    else:
+        listeView = list(widget.extractIdInVu(t=typM))
+        for l in listeView:
+            widget.supView(params["u2p"], params["typM"])
+    showInfoNotification("Vider historique ok!!")
+
+
 def supView(params):
     if __addon__.getSetting("bookonline") != "false":
+        notice("http://%s/requete.php?name=%s&type=supview&media=%s&numid=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), params["typM"], params["u2p"]))
         widget.pushSite("http://%s/requete.php?name=%s&type=supview&media=%s&numid=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), params["typM"], params["u2p"]))
     else:
         widget.supView(params["u2p"], params["typM"])
@@ -5008,6 +5031,19 @@ def gestionoc(params):
     else:
         widget.gestOC(params["u2p"], "supp")
     return
+
+def supFavHK(params):
+    if __addon__.getSetting("bookonline") != "false":
+        listeM = widget.responseSite("http://%s/requete.php?name=%s&type=favs&media=%s" %(__addon__.getSetting("bookonline_site"), __addon__.getSetting("bookonline_name"), params["typM"]))
+        listeM = [int(x) for x in listeM]
+    else:
+        listeM = list(widget.extractFavs(t=media))
+    params["mode"] = "sup"
+    for numId in listeM:
+        params["u2p"] = numId
+        gestionFavHK(params)
+        time.sleep(0.1)
+    showInfoNotification("Vider Favoris HK")
 
 def gestionFavHK(params):
     trk = actifTrakt()
@@ -5314,6 +5350,7 @@ def router(paramstring):
         "listeAll": (uptobox.listeAllded, params), "affNewsUpto": (newUptoPublic, params), "addcompte": (addCompteUpto, params), "AffCatPoiss": (newUptoPublic2, params), "affSaisonUptoPoiss": (affSaisonUptoPoiss, params),
         "visuEpisodesUptoPoiss": (visuEpisodesUptoPoiss, params), "delcompte": (delcompte, params), "affdetailfilmpoiss": (uptobox.detailFilmPoiss, params), "cryptFolder": (scraperUPTO.cryptFolder, ""),
         "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""), "feninfo": (fenInfo, params),
+        "delView": (delView, params), "supFavHK": (supFavHK, params),
         #strm
         'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""), 'strmsc': (makeStrms, 1),
         #profils
