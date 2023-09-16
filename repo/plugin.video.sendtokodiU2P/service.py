@@ -960,7 +960,8 @@ def detailsMedia(params):
         overview = "%s\nsynopsis: %s \nAnnée: %s\nGenre: %s\nNote: %.2f\nDurée: %.d mns" %(title, overview[:150] + "...", year, genre, popu, runtime)
         #fnotice(overview)
         xbmcplugin.setPluginCategory(__handle__, "Menu")
-        xbmcplugin.setContent(__handle__, 'episodes')
+        #xbmcplugin.setContent(__handle__, 'episodes')
+        xbmcplugin.setContent(__handle__, 'movies')
 
         categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": typMedia}), ("[COLOR green]Lire[/COLOR]", {"action": "afficheLiens", "lien": links, "u2p": numId})]
         """
@@ -998,6 +999,9 @@ def detailsMedia(params):
             categories.append(("Retirer fav's-HK", {"action": "fav", "mode": "sup", "u2p": numId, "typM": "movies"}))
         else:
             categories.append(("Ajouter fav's-HK", {"action": "fav", "mode": "ajout", "u2p": numId, "typM": "movies"}))
+
+        categories += [("Acteurs", {"action": "affActeurs", "u2p": numId, "typM": typMedia}),\
+                ("Similaires", {"action": "suggest", "u2p": numId, "typ": "Similaires", "typM": typMedia}), ("Recommandations", {"action": "suggest", "u2p": numId, "typ": "Recommendations", "typM": typMedia})]
 
         #fenetre information
         categories.append(("Fenêtre Information", {"action": "feninfo", "u2p": numId, "typM": "movies", "title": title}))

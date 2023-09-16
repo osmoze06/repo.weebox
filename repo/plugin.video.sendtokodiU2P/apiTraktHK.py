@@ -334,7 +334,7 @@ class TraktHK(ApiTrakt):
 
     def importListes(self, typM="movie"):
         dialog = xbmcgui.Dialog()
-        d = dialog.input("User Trakt (exemple: alKODIque):", type=xbmcgui.INPUT_ALPHANUM)
+        d = dialog.input("User Trakt (exemple: jukebox8786):", type=xbmcgui.INPUT_ALPHANUM)
         if d:
             dictListes = self. getUserListsLight(d)
             if dictListes:

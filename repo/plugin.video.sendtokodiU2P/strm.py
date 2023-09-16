@@ -281,7 +281,7 @@ http://www.themoviedb.org/movie/{0}""".format(numId)
 
 
     def makeSeriesSTRM(self, liste, clear=0, nomRep=""):
-        notice(clear)
+        #notice(clear)
         nomRep = makeNameRep(nomRep)
         if nomRep:
             repSerie = os.path.join(self.repKodiName+"/Series/", nomRep + "/")
@@ -302,19 +302,21 @@ http://www.themoviedb.org/movie/{0}""".format(numId)
 
         maxItem = min(len(liste),self.limitPerWidget)
 
+        #notice(len(liste))
+
         dictSerie  = {}
         fNewSerie = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/newserie.txt')
         if os.path.exists(fNewSerie) and not clear:
             with open(fNewSerie, "r") as f:
                 tx = f.read()
             tx = [int(x) for x in tx.split("\n") if x]
-            liste = [x for x in liste if x[4] in tx]
-            notice(tx)
+            liste = [x for x in liste if int(x[4]) in tx]
+            #notice(tx)
         else:
             if not clear:
                 liste = []
 
-
+        #notice(len(liste))
         for i, movie in enumerate(liste[::-1]):
             if i >= maxItem:
                 break

@@ -1718,13 +1718,14 @@ def playMedia(params):
                 #    cmd = quote(linkCMD)
                 #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     else:
-        link = params["lien"] + ".ts"
+        link = params["lien"] + ".mp4"
 
     #infinity ott
     #{'user_info': {'username': 'rY24nReEhXAxxMwx', 'password': 'YpGq3Ua4WEmbHNTD', 'message': '', 'auth': 1, 'status': 'Active', 'exp_date': '1685788532', 'is_trial': '1', 'active_cons': '0', 'created_at': '1685702132', 'max_connections': '1', 'allowed_output_formats': ['m3u8', 'ts', 'rtmp']}, 'server_info': {'url': 'vbn123.com', 'port': '8080', 'https_port': '25463', 'server_protocol': 'http', 'rtmp_port': '25462', 'timezone': 'Europe/Paris', 'timestamp_now': 1685717604, 'time_now': '2023-06-02 16:53:24'}}
 
     userAg = "|User-Agent=Mozilla"
     #userAg = "|User-Agent=VLC"
+    #userAg = ""
     result = {"url": link + userAg, "title": params["iptv"]}
     notice(link)
     #xbmc.Player().play(link)
@@ -1737,6 +1738,7 @@ def playMedia(params):
         if "replay" in params.keys() or typM in ["vod", "episode"]:
             xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
         else:
+            #xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
             xbmc.Player().play(result["url"], listitem=listIt)
         #notice(result["url"])
         #result["url"] =  result["url"].replace("myf-tv.com:8080", "mol-2.com:8080")
