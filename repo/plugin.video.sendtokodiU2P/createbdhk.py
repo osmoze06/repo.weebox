@@ -462,8 +462,25 @@ def mediasHKFilms(params):
     if "famille" in params.keys():
         famille = params["famille"]
         movies = None
+        #====================================================================================================================================================================================
+        if famille in ["tmdb"]:
+            nom = params["nom"]
+            listeId = widget.recupTMDB(nom, "movie")
+            listeId = listeId[offset:]
+            tabMovies = []
+            for n in listeId:
+                if n:
+                    sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, (SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId=m.numId) , m.backdrop, m.runtime, m.id \
+                        FROM filmsPub as m WHERE m.numId={}".format(n)
+                    movies = extractMedias(sql=sql)
+                    if movies:
+                        tabMovies.append(movies[0])
+                    if len(tabMovies) == limit:
+                        break
+            params["offset"] = offset
+            movies = tabMovies[:]
         #===============================================================================================================================================================================================
-        if famille in ["groupes"]:
+        elif famille in ["groupes"]:
             sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, (SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId=m.numId) , m.backdrop, m.runtime, m.id \
                         FROM filmsPub as m WHERE m.numId IN (SELECT f.numId FROM filmsRepos as f WHERE f.nom='{}')".format(params["nom"])\
                         + orderDefault + " LIMIT {} OFFSET {}".format(limit, offset)
@@ -779,8 +796,26 @@ def mediasHKSeries(params):
     if "famille" in params.keys():
         famille = params["famille"]
         movies = None
+        #====================================================================================================================================================================================
+        if famille in ["tmdb"]:
+            nom = params["nom"]
+            listeId = widget.recupTMDB(nom, "tv")
+            listeId = listeId[offset:]
+            tabMovies = []
+            for n in listeId:
+                notice(n)
+                if n:
+                    sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, m.backdrop, m.runtime, m.id FROM seriesPub as m\
+                                WHERE m.numId={}".format(n)
+                    movies = extractMedias(sql=sql)
+                    if movies:
+                        tabMovies.append(movies[0])
+                    if len(tabMovies) == limit:
+                        break
+            params["offset"] = offset
+            movies = tabMovies[:]
         #===============================================================================================================================================================================================
-        if famille in ["groupes"]:
+        elif famille in ["groupes"]:
             sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, m.backdrop, m.runtime, m.id FROM seriesPub as m\
                 WHERE m.numId IN (SELECT f.numId FROM seriesRepos as f WHERE f.nom='{}')".format(params["nom"])\
                         + orderDefault + " LIMIT {} OFFSET {}".format(limit, offset)

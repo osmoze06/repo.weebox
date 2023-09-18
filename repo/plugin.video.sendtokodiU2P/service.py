@@ -1708,9 +1708,9 @@ def affTmdb():
         choix = []
         for (nom, typMedia) in liste:
             if typMedia == "movie":
-                choix.append((nom, {"action":"MenuFilm", "famille": 'tmdb', "nom": nom}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', typMedia))
+                choix.append((nom, {"action":"MenuFilmHK", "famille": 'tmdb', "nom": nom}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', typMedia))
             else:
-                choix.append((nom, {"action":"MenuSerie", "famille": 'tmdb', "nom": nom}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', typMedia))
+                choix.append((nom, {"action":"MenuSerieHK", "famille": 'tmdb', "nom": nom}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', typMedia))
         isFolder = True
         for ch in sorted(choix):
             name, parameters, picture, texte = ch
@@ -5350,7 +5350,7 @@ def router(paramstring):
         "listeAll": (uptobox.listeAllded, params), "affNewsUpto": (newUptoPublic, params), "addcompte": (addCompteUpto, params), "AffCatPoiss": (newUptoPublic2, params), "affSaisonUptoPoiss": (affSaisonUptoPoiss, params),
         "visuEpisodesUptoPoiss": (visuEpisodesUptoPoiss, params), "delcompte": (delcompte, params), "affdetailfilmpoiss": (uptobox.detailFilmPoiss, params), "cryptFolder": (scraperUPTO.cryptFolder, ""),
         "affSaisonUptofoldercrypt": (uptobox.loadSaisonsUptoFolderCrypt, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesFolderCrypt, params), "affGlobalHK2": (createbdhk.affGlobal, ""), "feninfo": (fenInfo, params),
-        "delView": (delView, params), "supFavHK": (supFavHK, params),
+        "delView": (delView, params), "supFavHK": (supFavHK, params),'MenuFilmHK': (createbdhk.mediasHKFilms, params), 'MenuSerieHK': (createbdhk.mediasHKSeries, params),
         #strm
         'strms': (makeStrms, ""), "strmSelectWidget" : (configureSTRM,""), 'strmsc': (makeStrms, 1),
         #profils
