@@ -964,7 +964,7 @@ def detailsMedia(params):
         #fnotice(overview)
         xbmcplugin.setPluginCategory(__handle__, "Menu")
         #xbmcplugin.setContent(__handle__, 'episodes')
-        xbmcplugin.setContent(__handle__, 'movies')
+        xbmcplugin.setContent(__handle__, 'videos')
 
         categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": typMedia}), ("[COLOR green]Lire[/COLOR]", {"action": "afficheLiens", "lien": links, "u2p": numId})]
         """
@@ -3658,7 +3658,10 @@ def playMediaHK(params):
                 return
             else:
                 time.sleep(1)
-        trk = actifTrakt()
+        try:
+            trk = actifTrakt()
+        except:
+            trk = None
         if numId != "divers" and str(numId) != "0":
             if typMedia == "movie":
                 if __addon__.getSetting("bookonline") != "false":

@@ -56,11 +56,15 @@ class ApiTrakt:
                 "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
                 "grant_type": "refresh_token"
             }
-        request = requests.post(url, data=values)
-        response = request.json()
-        self.access_token = response["access_token"]
-        self.refresh_token = response['refresh_token']
-        self.keyExpire =  int(response["created_at"]) + int(response["expires_in"])
+        try:
+            request = requests.post(url, data=values)
+            response = request.json()
+            self.access_token = response["access_token"]
+            self.refresh_token = response['refresh_token']
+            self.keyExpire =  int(response["created_at"]) + int(response["expires_in"])
+        except:
+            showInfoNotification("Trakt desynchro")
+            raise
 
     def getUserlists(self, userlist, page=1):
         self.dictUsers = {}
