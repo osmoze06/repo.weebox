@@ -22,6 +22,7 @@ def main_menu():
     add_dir("Version_KODI", 'script_verif_kodi', 'call_save', artworkPath + 'download.png')
     add_dir("Infos_Versions", 'log_updates', 'call_save', artworkPath + 'download.png')    
     add_dir("Weebox_infos", 'weebox_news', 'call_save', artworkPath + 'download.png')
+    add_dir("Install_Vstream", 'install_vstream', 'call_save', artworkPath + 'download.png')
     add_dir("Recup_Profil", 'recup_profil', 'call_save', artworkPath + 'download.png')
 
 def callSave(url):
