@@ -470,7 +470,7 @@ class IPTVMac:
         self.infosCompteUrl = "/portal.php?type=account_info&action=get_main_info&JsHttpRequest=1-xml"
         self.genreUrl = "/portal.php?type=itv&action=get_genres&JsHttpRequest=1-xml"
         self.genreUrlVod =  "/server/load.php?action=create_link&type=vod&cmd={}&JsHttpRequest=1-xml"
-        self.listGenreUrl = "/portal.php?type={}&action=get_ordered_list&genre={}&force_ch_link_check=&fav=0&sortby=number&hd=0&p={}&from_ch_id=0&JsHttpRequest=1-xml"
+        self.listGenreUrl = "/portal.php?type={}&action=get_ordered_list&genre={}&category={}&force_ch_link_check=&fav=0&sortby=number&hd=0&p={}&from_ch_id=0&JsHttpRequest=1-xml"
         #self.listGenreUrl = "/portal.php?type={}&action=get_ordered_list&category={}&force_ch_link_check=&fav=0&sortby=number&hd=0&p={}&from_ch_id=0&JsHttpRequest=1-xml"
         self.catUrl = "/portal.php?type={}&action=get_categories&JsHttpRequest=1-xml"  #vod ou series
         self.createLink = "/portal.php?type=itv&action=create_link&cmd={}&series=0&forced_storage=false&disable_ad=false&download=false&force_ch_link_check=false&JsHttpRequest=1-xml"
@@ -480,6 +480,9 @@ class IPTVMac:
         self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%2Fmedia%2F{}.mpg&forced_storage=false&disable_ad=false&download=false&force_ch_link_check=false&JsHttpRequest=1-xml"
         #self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%20%2Fmedia%2F36830002_5942.mpg&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml"
         #self.createLinkReplay = "/portal.php?type=tv_archive&action=create_link&cmd=auto%20%2Fmedia%2F{}.mpg&series=&forced_storage=0&disable_ad=0&download=0&force_ch_link_check=0&JsHttpRequest=1-xml"
+
+        #{'type': ['vod'], 'action': ['get_ordered_list'], 'category': ['0'], 'search': ['Maigret'], 'sortby': ['name'], 'p': ['5']}
+        self.search = "/portal.php?type={}&action=get_ordered_list&category=0&search={}&sortby=name&page={}&JsHttpRequest=1-xml" #vod ou series
 
         #type=epg&action=get_simple_data_table&ch_id=123481&date=2022-07-09&p=2&JsHttpRequest=1-xml
         self.data_table = "/portal.php?type=epg&action=get_simple_data_table&ch_id={}&date={}&p={}&JsHttpRequest=1-xml"
@@ -555,7 +558,7 @@ class IPTVMac:
             return False
 
     def getChaines(self, typ, genre, i):
-        tmpChaines = self.getInfos(self.listGenreUrl.format(typ, genre, i)).json()["js"]["data"]
+        tmpChaines = self.getInfos(self.listGenreUrl.format(typ, genre, genre, i)).json()["js"]["data"]
         if typ == "itv":
             self.chaines += [(chaine["cmd"], chaine["name"], chaine["id"], chaine["logo"]) for chaine in tmpChaines]
         else:
@@ -565,7 +568,7 @@ class IPTVMac:
         i = 1
         #'allow_local_timeshift': '1'
         #notice(self.urlBase + self.listGenreUrl.format(typ, genre, i))
-        page = self.getInfos(self.listGenreUrl.format(typ, genre, i)).json()
+        page = self.getInfos(self.listGenreUrl.format(typ, genre, genre, i)).json()
         #notice("recup 1ere page (%s): "%genre + str(page))
         self.chaines = [(chaine["cmd"], chaine["name"], chaine["id"], chaine["logo"]) for chaine in page["js"]["data"]]
         nbItems = page["js"]["total_items"]
@@ -598,14 +601,34 @@ class IPTVMac:
         episodes = media.get("series", "[]")
         return (idVod, name, description, duree, numId, poster, certif, year, added, actors, director, rep, popu, genre, link, episodes)
 
+    def listeSearch(self, typ, d):
+        i = 1
+        requete = self.search.format(typ, d, i)
+        page = self.getInfos(requete).json()
+        self.chaines = [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
+
+        nbItems = page["js"]["total_items"]
+        itemsPage = page["js"]["max_page_items"]
+        if nbItems > 14:
+            i += 1
+            requete = self.search.format(typ, d, i)
+            page = self.getInfos(requete).json()
+
+            self.chaines += [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
+        return self.chaines
+
+
+
 
     def listeVod(self, typ, genre, numSerie="", offset="ko"):
+        notice(offset)
         if offset != "ko":
             i = offset
             nbPage = (5 + offset) * 14
         else:
             i = 1
             nbPage = 0
+        notice(nbPage)
         #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
         #('399532', "FR| Fortress 2: Sniper's Eye", "Le film suit l'histoire d'un lieu", 97, '883502', 'http://myf-tv.com:8080/images/byi8ay0EFKsHxxItmFKAbfwSgBU_big.jpg', '12+', '2022-04-29', '2022-04-28 17:55:50', 'Chad Michael Murray', 'Josh Sternfeld', "FR|_Fortress_2:_Sniper's_Eye", 'N/A')
         if numSerie:
@@ -617,23 +640,26 @@ class IPTVMac:
             except:
                 requete = self.getsaison.format(quote(numSerie), numSerie, i)
         else:
-            requete = self.listGenreUrl.format(typ, genre, i)
-
-        #notice(requete)
+            requete = self.listGenreUrl.format(typ, genre, genre, i)
         page = self.getInfos(requete).json()
-        #notice(page)
         self.chaines = [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
         nbItems = page["js"]["total_items"]
+        notice(nbItems)
         if nbPage and nbItems >= nbPage:
             nbItems = nbPage
         itemsPage = page["js"]["max_page_items"]
         nbItems -= itemsPage
-        while nbItems > 0:
+        nbItemsPage = 70
+        if nbItems < nbItemsPage:
+            nbItemsPage =  nbItems
+        while nbItemsPage > 0:
             i += 1
             threading.Thread(name="iptvC", target=self.getChaines, args=(typ, genre, i,)).start()
-            nbItems -= itemsPage
+            nbItemsPage -= itemsPage
+            notice(nbItemsPage)
             time.sleep(0.1)
         self.testThread()
+        notice(len(self.chaines))
         return self.chaines
 
     def testThread(self):
@@ -846,6 +872,65 @@ def activeMac(params):
             IPTVfav()
         else:
             affChaines(params)
+
+def menuFournisseur(params):
+    notice(params)
+    xbmcplugin.setPluginCategory(HANDLE, "files")
+    xbmcplugin.setContent(HANDLE, "files")
+    ok = addDirectoryGroupe("TV", isFolder=True, parameters={"action": "loadFTV", "fourn": params["fourn"]})
+    ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "vod"})
+    ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "series"})
+    ok = addDirectoryGroupe("Recherche VOD/Series", isFolder=True, parameters={"action": "searchVod", "fourn": params["fourn"], "typM": "vod"})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+def searchVod(params):
+    dialog = xbmcgui.Dialog()
+    d = dialog.input("Recherche (mini 3 lettres)", type=xbmcgui.INPUT_ALPHANUM, defaultt="")
+    if len(d) > 2:
+        notice(d)
+        params["search"] = d
+        menuSearch(params)
+
+def menuSearch(params):
+
+    xbmcplugin.setPluginCategory(HANDLE, "files")
+    xbmcplugin.setContent(HANDLE, "files")
+    ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "vod", "search": params["search"]})
+    ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "series", "search": params["search"]})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+
+def searchVod2(params):
+    fournisseur = params["fourn"]
+    typM = params["typM"]
+    d = params["search"]
+    bd = BookmarkIPTV(BDBOOKMARK)
+    infosFournisseur = bd.recupToken(fournisseur)
+    site, mac, token = infosFournisseur[0]
+    iptv = IPTVMac(site, mac, token)
+    medias = iptv.listeSearch(typM, d)
+
+    xbmcplugin.setPluginCategory(HANDLE, typM)
+    xbmcplugin.setContent(HANDLE, 'movies')
+    for i, media in enumerate(sorted(medias, key=lambda x: x[8], reverse=True)):
+        media = Media("vod", *media)
+        if typM == "series":
+            if  media.link:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affEpisodes", "numId": media.numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id, "saison": media.title}, media=media)
+            else:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affVod", "numId": media.numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id}, media=media)
+        else:
+            ok = addDirectoryVod("%s" %(media.title), isFolder=False, parameters={"action": "playMediaIptv", "lien": media.link, "iptv": media.title, "typM": typM, "fourn": fournisseur}, media=media)
+
+    if len(medias) > 83 and "offset" in params.keys():
+        addDirNext(params)
+
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=False)
+
 
 def load(params):
     ADDON.setSetting("passtmp", "")
@@ -1083,7 +1168,10 @@ def getVodSeries(params):
     groupes = sorted(dictCat.keys())
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, 'files')
+    #¬notice(dictCat)
     for i, media in enumerate(groupes):
+        #notice(media)
+        #notice(dictCat[media])
         ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVod", "numId": dictCat[media], "fourn": fournisseur, "typM": typM, "offset": 1})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
@@ -1114,6 +1202,7 @@ def affVod(params):
     fournisseur = params["fourn"]
     numId = params["numId"]
     typM = params["typM"]
+    notice(typM)
     bd = BookmarkIPTV(BDBOOKMARK)
     infosFournisseur = bd.recupToken(fournisseur)
     site, mac, token = infosFournisseur[0]
@@ -1129,7 +1218,9 @@ def affVod(params):
         offset = int(params["offset"])
     else:
         offset =  "ko"
+
     medias = iptv.listeVod(typM, numId, numSerie, offset)
+    #notice(medias)
     #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
     #('399532', "FR| Fortress 2: Sniper's Eye", "Le film suit l'histoire d'un lieu", 97, '883502', 'http://myf-tv.com:8080/images/byi8ay0EFKsHxxItmFKAbfwSgBU_big.jpg', '12+', '2022-04-29', '2022-04-28 17:55:50', 'Chad Michael Murray', 'Josh Sternfeld', "FR|_Fortress_2:_Sniper's_Eye", 'N/A')
     xbmcplugin.setPluginCategory(HANDLE, typM)

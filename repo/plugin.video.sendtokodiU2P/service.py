@@ -5379,12 +5379,12 @@ def router(paramstring):
         "affbacattmdb": (createbdhk.affbacattmdb, params), "updateba": (importDatabase, "ba"), "rskin2": (rskin2, ''), "rskin3": (rskin3, ''), "intmajbann15": (intmajbann15, ''), "majhkcron": (majHkcron, ''),  "mepautostart2": (mepAutoStart2, ""),
         }
     if vIPTV:
-        dictActionsIPTV = { "iptvLoad": (iptv.menu, ""), "affChaine": (iptv.affChaines, params), "playMediaIptv": (iptv.playMedia, params), "ajoutIPTV": (iptv.ajoutIPTV, ""), "loadF": (iptv.load, params),
+        dictActionsIPTV = { "iptvLoad": (iptv.menu, ""), "affChaine": (iptv.affChaines, params), "playMediaIptv": (iptv.playMedia, params), "ajoutIPTV": (iptv.ajoutIPTV, ""), "loadF": (iptv.menuFournisseur, params),
                     "activemac": (iptv.activeMac, params), "gestfourn": (iptv.gestfourn, params), "lock": (iptv.lock, params), "affepgChann": (iptv.affepgChann, params), "mapepg": (iptv.mapEpg, params),
                     "gestFuseau": (iptv.gestFuseau, params), "getVod": (iptv.getVodSeries, params), "affVod": (iptv.affVod, params), "gestfournVod": (iptv.gestfournVod, params), "affEpisodes": (iptv.affEpisodes, params),
                     "retireriptv": (iptv.retireriptv, ""), "delDB": (iptv.removeDB, ""), "IPTVbank":(iptv.IPTVbank, ""), "addFavIptv": (iptv.addFavIptv, params), "IPTVfav": (iptv.IPTVfav, ""),
                     "iptvsupfav": (iptv.supfavIptv, params), "iptvdepfav": (iptv.iptvdepfav, params), "iptvreplay": (iptv.replay, params),  "loadFX": (iptv.loadX, params), "affChainex": (iptv.affChainesx, params),
-                    "fepgx": (iptv.forceMajEpgX, ""), "menus": (iptv.menuStalker, ""), "menux": (iptv.menuXtream, "")}
+                    "fepgx": (iptv.forceMajEpgX, ""), "menus": (iptv.menuStalker, ""), "menux": (iptv.menuXtream, ""), "loadFTV": (iptv.load, params), "searchVod": (iptv.searchVod, params), "searchVodf": (iptv.searchVod2, params)}
         dictActions.update(dictActionsIPTV)
     notice(len(dictActions))
     if params:
