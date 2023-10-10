@@ -67,6 +67,10 @@
       <fanart>fanart.jpg</fanart>
 	  <screenshot>screenshot-01.jpg</screenshot>
       <screenshot>screenshot-02.jpg</screenshot>
-    </assets>
+    <news>
+[VERSION 0.9.24.beta8 - 10/10/2023]
+- ITVP VOD : Fix nombre de Saison.
+    </news> 
+ </assets>
   </extension>
 </addon>

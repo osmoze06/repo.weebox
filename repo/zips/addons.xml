@@ -86,7 +86,7 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <screenshot>screenshot-03.jpg</screenshot>
         </assets>		
     </extension>
-</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.9.24.beta5" provider-name="noway">
+</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.9.24.beta8" provider-name="noway">
   <requires>
     <trycatch>
       <try>
@@ -125,7 +125,11 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
       <fanart>fanart.jpg</fanart>
 	  <screenshot>screenshot-01.jpg</screenshot>
       <screenshot>screenshot-02.jpg</screenshot>
-    </assets>
+    <news>
+[VERSION 0.9.24.beta8 - 10/10/2023]
+- ITVP VOD : Fix nombre de Saison.
+    </news> 
+ </assets>
   </extension>
 </addon><addon id="plugin.video.vstream" name="vStream" version="2.6.4" provider-name="venom-xbmc-addons">
     <requires>

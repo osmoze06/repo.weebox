@@ -605,6 +605,7 @@ class IPTVMac:
         i = 1
         requete = self.search.format(typ, d, i)
         page = self.getInfos(requete).json()
+        #notice(page)
         self.chaines = [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
 
         nbItems = page["js"]["total_items"]
@@ -617,46 +618,61 @@ class IPTVMac:
             self.chaines += [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
         return self.chaines
 
-
+    def getSaisonsFull(self, numSerie, genre, i):
+        tmpChaines = self.getInfos(self.saison.format(numSerie, genre, i)).json()["js"]["data"]
+        self.chaines += [self.extractInfosVod(chaine) for chaine in tmpChaines]
 
 
     def listeVod(self, typ, genre, numSerie="", offset="ko"):
-        notice(offset)
+        notice("%s %s %s" %(offset, typ, genre))
         if offset != "ko":
             i = offset
             nbPage = (5 + offset) * 14
         else:
             i = 1
             nbPage = 0
-        notice(nbPage)
+        #notice(nbPage)
         #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
         #('399532', "FR| Fortress 2: Sniper's Eye", "Le film suit l'histoire d'un lieu", 97, '883502', 'http://myf-tv.com:8080/images/byi8ay0EFKsHxxItmFKAbfwSgBU_big.jpg', '12+', '2022-04-29', '2022-04-28 17:55:50', 'Chad Michael Murray', 'Josh Sternfeld', "FR|_Fortress_2:_Sniper's_Eye", 'N/A')
+
+        mdSaison = False
+        notice(numSerie)
         if numSerie:
+            mdSaison = True
             try:
                 if numSerie.split(":")[0] == numSerie.split(":")[1]:
                     requete = self.saison.format(numSerie, genre, i)
                 else:
                     requete = self.getsaison.format(quote(numSerie), numSerie, i)
+
+
             except:
                 requete = self.getsaison.format(quote(numSerie), numSerie, i)
+
         else:
             requete = self.listGenreUrl.format(typ, genre, genre, i)
         page = self.getInfos(requete).json()
         self.chaines = [self.extractInfosVod(chaine) for chaine in page["js"]["data"]]
         nbItems = page["js"]["total_items"]
-        notice(nbItems)
+        #notice("nbTotal {}".format(nbItems))
         if nbPage and nbItems >= nbPage:
             nbItems = nbPage
         itemsPage = page["js"]["max_page_items"]
         nbItems -= itemsPage
         nbItemsPage = 70
         if nbItems < nbItemsPage:
-            nbItemsPage =  nbItems
+            nbItemsPage = nbItems
+        #notice("nbTotal {}".format(nbItems))
+        #notice("nbTotalArecp {}".format(nbItemsPage))
+        #notice(mdSaison)
         while nbItemsPage > 0:
             i += 1
-            threading.Thread(name="iptvC", target=self.getChaines, args=(typ, genre, i,)).start()
+            if mdSaison:
+                threading.Thread(name="iptvC", target=self.getSaisonsFull, args=(numSerie, genre, i,)).start()
+            else:
+                threading.Thread(name="iptvC", target=self.getChaines, args=(typ, genre, i,)).start()
             nbItemsPage -= itemsPage
-            notice(nbItemsPage)
+            #notice(nbItemsPage)
             time.sleep(0.1)
         self.testThread()
         notice(len(self.chaines))
@@ -1147,6 +1163,7 @@ def getVodSeries(params):
         ADDON.setSetting(id="token1", value=token)
     else:
         macs = bd.getAdr(fournisseur)
+        site = fournisseur
         for mac in macs:
             ADDON.setSetting("site1", fournisseur)
             ADDON.setSetting("mac1", mac)
@@ -1157,6 +1174,7 @@ def getVodSeries(params):
                 break
         ADDON.setSetting(id="token1", value=iptv.token)
         bd.insertToken(fournisseur, mac, iptv.token)
+        token = iptv.token
     iptv = IPTVMac(site, mac, token)
     liste = bd.getGroupeVod(fournisseur, typM)
     if liste:
@@ -1203,12 +1221,16 @@ def affVod(params):
     numId = params["numId"]
     typM = params["typM"]
     notice(typM)
+    notice(fournisseur)
     bd = BookmarkIPTV(BDBOOKMARK)
     infosFournisseur = bd.recupToken(fournisseur)
     site, mac, token = infosFournisseur[0]
     #site = ADDON.getSetting("site1")
     #mac = str.upper(ADDON.getSetting("mac1"))
     #token = ADDON.getSetting("token1")
+    notice(site)
+    notice(mac)
+    notice(token)
     iptv = IPTVMac(site, mac, token)
     if "numSerie" in params.keys():
         numSerie = params["numSerie"]
