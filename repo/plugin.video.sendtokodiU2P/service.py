@@ -1873,7 +1873,7 @@ def ventilationHK():
 
     # creation avec repertoires crypté
     if __addon__.getSetting("actifnewpaste") != "false":
-        choix += [("Médiathéque hk3", {"action":"menuRepCrypte"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/upto.png', "DATABASE new systéme"),]
+        choix += [("Médiathéque HK3", {"action":"menuRepCrypte"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/upto.png', "DATABASE new systéme"),]
 
     # trakt
     if __addon__.getSetting("traktperso") != "false":
@@ -1904,6 +1904,10 @@ def ventilationHK():
         name, parameters, picture, texte = ch
         li = xbmcgui.ListItem(label=name)
         updateMinimalInfoTagVideo(li,name,texte)
+        if "HK3" in name:
+            commands = []
+            commands.append(('[COLOR yellow]Details Mediathéque[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=detailmediatheque)'))
+            li.addContextMenuItems(commands)
         li.setArt({'thumb': picture,
                   'icon': addon.getAddonInfo('icon'),
                   'icon': addon.getAddonInfo('icon'),
@@ -5452,7 +5456,7 @@ def gestiondbhk3():
     dialog = xbmcgui.Dialog()
     ret = dialog.yesno('Gestion', 'Opération ?', nolabel="Sauvegarde", yeslabel="Restauration")
     if not ret:
-        ret = dialog.yesno('Sauvegarde', 'type ?', nolabel="Local + Compte 1fichier", yeslabel="Local")
+        ret = dialog.yesno('Sauvegarde', 'type ?', nolabel="Local + 1fichier/darkibox", yeslabel="Local")
         if not ret:
             #compte
             xbmcvfs.copy(os.path.join(chemin, bd), os.path.join(chemin, bdSauve))
@@ -5473,6 +5477,13 @@ def gestiondbhk3():
             showInfoNotification("Restauration Ok...")
         else:
             showInfoNotification("Restauration Ko , fait sauvegarde avant...")
+
+def detailmediatheque():
+    sql = "SELECT COUNT(*) FROM filmsPub"
+    nbFilms = createbdhk.extractMedias(sql=sql)
+    sql = "SELECT COUNT(*) FROM seriesPub"
+    nbSeries = createbdhk.extractMedias(sql=sql)
+    showInfoNotification("%d type film, %d type serie" %(nbFilms[0][0], nbSeries[0][0]))
 
 
 def router(paramstring):
@@ -5531,7 +5542,7 @@ def router(paramstring):
 
         #hk3
         "loadhk3": (loadhk3.getLinks, ""), "resetBDhkNew":(loadhk3.resetBdFull, ""), "affSaisonUptofoldercrypt": (uptobox.loadSaisonsHK3, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesHK3, params),
-        "loaddbhk3": (importBDhk3, ""), "suiteSerie": (suiteSerie, ""), 'vuNonVu': (gestionVuSaison, params), "gestiondb": (gestiondbhk3, ""), "loadhk3v": (loadhk3.getLinks, 1),
+        "loaddbhk3": (importBDhk3, ""), "suiteSerie": (suiteSerie, ""), 'vuNonVu': (gestionVuSaison, params), "gestiondb": (gestiondbhk3, ""), "loadhk3v": (loadhk3.getLinks, 1), "detailmediatheque": (detailmediatheque, ""),
         }
     if vIPTV:
         dictActionsIPTV = { "iptvLoad": (iptv.menu, ""), "affChaine": (iptv.affChaines, params), "playMediaIptv": (iptv.playMedia, params), "ajoutIPTV": (iptv.ajoutIPTV, ""), "loadF": (iptv.menuFournisseur, params),
