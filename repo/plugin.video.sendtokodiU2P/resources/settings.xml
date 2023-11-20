@@ -19,17 +19,21 @@
         <setting id="actiftmdb" label="Mon MOVIE-DB" type="bool" default="false" />
         <setting label="Création liste TMDB" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=createLTMDB)" visible="eq(-1,true)" />
         <setting label="Suppréssion liste TMDB" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=suppLTMDB)" visible="eq(-2,true)" />
-        <setting label="Repo Uptobox" type="lsep" />
+        <setting id="actifupto" label="Mon Uptobox" type="bool" values="false" default="false" visible="false"/>
+        <!--<setting label="Repo Uptobox" type="lsep" />
         <setting id="actifupto" label="Mon Uptobox" type="bool" default="false" />
         <setting label="Création accés répertoire" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=createRUPTO)" visible="eq(-1,true)" />
         <setting label="Création accés répertoire Publique" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=createRUPTOP)" visible="eq(-2,true)" />
         <setting label="Cryptage répertoire Publique" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=cryptFolder)" visible="eq(-3,true)" />
         <setting label="Supprimer Repertoire" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=suppLUPTO)" visible="eq(-4,true)" />
         <setting id="nbupto" label="Pagination Uptobox" type="number" default="20" visible="eq(-5,true)" />
-        <setting id="modeadd" label="Mode ajout à son compte" type="labelenum" values="alias|std" default="alias"  visible="eq(-6,true)"/>
+        <setting id="modeadd" label="Mode ajout à son compte" type="labelenum" values="alias|std" default="alias"  visible="eq(-6,true)"/>-->
+        <setting label="AllDebrid" type="lsep" />
         <setting id="actifalldeb" label="Mon Alldebrid" type="bool" default="false" />
     </category>
     <category label="Général">
+        <setting id="actifhk" label="Activer HK" type="bool" values="false" default="false" visible="false"/>
+        <!--
         <setting label="DataBase HK1" type="lsep" />
         <setting id="actifhk" label="Activer HK" type="bool" default="false" />
         <setting id="numhk" label="Num HK" type="text" default="0000" visible="eq(-1,true)"/>
@@ -38,10 +42,19 @@
         <setting id="heberg" label="Hébergeur liste DB" type="labelenum" values="Anotepad|Pastebin|Rentry|Textup|fichier|RentryC" default="RentryC"  visible="eq(-1,true)"/>
         <setting id="numHeberg" label="Numero Anotepad/Pastebin/Rentry/Textup" type="text" default="" visible="eq(-2,true)"/>
         <setting label="Ajouter contenu" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=folderPastebin&maj=false)" visible="eq(-3,true)"/>
-        <setting label="Reset database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=resetBDhkNew)" visible="eq(-4,true)"/>
+        <setting label="Reset database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=resetBDhkNew)" visible="eq(-4,true)"/>-->
         <!-- <setting id="nbHmaj" label="Nombre d'heures entre deux M.A.J auto (0=jamais)" type="number" default="200" visible="eq(-5,true)"/> -->
         <!--<setting id="actiflocal" label="Activer BD locale" type="bool" default="false" visible="false" />
         <setting id="numpastes" label="Num Pastes" type="text" default="" visible="eq(-1,true)"/>-->
+        <setting label="DataBase HK3" type="lsep" />
+        <setting id="actifnewpaste" label="Activer Médiathéque HK3" type="bool" default="false" />
+        <setting id="heberg" label="Hébergeur liste Liens" type="labelenum" values="Anotepad|Pastebin|Rentry|Textup|fichier|Rentry" default="Rentry"  visible="eq(-1,true)"/>
+        <setting id="numHeberg" label="Numero Anotepad/Pastebin/Rentry/Textup" type="text" default="" visible="eq(-2,true)"/>
+        <setting label="Ajouter contenu" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=loadhk3v)" visible="eq(-3,true)"/>
+        <setting label="Reset database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=resetBDhkNew)" visible="eq(-4,true)"/>
+        <setting id="numdatabase" label="Link database" type="text" default="" visible="eq(-5,true)"/>
+        <setting label="Importer Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=loaddbhk3)" visible="eq(-6,true)"/>
+        <setting label="Gestion Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestiondb)" visible="eq(-7,true)"/>
         <setting label="Lecture" type="lsep" />
         <setting id="resos" label="Résolution prioritaire" type="labelenum" values="720|1080|2160" default="1080" />
         <setting id="autoplay" label="Lecture automatique" type="bool" default="false" />
@@ -62,10 +75,10 @@
     </category>
     <!-- bookmak en ligne -->
     <category label="Bookmark Online">
-        <setting id="ochk1" label="On continue ... (visu hk1)" type="bool" default="false" />
+        <!--<setting id="ochk1" label="On continue ... (visu hk1)" type="bool" default="false" />-->
         <setting id="bookonline" label="Bookmark en ligne" type="bool" default="false" />
         <setting id="bookonline_name" label="Pass" type="text" default="" visible="eq(-1,true)" />
-        <setting id="bookonline_site" label="Site" type="text" default="bookmark.zapto.org:5000" visible="eq(-2,true)" />
+        <setting id="bookonline_site" label="Site" type="text" default="bookmark.embyshare.ovh:80" visible="eq(-2,true)" />
         <setting label="Créer Profil" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=ajoutP)" visible="eq(-3,true)"/>
         <setting label="Supprimer Profil" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=suppP)" visible="eq(-4,true)"/>
         <setting id="rentry" type="text" label="Code Import Config"  default=""  visible="eq(-5,true)"/>
@@ -73,10 +86,9 @@
     </category>
     <!-- Installation avancée -->
     <category label="Installation avancée">
-        <setting label="Maj HK² & HK" type="lsep" />
+        <setting label="Maj HK3 & HK" type="lsep" />
         <!-- <setting id="majhk2" label="Activer la Maj au restart" type="bool" default="false" /> -->
         <!-- <setting label="Mise en place de la Maj au restart KODI" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart)"/>-->
-        <setting id="extupto" label="extension Uptobox" type="text" default="uptobox.eu" />
         <setting id="intmaj" label="Interval (mins) Service de MAJ (0=desactivé)" type="labelenum" values="0|15|30|45|60|120|180|240" default="0"/>
         <setting label="Mise en place service de Maj" type="action" option="close" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=mepautostart2)"/>
         <setting id="delaimaj" label="Delai 1er MAJ (mins)" type="number" default="0"/>
@@ -109,7 +121,8 @@
     <!-- Débrideurs -->
     <category label="Débrideurs">
         <setting label="Clés API de débridage" type="lsep" />
-        <setting id="keyupto" label="Uptobox" type="text" default=""/>
+        <setting id="key1fichier" label="1fichier" type="text" default=""/>
+        <setting id="keydarkibox" label="Darkibox" type="text" default=""/>
         <setting id="keyalldebrid" label="AllDebrid" type="text" default=""/>
         <setting id="keyrealdebrid" label="RealDebrid" type="text" default=""/>
         <setting id="apikey" type="text" label="TMDB"  default="96139384ce46fd4ffac13e1ad770db7a"/>
@@ -160,9 +173,5 @@
         <setting label="Vider la poissonnerie" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=reinitPoissonnerie)" />
     </category>
     -->
-    <category label="Bande Annonce">
-        <setting label="Bande Annonce" type="lsep" />
-        <setting id="numba" label="Numero" type="text" default="1yjXN"/>
-    </category>
 
 </settings>

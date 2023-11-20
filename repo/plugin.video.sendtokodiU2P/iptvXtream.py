@@ -561,6 +561,18 @@ class IPTVXtream:
         URL = '%s/xmltv.php?username=%s&password=%s' % (self.server, self.username, self.password)
         return URL
 
+    def get_vod_cat_URL(self):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_vod_categories')
+        return URL
+
+    def get_vod_streams_URL(self):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_vod_streams')
+        return URL
+
+    def get_vod_streams_URL_by_category(self, category_id):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s&category_id=%s' % (self.server, self.username, self.password, 'get_vod_streams', category_id)
+        return URL
+
 
 if __name__ == '__main__':
 

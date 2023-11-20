@@ -5,28 +5,15 @@ import xbmcvfs
 import sqlite3
 import xbmc
 import os
+import loadhk3
 
 pyVersion = sys.version_info.major
 pyVersionM = sys.version_info.minor
-if pyVersionM == 11:
-    import cryptPaste11 as cryptage
-    import scraperUPTO11 as scraperUPTO
-elif pyVersionM == 8:
-    import cryptPaste8 as cryptage
-    import scraperUPTO8 as scraperUPTO
-elif pyVersionM == 9:
-    import cryptPaste9 as cryptage
-    import scraperUPTO9 as scraperUPTO
-elif pyVersionM == 10:
-    import cryptPaste10 as cryptage
-    import scraperUPTO10 as scraperUPTO
 
 time.sleep(0.1)
 addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
 interval = int(addon.getSetting("intmaj"))
 delaiMaj = int(addon.getSetting("delaimaj"))
-fNewSerie = xbmcvfs.translatePath('special://home/addons/plugin.video.sendtokodiU2P/newserie.txt')
-#scraperUPTO.extractEpisodesOnContinue()
 if interval:
     delai = time.sleep(delaiMaj * 60)
     monitor = xbmc.Monitor()
@@ -40,15 +27,15 @@ if interval:
             else:
                 okMaj = True
         if okMaj:
-            actu = scraperUPTO.majHkNewStart()
+            actu = loadhk3.getLinks()
             intervalNew = interval
-            if addon.getSetting("actifStrm") != "false":
-                a = 0
-                while a < 60:
-                    time.sleep(1)
-                    a += 1
-                    if os.path.exists(fNewSerie):
-                        break
-                xbmc.executebuiltin("RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strms)")
+            #if addon.getSetting("actifStrm") != "false":
+            #    a = 0
+            #    while a < 60:
+            #        time.sleep(1)
+            #        a += 1
+            #        if os.path.exists(fNewSerie):
+            #           break
+            #    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=strms)")
         if monitor.waitForAbort(intervalNew * 60):
             break

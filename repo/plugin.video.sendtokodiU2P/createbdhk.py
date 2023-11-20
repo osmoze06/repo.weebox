@@ -49,7 +49,7 @@ try:
     ADDON = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     KEYTMDB = ADDON.getSetting("apikey")
     LIMIT = ADDON.getSetting("nb_items")
-    LIMITSCRAP = ADDON.getSetting("nbupto")
+    LIMITSCRAP = 50
     HANDLE = int(sys.argv[1])
     BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasHK.bd')
     BDREPO = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mymedia.db')
@@ -694,6 +694,7 @@ def mediasHKFilms(params):
         sql = "SELECT DISTINCT nom FROM filmsRepos WHERE nom!='concert' AND nom!='sport' AND nom!='docu' AND nom!='film' AND nom!='spectacle'"
         sql = "SELECT DISTINCT nom FROM filmsRepos"
         liste = extractMedias(sql=sql, unique=1)
+        liste = [x for x in liste if x != "histoire"]
         choix = [(x.capitalize(), {"action":"mediasHKFilms", "famille":"groupes", "offset": "0", "nom":x}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/%s.png' %x, x) for x in liste]
         addCategorieMedia(choix)
 
@@ -1062,10 +1063,11 @@ def mediasHKSeries(params):
         affMedias(typM, movies, params)
 
     else:
-        if ADDON.getSetting("ochk1") != "false" and int(ADDON.getSetting("intmaj")):
-            choix = [("On continue...", {"action":"suiteSerieHK2"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
-        else:
-            choix = [("On continue...", {"action":"mediasHKSeries", "famille": "Mon historique", "offset": "0", "suite": "1"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
+        #if ADDON.getSetting("ochk1") != "false" and int(ADDON.getSetting("intmaj")):
+        #    choix = [("On continue...", {"action":"suiteSerie"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
+        #else:
+        #    choix = [("On continue...", {"action":"mediasHKSeries", "famille": "Mon historique", "offset": "0", "suite": "1"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
+        choix = [("On continue...", {"action":"suiteSerie"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Mon historique.png', "on continue nos series")]
         choix += [("Series", {"action":"mediasHKSeries", "famille": "serieserie"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Serie.png', "Liste series hors animation et documentaire")]
         choix += [("Derniers Ajouts", {"action":"mediasHKSeries", "famille": "seriesall"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Serie.png', "Liste series tous genres")]
         choix += [("Liste Aléatoire", {"action":"mediasHKSeries", "famille": "Liste Aléatoire"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/Liste Aléatoire.png', "Liste Aléatoire, tous genres")]

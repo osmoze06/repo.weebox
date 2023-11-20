@@ -755,15 +755,6 @@ def menuStalker():
     ok = addDirectoryGroupe("Favoris", isFolder=True, parameters={"action": "IPTVfav"})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
-def menuXtream():
-    xbmcplugin.setPluginCategory(HANDLE, "TV")
-    xbmcplugin.setContent(HANDLE, "files")
-
-    nomX = ADDON.getSetting("nomx1")
-    if nomX:
-        ok = addDirectoryGroupe(nomX, isFolder=True, parameters={"action": "loadFX", "numId": '1'})
-    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=False)
-
 
 def ajoutIPTV():
     bd = BookmarkIPTV(BDBOOKMARK)
@@ -1025,7 +1016,41 @@ def loadNewFX(params):
     #xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
     menuXtream()
 
-def loadX(params):
+def loadXvod(params):
+    notice("load vod")
+    nomX = ADDON.getSetting("nomx1")
+    #user = ADDON.getSetting("userx1")
+    #passwd = ADDON.getSetting("passwordx1")
+    #server = ADDON.getSetting("serverx1")
+    itv = iptvx.IPTVXtream(1)
+    try:
+        cc = itv.authenticate()
+        notice(cc)
+        if cc["user_info"]["status"] == "Active":
+            valid = True
+            notice('server ok')
+            notice(cc["user_info"]["exp_date"])
+        else:
+            valid = False
+    except Exception as e:
+        valid = False
+        notice(e)
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Compte Out", str(e))
+
+    dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.vodType)}
+
+    typM = itv.vodType
+    groupes = dictCat.keys()
+    xbmcplugin.setPluginCategory(HANDLE, "files")
+    xbmcplugin.setContent(HANDLE, 'files')
+    for i, media in enumerate(groupes):
+        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVodx", "numId": dictCat[media], "typM": typM})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+
+def loadXitv(params):
+    notice("load chaines")
     if ADDON.getSetting("newfeniptv") != "false":
         loadNewFX(params)
     else:
@@ -1081,6 +1106,30 @@ def loadX(params):
                 ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affChainex", "numId": dictCat[media], "typM": typM})
             xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def menuXtream():
+    xbmcplugin.setPluginCategory(HANDLE, "TV")
+    xbmcplugin.setContent(HANDLE, "files")
+
+    nomX = ADDON.getSetting("nomx1")
+    if nomX:
+        ok = addDirectoryGroupe(nomX, isFolder=True, parameters={"action": "loadFX", "numId": '1'})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=False)
+
+def loadX(params):
+    notice("menu itv/vod/series xtream")
+    xbmcplugin.setPluginCategory(HANDLE, "files")
+    xbmcplugin.setContent(HANDLE, "files")
+    #ok = addDirectoryGroupe("nomx", isFolder=True, parameters={"action": "loadFX", "numId": '1'})
+    ok = addDirectoryGroupe("TV", isFolder=True, parameters={"action": "loadXitv",  "numId": '1'})
+    #ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "loadXvod",  "numId": '1'})
+
+
+    #ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "vod"})
+    #ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "series"})
+    #ok = addDirectoryGroupe("Recherche VOD/Series", isFolder=True, parameters={"action": "searchVod", "fourn": params["fourn"], "typM": "vod"})
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+
 def gestfourn(params):
     #notice(params)
     fournisseur = params["fourn"]
@@ -1131,7 +1180,7 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
     commands = []
     if parameters["action"] == "affVod":
         commands.append(('[COLOR yellow]Gestion Groupes Vod/Series[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestfournVod&fourn=%s&typM=%s)' %(parameters["fourn"], parameters["typM"], )))
-    elif parameters["action"] in ["affChainex", "loadFX"]:
+    elif parameters["action"] in ["affChainex", "loadFX", "loadXitv", "loadXserie", "loadXvod", "affVodx", "affSeriex"]:
         commands.append(('[COLOR yellow]Force Maj EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=fepgx)'))
     else:
         commands.append(('[COLOR yellow]Maj EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=bdepg)'))
@@ -1589,6 +1638,32 @@ def IPTVfav():
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def affVodx(params):
+    numId = params["numId"]
+    typM = params["typM"]
+    itv = iptvx.IPTVXtream(1)
+    movies = itv.streamsByCategory(itv.vodType, numId)
+    notice(movies)
+    #{'num': 1, 'name': 'Miraculous - le film (2023)', 'title': 'Miraculous - le film', 'year': '2023', 'stream_type': 'movie', 'stream_id': 4742, 'stream_icon': 'https://image.tmdb.org/t/p/w600_and_h900_bestv2/iu4qpzsyBcnWhiwh1BxTAJefTmS.jpg', 'rating': 7.8, 'rating_5based': 3.9, 'added': '1699779588', 'category_id': '35', 'category_ids': [35], 'container_extension': 'mkv', 'custom_sid': '', 'direct_source': ''}
+    #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
+    xbmcplugin.setPluginCategory(HANDLE, typM)
+    xbmcplugin.setContent(HANDLE, 'movies')
+    for i, media in enumerate(sorted(medias, key=lambda x: x[8], reverse=True)):
+        media = Media("vod", *media)
+        if typM == "series":
+            if  media.link:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affEpisodes", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id, "saison": media.title}, media=media)
+            else:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affVod", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id}, media=media)
+        #else:
+        #    ok = addDirectoryVod("%s" %(media.title), isFolder=False, parameters={"action": "playMediaIptv", "lien": media.link, "iptv": media.title, "typM": typM, "fourn": fournisseur}, media=media)
+
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
 def affChainesx(params):
     #notice("aff chaines xtream")
     numId = params["numId"]
@@ -1597,6 +1672,7 @@ def affChainesx(params):
     bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
     epgs = bd.extractEpgX()
     chaines = itv.streamsByCategory(itv.liveType, numId)
+    #notice(chaines)
     #{'num': 2, 'name': 'TF1', 'stream_type': 'live', 'stream_id': 482, 'stream_icon': '/images/DJagQBurpUQ4xR3aG2lwzvhXm58CUJMcpz05mRzzbfi7NSghNmeIr2ZWVq4chRTq.png', 'epg_channel_id': 'TF1.fr', 'added': '1683902974', 'custom_sid': '', 'tv_archive': 0, 'direct_source': '', 'tv_archive_duration': 0, 'category_id': '1', 'category_ids': [1], 'thumbnail': ''}
     for i, chaine in enumerate(chaines):
         plot = ""
@@ -1831,7 +1907,10 @@ def playMedia(params):
                 #    cmd = quote(linkCMD)
                 #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     else:
-        link = params["lien"] + ".mp4"
+        if "noos" in params["lien"]:
+            link = params["lien"] + ".mp4"
+        else:
+            link = params["lien"] + ".ts"
 
     #infinity ott
     #{'user_info': {'username': 'rY24nReEhXAxxMwx', 'password': 'YpGq3Ua4WEmbHNTD', 'message': '', 'auth': 1, 'status': 'Active', 'exp_date': '1685788532', 'is_trial': '1', 'active_cons': '0', 'created_at': '1685702132', 'max_connections': '1', 'allowed_output_formats': ['m3u8', 'ts', 'rtmp']}, 'server_info': {'url': 'vbn123.com', 'port': '8080', 'https_port': '25463', 'server_protocol': 'http', 'rtmp_port': '25462', 'timezone': 'Europe/Paris', 'timestamp_now': 1685717604, 'time_now': '2023-06-02 16:53:24'}}
@@ -1839,6 +1918,7 @@ def playMedia(params):
     userAg = "|User-Agent=Mozilla"
     #userAg = "|User-Agent=VLC"
     #userAg = ""
+    userAg = "|User-Agent=VLC/3.0.18"
     result = {"url": link + userAg, "title": params["iptv"]}
     notice(link)
     #xbmc.Player().play(link)

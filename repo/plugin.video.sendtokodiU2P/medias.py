@@ -412,6 +412,7 @@ class Media:
           self.episode = argvs[-2]
           self.saison = argvs[-3]
           self.vu = argvs[-1]
+          #notice(self.backdrop)
 
         elif self.typeMedia == "cast":
           #('Artemis Pebdani', 'Additional Voices (voice)', '/ctwVQYbcOuTIQJ866fi3AhzqKBM.jpg', numId)

@@ -86,7 +86,7 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <screenshot>screenshot-03.jpg</screenshot>
         </assets>		
     </extension>
-</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="0.9.24.beta8" provider-name="noway">
+</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="1.0.0" provider-name="noway">
   <requires>
     <trycatch>
       <try>
@@ -98,6 +98,7 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
         </trycatch>
     <import addon="script.module.requests" version="2.12.4" />
     <import addon="script.module.pyxbmct" />
+    <import addon="script.module.beautifulsoup4" version="4.3.1" />
   </requires>
   <extension point="xbmc.python.pluginsource" library="service.py">
   <provides>video</provides>
@@ -125,11 +126,7 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
       <fanart>fanart.jpg</fanart>
 	  <screenshot>screenshot-01.jpg</screenshot>
       <screenshot>screenshot-02.jpg</screenshot>
-    <news>
-[VERSION 0.9.24.beta8 - 10/10/2023]
-- ITVP VOD : Fix nombre de Saison.
-    </news> 
- </assets>
+    </assets>
   </extension>
 </addon><addon id="repo.weebox" name="WEEBOX Addons Repository" version="0.0.1" provider-name="Osmoze06">
     <extension point="xbmc.addon.repository" name="WEEBOX Addons Repository">

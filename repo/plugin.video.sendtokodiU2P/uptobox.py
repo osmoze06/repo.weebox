@@ -47,8 +47,8 @@ try:
     BDBOOKMARK = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/bookmarkUptobox.db')
     BDFLDP = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mymedia.db')
     BDREPONEW = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd')
-    NBMEDIA = int(ADDON.getSetting("nbupto"))
-    EXTUPTO = ADDON.getSetting("extupto")
+    NBMEDIA = 50
+    EXTUPTO = "uptobox.com"
 except: pass
 
 class RenameMedia:
@@ -741,13 +741,13 @@ def getEpisodesSaison(numId):
 
     cnx = sqlite3.connect(BDREPONEW)
     cur = cnx.cursor()
-    cur.execute('SELECT folder, hsh FROM seriesfolderHash WHERE numId={}'.format(numId))
-    liste = cur.fetchall()
+    cur.execute('SELECT saison, episode, link FROM episodes WHERE numId={}'.format(numId))
+    tabExtract = cur.fetchall()
     cur.close()
     cnx.close()
-    eRep = scraperUPTO.ExtractRep()
-    tabExtract = eRep.extractAll(liste)
-    tabFiles = []
+    tabFiles = [("Saison %s" %str(x[0]).zfill(2), x[1], x[2]) for x in tabExtract]
+    liste = [("Saison %s" %str(x[0]).zfill(2), x[1]) for x in tabExtract]
+    """
     if tabExtract:
         liste = []
         renam = RenameMedia()
@@ -759,6 +759,7 @@ def getEpisodesSaison(numId):
                 liste.append(("Saison %s" %n[1], int(n[2].split("E")[1])))
             except:
                 notice(n)
+    """
     dictSaisons = {}
     for saison in list(set([x[0] for x in liste])):
         nbTotal = len([x for x in list(set(liste)) if x[0] == saison])
@@ -772,7 +773,7 @@ def getEpisodesSaison(numId):
         dictSaisons[saison] = (c, nbVus, nbTotal)
     return dictSaisons, tabFiles
 
-def loadSaisonsUptoFolderCrypt(params):
+def loadSaisonsHK3(params):
     typMedia = "tvshow"
     numId = params["u2p"]
 
@@ -1059,7 +1060,7 @@ def getEpisodesSerie(numId, saison):
     return [x[0] for x in tabExtract if int(saison) == int(x[0].split("E")[0][1:])]
 
 
-def affEpisodesFolderCrypt(params):
+def affEpisodesHK3(params):
     typMedia = "tvshow"
     numId = params["u2p"]
     saison = params["saison"]
