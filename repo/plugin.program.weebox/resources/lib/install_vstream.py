@@ -13,21 +13,27 @@ addon_name = 'plugin.video.vstream'
 xbmc.executebuiltin("Notification(INSTALLATION, Lancement)")
 
 # Vérifiez si le référentiel est installé
-while not xbmc.getCondVisibility('System.HasAddon(' + repository_name + ')'):
-    xbmc.sleep(10000)  # Attendre 10 secondes avant de vérifier à nouveau
+if not xbmc.getCondVisibility('System.HasAddon(' + repository_name + ')'):
+    xbmc.executebuiltin("Notification(INSTALLATION, Référentiel non installé, installation en cours)")
+    # Installez le référentiel
+    xbmc.executebuiltin('InstallAddon(' + repository_name + ')')
+    
+    # Attendez que le référentiel soit installé
+    while not xbmc.getCondVisibility('System.HasAddon(' + repository_name + ')'):
+        xbmc.sleep(1000)  # Attendre 1 seconde avant de vérifier à nouveau
 
 # Le référentiel est installé, passez à l'installation de l'addon
-xbmc.executebuiltin("Notification(INSTALLATION, Référentiel installé)")
+xbmc.executebuiltin("Notification(INSTALLATION, Référentiel installé, installation de l'addon en cours)")
 
 # Installez l'addon à partir du référentiel
 xbmc.executebuiltin('InstallAddon(' + addon_name + ')')
 
-# Vérifiez si l'addon est installé
+# Attendez que l'addon soit installé
 while not xbmc.getCondVisibility('System.HasAddon(' + addon_name + ')'):
-    xbmc.sleep(10000)  # Attendre 10 secondes avant de vérifier à nouveau
+    xbmc.sleep(1000)  # Attendre 1 seconde avant de vérifier à nouveau
 
 # L'addon est installé, procédez au téléchargement des fichiers
-xbmc.executebuiltin("Notification(INSTALLATION, Addon installé)")
+xbmc.executebuiltin("Notification(INSTALLATION, Addon installé, téléchargements en cours)")
 
 settings_download2 = 'http://weeclic.ddns.net/libreelec/clients/_SETTINGS_VSTREAM/settings.xml'
 settings_loc2 = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.vstream/settings.xml')
@@ -41,6 +47,5 @@ settings_download4 = 'http://weeclic.ddns.net/libreelec/clients/_SETTINGS_VSTREA
 settings_loc4 = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.vstream/pastebin_cache.db')
 urllib.request.urlretrieve(settings_download4, settings_loc4)
 
-xbmc.executebuiltin("Notification(INSTALLATION, Paramétrage terminé)")
-
+xbmc.executebuiltin("Notification(INSTALLATION, Téléchargements terminés)")
 sys.exit()
