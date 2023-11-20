@@ -348,9 +348,11 @@ class PopupWindowNew(xbmcgui.WindowDialog):
             self.addControl(xbmcgui.ControlLabel(x=pos, y=20, width=100, height=80, label="Last\nSeries"))
             x = pos + 55
             for i, img in enumerate(series[: 7 + ajoutSerie]):
-                image2 = "http://image.tmdb.org/t/p/w185" + img
-                pos = (x + (i * l) + (5 * i))
-                self.addControl(xbmcgui.ControlImage(x=pos, y=15, width=l, height=100, filename=image2))
+                try:
+                    image2 = "http://image.tmdb.org/t/p/w185" + img
+                    pos = (x + (i * l) + (5 * i))
+                    self.addControl(xbmcgui.ControlImage(x=pos, y=15, width=l, height=100, filename=image2))
+                except: pass
 
 
 

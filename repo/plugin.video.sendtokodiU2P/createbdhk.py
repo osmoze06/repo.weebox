@@ -1252,8 +1252,19 @@ def suiteSerie2():
 def tmdbSerie(params):
     numId = params["u2p"]
     saison = params["saison"]
-    episodes = uptobox.getEpisodesSuite(numId)
+
+    #episodes = uptobox.getEpisodesSuite(numId)
+    #notice(episodes)
+
+    cnx = sqlite3.connect(BDREPONEW)
+    cur = cnx.cursor()
+    cur.execute('SELECT saison, episode, link FROM episodes WHERE numId={}'.format(numId))
+    listeIn = cur.fetchall()
+    cur.close()
+    cnx.close()
+    episodes = [(int("%d%s" %(x[0], str(x[1]).zfill(4))), x[2], "S%sE%s" %(str(x[0]).zfill(2), str(x[1]).zfill(4))) for x in listeIn]
     notice(episodes)
+
     listeSerie  = []
     listesEpisodes = []
     for (episode, lien, numEpisode) in [x for x in sorted(episodes) if "S%s" %str(saison).zfill(2) == x[2].split("E")[0]]:

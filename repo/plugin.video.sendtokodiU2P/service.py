@@ -5416,6 +5416,7 @@ def rskin3():
 def importBDhk3():
     cr = Crypt()
     filecode = __addon__.getSetting("numdatabase")
+    hebergDB = __addon__.getSetting("hebergdb")
     if len(filecode) == 12:
         link = cr.urlBase + filecode
     else:
@@ -5424,20 +5425,27 @@ def importBDhk3():
     ApikeyAlldeb = getkeyAlldebrid()
     ApikeyRealdeb = getkeyRealdebrid()
     Apikey1fichier = getkey1fichier()
+    ApikeyDarkibox = __addon__.getSetting("keydarkibox")
     if ApikeyAlldeb:
         linkD, ok = cr.resolveLink(link, ApikeyAlldeb)
     else:
-        linkD, ok = cr.resolveLink(link, Apikey1fichier)
+        if hebergDB == "1Fichier":
+            linkD, ok = cr.resolveLink(link, Apikey1fichier)
+        else:
+            dictLiens = cr.debridDarkibox(link.split("/")[-1], ApikeyDarkibox)
+            linkD = dictLiens["o"][0]
     #notice(linkD)
     r = requests.get(linkD, timeout=3)
     open(os.path.join(__repAddonData__, "combine.bd"), 'wb').write(r.content)
-
+    time.sleep(0.2)
     loadhk3.joinBlocker()
     showInfoNotification("import et fusion BD Ok...")
 
 def gestiondbhk3():
     cr = Crypt()
     Apikey1fichier = getkey1fichier()
+    ApikeyDarkibox = __addon__.getSetting("keydarkibox")
+    hebergDB = __addon__.getSetting("hebergdb")
     chemin = xbmcvfs.translatePath("special://home/userdata/addon_data/plugin.video.sendtokodiU2P/")
     bd = "mediasNew.bd"
     bdSauve = "mediasNewSauve.bd"
@@ -5448,8 +5456,11 @@ def gestiondbhk3():
         if not ret:
             #compte
             xbmcvfs.copy(os.path.join(chemin, bd), os.path.join(chemin, bdSauve))
-            url = cr.upload1fichier(os.path.join(chemin, bd), Apikey1fichier)
-            numDB = url.split("?")[1].split("/")[-1]
+            if hebergDB == "1Fichier":
+                url = cr.upload1fichier(os.path.join(chemin, bd), Apikey1fichier)
+                numDB = url.split("?")[1].split("/")[-1]
+            else:
+                numDB = cr.uploadDarkibox(os.path.join(chemin, bd), ApikeyDarkibox)
             #notice(numDB)
             __addon__.setSetting(id="numdatabase", value=numDB)
             showInfoNotification("Sauvegarde Ok...")

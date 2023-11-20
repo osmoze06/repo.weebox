@@ -52,9 +52,10 @@
         <setting id="numHeberg" label="Numero Anotepad/Pastebin/Rentry/Textup" type="text" default="" visible="eq(-2,true)"/>
         <setting label="Ajouter contenu" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=loadhk3v)" visible="eq(-3,true)"/>
         <setting label="Reset database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=resetBDhkNew)" visible="eq(-4,true)"/>
-        <setting id="numdatabase" label="Link database" type="text" default="" visible="eq(-5,true)"/>
-        <setting label="Importer Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=loaddbhk3)" visible="eq(-6,true)"/>
-        <setting label="Gestion Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestiondb)" visible="eq(-7,true)"/>
+        <setting id="hebergdb" label="Hébergeur Database" type="labelenum" values="1Fichier|Darkibox" default="1Fichier"  visible="eq(-5,true)"/>
+        <setting id="numdatabase" label="Link database" type="text" default="" visible="eq(-6,true)"/>
+        <setting label="Importer Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=loaddbhk3)" visible="eq(-7,true)"/>
+        <setting label="Gestion Database" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestiondb)" visible="eq(-8,true)"/>
         <setting label="Lecture" type="lsep" />
         <setting id="resos" label="Résolution prioritaire" type="labelenum" values="720|1080|2160" default="1080" />
         <setting id="autoplay" label="Lecture automatique" type="bool" default="false" />

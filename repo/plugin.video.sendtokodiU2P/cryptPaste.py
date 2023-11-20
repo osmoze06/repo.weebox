@@ -12,6 +12,7 @@ import json
 from json import JSONDecodeError
 try:
     # Python 3
+
     from html.parser import HTMLParser
 except ImportError:
     # Python 2
@@ -250,6 +251,49 @@ class Crypt:
                 return ""
         else:
             return ""
+
+    def uploadDarkibox(self, file_path, key):
+        url = self.urlBase + "api/upload/server?key=" + key
+        r = requests.get(url)
+        if r.ok:
+            resp = r.json()
+            urlServ = resp["result"]
+        else:
+            urlServ = ""
+
+        if urlServ:
+            chemin, nom = os.path.split(file_path)
+            f = {"file" : (nom, open(file_path, 'rb'))}
+            data = {"key": key}
+            r = requests.post(urlServ, data=data, files=f, allow_redirects=True)
+            if r.ok:
+                resp = r.json()
+                return resp["files"][0]["filecode"]
+            else:
+                return ""
+        else:
+            return ""
+
+    def infoCompteDarkibox(self, key):
+        url = self.urlBase + "api/account/info?key={}".format(self.key)
+        r = requests.get(url)
+        try:
+            infos = r.json()
+            return infos["result"]["premium"]
+        except:
+            return 0
+
+    def debridDarkibox(self, filecode, key):
+        url = self.urlBase + "api/file/direct_link?key={}&file_code={}".format(key, filecode)
+        r = requests.get(url)
+        notice(url)
+        if r.ok:
+            infos = r.json()
+            notice(infos)
+            dictLiens = {x["name"]: (x["url"], x["filename"], x["size"]) for x in infos["result"]["versions"]}
+            return dictLiens
+        else:
+            return {}
 
     def resolveLink(self, linkUrl, key):
         notice(linkUrl)
