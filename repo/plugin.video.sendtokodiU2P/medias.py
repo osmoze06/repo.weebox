@@ -844,7 +844,12 @@ class TMDB:
             dict_serie["results"][0]["genre_ids"] = self.formatGenre(dict_serie["results"][0]["genre_ids"])
           except: pass
           dict_serie["results"][0]["release_date"] = dict_serie["results"][0]['first_air_date']
-          dict_serie["results"][0]["title"] = "%s (%sE%d)" %(dict_serie["results"][0]['name'], episode.split("E")[0], int(episode.split("E")[1]))
+          if episode:
+            dict_serie["results"][0]["title"] = "%s (%sE%d)" %(dict_serie["results"][0]['name'], episode.split("E")[0], int(episode.split("E")[1]))
+          elif saison:
+            dict_serie["results"][0]["title"] = "%s (saison %s)" %(dict_serie["results"][0]['name'], saison)
+          else:
+            dict_serie["results"][0]["title"] = "%s (saisons)" %(dict_serie["results"][0]['name'])
         except Exception as e:
           pass
         if "results" not in dict_serie.keys() or not dict_serie["results"]:

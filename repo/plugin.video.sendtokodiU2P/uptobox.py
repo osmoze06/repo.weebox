@@ -1435,11 +1435,6 @@ def addDirectoryUptobox(name, isFolder=True, parameters={}, media="" ):
     return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
 
 def debridLien(link):
-    ApikeyUpto = ADDON.getSetting("keyUpto")
-    if ApikeyUpto:
-        up = Uptobox(key=ApikeyUpto)
-        url, statut = up.linkDownload(link)
-        return url, statut
     key = ADDON.getSetting("keyalldebrid")
     if key:
         up = Alldedrid(key=key)

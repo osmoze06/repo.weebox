@@ -83,6 +83,7 @@ try:
     BDMEDIANew = xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/mediasNew.bd')
 except: pass
 import loadhk3
+import torrent
 
 class FenInfo(pyxbmct.AddonFullWindow):
 
@@ -1723,6 +1724,27 @@ def extractMedias(limit=0, offset=1, sql="", unique=0):
     cnx.close()
     return requete
 
+def affTorrent():
+    choix = [("RSS Films YGG ", {"action":"rssygg", "offset": 0, "typm": "films"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "RSS YYG liste films"),
+             ("RSS Series YGG ", {"action":"rssygg", "offset": 0, "typm": "series"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "RSS YYG liste series"),
+             ("RSS Films Animation YGG ", {"action":"rssygg", "offset": 0, "typm": "anime"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "RSS YYG liste films Animation"),
+             ("RSS Series Animation YGG ", {"action":"rssygg", "offset": 0, "typm": "animeSerie"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "RSS YYG liste series Animation"),
+             ("M.A.J RSS YGG ", {"action":"majrssygg"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "RSS YYG liste films")]
+    xbmcplugin.setPluginCategory(__handle__, "Menu Torrents")
+    addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
+    isFolder = True
+    for ch in sorted(choix):
+        name, parameters, picture, texte = ch
+        li = xbmcgui.ListItem(label=name)
+        updateMinimalInfoTagVideo(li,name,texte)
+        li.setArt({'thumb': picture,
+                  'icon': addon.getAddonInfo('icon'),
+                  'icon': addon.getAddonInfo('icon'),
+                  'fanart': addon.getAddonInfo('fanart')})
+        url = sys.argv[0] + '?' + urlencode(parameters)
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
+    xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True)
+
 def affAlldeb():
     choix = [("Magnets", {"action":"magnets", "offset": 0}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Afficher les liens magnets"),
              ("History", {"action":"listeAll", "offset": 0, "typeL": "history"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Afficher les liens recents"),
@@ -1873,7 +1895,7 @@ def ventilationHK():
 
     # creation avec repertoires crypté
     if __addon__.getSetting("actifnewpaste") != "false":
-        choix += [("Médiathéque HK3", {"action":"menuRepCrypte"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/upto.png', "DATABASE new systéme"),]
+        choix += [("Médiathéque HK3", {"action":"menuRepCrypte"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/strm.png', "DATABASE new systéme"),]
 
     # trakt
     if __addon__.getSetting("traktperso") != "false":
@@ -1896,6 +1918,10 @@ def ventilationHK():
     # mon alldeb
     if __addon__.getSetting("actifalldeb") != "false":
         choix.append(("Mon Alldebrid", {"action":"affAlldeb"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/alldebrid.png', "Accés liens du compte"))
+
+    #torrent
+    if __addon__.getSetting("actiftorrent") != "false":
+        choix.append(("Mes Torrents", {"action":"torrent"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/torrent2.png', "torrent univers..."))
 
     #choix.append(("Mes Bandes Annonces", {"action":"affbaext"}, 'special://home/addons/plugin.video.sendtokodiU2P/resources/png/liste.png', "Accés repo special Bande Annonce"))
 
@@ -5543,6 +5569,9 @@ def router(paramstring):
         #hk3
         "loadhk3": (loadhk3.getLinks, ""), "resetBDhkNew":(loadhk3.resetBdFull, ""), "affSaisonUptofoldercrypt": (uptobox.loadSaisonsHK3, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesHK3, params),
         "loaddbhk3": (importBDhk3, ""), "suiteSerie": (suiteSerie, ""), 'vuNonVu': (gestionVuSaison, params), "gestiondb": (gestiondbhk3, ""), "loadhk3v": (loadhk3.getLinks, 1), "detailmediatheque": (detailmediatheque, ""),
+
+        #torrent
+        #"torrent": (affTorrent, ""), "majrssygg": (torrent.majrssygg, ""), "rssygg": (torrent.rssygg, params), "playTorrent": (torrent.playTorrent, params),
         }
     if vIPTV:
         dictActionsIPTV = { "iptvLoad": (iptv.menu, ""), "affChaine": (iptv.affChaines, params), "playMediaIptv": (iptv.playMedia, params), "ajoutIPTV": (iptv.ajoutIPTV, ""), "loadF": (iptv.menuFournisseur, params),

@@ -47,9 +47,11 @@ def createListItemFromVideo(video):
     title = video['title']
     list_item = xbmcgui.ListItem(title, path=url)
     if "episode" in video.keys():
-        list_item.setInfo(type='Video', infoLabels={'Title': title, "episode": video['episode'], "season": video['season']})
+        list_item = updateMinimalInfoTagVideo(list_item, title, episode=video['episode'], season=video['season'])
+        #list_item.setInfo(type='Video', infoLabels={'Title': title, "episode": video['episode'], "season": video['season']})
     else:
-        list_item.setInfo(type='Video', infoLabels={'Title': title})
+        list_item = updateMinimalInfoTagVideo(list_item, title)
+        #list_item.setInfo(type='Video', infoLabels={'Title': title})
     return list_item
 
 def normalizeNum(num):
@@ -155,7 +157,7 @@ def updateMinimalInfoTagVideo(li, title, plot=None, episode=None, season=None):
             except Exception as e:
                 notice("Util.py - updateMinimalInfoTagVideo::season " + str(e))
 
-        return vinfo
+        return li
     else:
         if plot!= None:
             li.setInfo('video', {"title": title, 'plot': plot, 'mediatype': 'video'})

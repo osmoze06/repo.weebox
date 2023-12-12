@@ -30,6 +30,8 @@
         <setting id="modeadd" label="Mode ajout à son compte" type="labelenum" values="alias|std" default="alias"  visible="eq(-6,true)"/>-->
         <setting label="AllDebrid" type="lsep" />
         <setting id="actifalldeb" label="Mon Alldebrid" type="bool" default="false" />
+        <setting label="Torrents" type="lsep" />
+        <setting id="actifTorrent" label="Mes Torrents" type="bool" default="false" />
     </category>
     <category label="Général">
         <setting id="actifhk" label="Activer HK" type="bool" values="false" default="false" visible="false"/>
@@ -166,13 +168,11 @@
         <setting id="contentIptv" label="Choix type de vue chaines" type="labelenum" values="videos|files|episodes|movies" default="videos"/>
 
     </category>
-    <!--
-    <category label="Poissonnerie">
-        <setting label="Ma Poissonnerie" type="lsep" />
-        <setting id="poissFolder" label="Folder" type="text" default=""/>
-        <setting id="poissHash" label="Hash" type="text" default=""/>
-        <setting label="Vider la poissonnerie" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=reinitPoissonnerie)" />
+    <category label="Torrent">
+        <setting id="torrentygg" label="TORRENT" type="bool" default="false" />
+        <setting label="YGG" type="lsep"  visible="eq(-1,true)"/>
+        <setting id="passygg" label="Pass" type="text" default="" visible="eq(-2,true)"/>
+        <setting id="adrygg" label="Url" type="text" default="" visible="eq(-3,true)"/>
     </category>
-    -->
 
 </settings>

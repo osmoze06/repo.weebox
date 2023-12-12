@@ -172,10 +172,15 @@ class Crypt:
         #print(url)
         soup = BeautifulSoup(r.content, "html.parser")
         links = soup.findAll("div", {"class": "mb-3"})
-        tx = [x.text for x in links if "darkibox" in x.text][0]
-        linkOk = ["https://darkibox.com/" + x for x in re.findall(masqueOk, tx)]
-        linkOut = [ x for x in tabFile if x not in linkOk]
-        return [self.cryptFile(x.split("/")[-1]) for x in linkOk], [self.cryptFile(x.split("/")[-1]) for x in linkOut]
+        if links:
+            tx = [x.text for x in links if "darkibox" in x.text][0]
+            linkOk = ["https://darkibox.com/" + x for x in re.findall(masqueOk, tx)]
+            linkOut = [ x for x in tabFile if x not in linkOk]
+            return [self.cryptFile(x.split("/")[-1]) for x in linkOk], [self.cryptFile(x.split("/")[-1]) for x in linkOut]
+        else:
+            return [], []
+
+
 
     def extractLinksDarkibox(self, tabFile):
         #'https://1fichier.com/?c5e3ohrmfj': ['https://1fichier.com/?c5e3ohrmfj', 'Chisum._John.Wayne.1970.Western_.DVDRIP.FR.avi', 735217676]
