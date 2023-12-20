@@ -126,6 +126,7 @@
         <setting label="Clés API de débridage" type="lsep" />
         <setting id="key1fichier" label="1fichier" type="text" default=""/>
         <setting id="keydarkibox" label="Darkibox" type="text" default=""/>
+        <setting id="debfreedarki" label="Dedrid Darkibox Free" type="bool" default="false" />
         <setting id="keyalldebrid" label="AllDebrid" type="text" default=""/>
         <setting id="keyrealdebrid" label="RealDebrid" type="text" default=""/>
         <setting id="apikey" type="text" label="TMDB"  default="96139384ce46fd4ffac13e1ad770db7a"/>

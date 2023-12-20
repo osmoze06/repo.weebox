@@ -317,6 +317,56 @@ class BDMedia:
         cur.close()
         cnx.close()
 
+class PopupWindowNew2(xbmcgui.WindowDialog):
+    def __init__(self, image, films=[], series=[]):
+        background = xbmcgui.ControlImage(40, 40, 270, 154, 'ContentPanel.png')
+        self.addControl(background)
+        self.strActionInfo = xbmcgui.ControlLabel(100, 400, 200, 200, 'label', 'font13', '0xFFFF00FF')
+        self.addControl(self.strActionInfo)
+        self.strActionInfo.setLabel('')
+        self.button0 = xbmcgui.ControlButton(42, 42, 270, 30, "shortName1")
+        self.addControl(self.button0)
+        self.button1 = xbmcgui.ControlButton(42, 72, 270, 30, "shortName2")
+        self.addControl(self.button1)
+        self.button2 = xbmcgui.ControlButton(42, 102, 270, 30, "shortName3")
+        self.addControl(self.button2)
+        self.button3 = xbmcgui.ControlButton(42, 132, 270, 30, "shortName4")
+        self.addControl(self.button3)
+        self.button4 = xbmcgui.ControlButton(42, 162, 270, 30, "shortName5")
+        self.addControl(self.button4)
+        self.setFocus(self.button0)
+        self.button0.controlDown(self.button1)
+        self.button0.controlUp(self.button4)
+        self.button1.controlUp(self.button0)
+        self.button1.controlDown(self.button2)
+        self.button2.controlUp(self.button1)
+        self.button2.controlDown(self.button3)
+        self.button3.controlUp(self.button2)
+        self.button3.controlDown(self.button4)
+        self.button4.controlUp(self.button3)
+        self.button4.controlDown(self.button0)
+
+    def onAction(self, action):
+        notice(action.getId())
+        if action.getId() == 10:
+            self.close()
+
+    def onControl(self, control):
+        if control == self.button0:
+            #self.close()
+            notice("button0")
+        if control == self.button1:
+            #self.close()
+            notice("button1")
+        if control == self.button2:
+            #self.close()
+            notice("button2")
+        if control == self.button3:
+            #self.close()
+            notice("button3")
+        if control == self.button4:
+            self.close()
+
 class PopupWindowNew(xbmcgui.WindowDialog):
     def __init__(self, image, films=[], series=[]):
         ajoutSerie = max([0, 7 - len(films)])
@@ -353,6 +403,11 @@ class PopupWindowNew(xbmcgui.WindowDialog):
                     pos = (x + (i * l) + (5 * i))
                     self.addControl(xbmcgui.ControlImage(x=pos, y=15, width=l, height=100, filename=image2))
                 except: pass
+    #def onAction(self, action):
+    #    notice("keyborad")
+    #    notice(action.getId())
+    #    notice(action.getButtonCode())
+
 
 
 

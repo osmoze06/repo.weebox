@@ -27,7 +27,7 @@ except ImportError:
 import urllib.request
 from bs4 import BeautifulSoup
 from util import *
-
+ADDON = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
 
 class Crypt:
 
@@ -307,6 +307,7 @@ class Crypt:
             notice("Key 1fichier")
 
             if "darkibox" in linkUrl:
+                notice("free darki")
                 return self.debridFree(linkUrl.split("/")[-1]), "darkibox"
             else:
                 params = {
@@ -338,36 +339,40 @@ class Crypt:
                     #return o
         else:
             notice("Key Alldeb")
-            dlLink = ""
-            statut = "ok"
-            url1 = "http://api.alldebrid.com/v4/link/unlock?agent=u2p&apikey=%s&link=%s" % (key.strip() , linkUrl)
-            #notice(url1)
-            req = requests.get(url1)
-            dict_liens = req.json()
-            #notice(dict_liens)
-            try:
-                if dict_liens["status"] == "success":
-                    dlLink = dict_liens['data']['link']
-                else:
-                    statut = dict_liens["error"]["code"]
-            except: pass
-            return dlLink, statut
-
-            #realdeb
-            """
-            #52
-            key = "JUP7JPSRU6RET2L7G4IHFF7VUBRXKD5QJXNP75H2WZ5XC2QZBZMQ"
-            headers = {'Authorization': 'Bearer %s' %key}
-            data = {'link': linkUrl, 'password':''}
-            r = requests.post('https://api.real-debrid.com/rest/1.0/unrestrict/link', data=data, headers=headers)
-            dictData = r.json()
-            if 'error' in dictData.keys():
-                link, status = "", 'err'
+            if "darkibox" in linkUrl and ADDON.getSetting("debfreedarki") != "false":
+                notice("free darki")
+                return self.debridFree(linkUrl.split("/")[-1]), "darkibox"
             else:
-                link, status = dictData['download'], "ok"
+                dlLink = ""
+                statut = "ok"
+                url1 = "http://api.alldebrid.com/v4/link/unlock?agent=u2p&apikey=%s&link=%s" % (key.strip() , linkUrl)
+                #notice(url1)
+                req = requests.get(url1)
+                dict_liens = req.json()
+                #notice(dict_liens)
+                try:
+                    if dict_liens["status"] == "success":
+                        dlLink = dict_liens['data']['link']
+                    else:
+                        statut = dict_liens["error"]["code"]
+                except: pass
+                return dlLink, statut
 
-            return link, status
-            """
+                #realdeb
+                """
+                #52
+                key = "JUP7JPSRU6RET2L7G4IHFF7VUBRXKD5QJXNP75H2WZ5XC2QZBZMQ"
+                headers = {'Authorization': 'Bearer %s' %key}
+                data = {'link': linkUrl, 'password':''}
+                r = requests.post('https://api.real-debrid.com/rest/1.0/unrestrict/link', data=data, headers=headers)
+                dictData = r.json()
+                if 'error' in dictData.keys():
+                    link, status = "", 'err'
+                else:
+                    link, status = dictData['download'], "ok"
+
+                return link, status
+                """
 
 
 if __name__ == '__main__':

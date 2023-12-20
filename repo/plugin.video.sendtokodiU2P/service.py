@@ -859,6 +859,7 @@ def gestionMedia(params):
         else:
             dictA["Ajouter à %s" %l] = (gestionListeV, {"mode": "ajout", "u2p": numId, "typM": typMedia, "nom": l})
     dictA["Correction Certification"] = (correctCertif, {"u2p": numId, "typM": typMedia})
+    dictA["Update TMDB"] = (correctTmdb, {"u2p": numId, "typM": typMedia})
 
     dictA['Vider Historique'] = (delView, {"typM": media})
     dictA['Vider Favoris HK'] = (supFavHK, {"typM": media})
@@ -1317,7 +1318,8 @@ def affLiens2(params):
     #dictResos = {x.split("#")[0].split("@")[1]: dictResos[x.split("#")[0].split("@")[1]] if dictResos[x.split("#")[0].split("@")[1]] else x.split("#")[1] for x in paramstring}
     #paramstring = orderLiens(dictResos, paramstring)
     #tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo" %(colorLiens(dictResos[x.split("#")[0].split("@")[1]][0]), i + 1, dictResos[x.split("#")[0].split("@")[1]][0], (int(dictResos[x.split("#")[0].split("@")[1]][1]) / 1000000000.0)) for i, x in enumerate(paramstring)]
-    tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 1000000000.0)) for i, x in enumerate(links)]
+    tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo-1F" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 1000000000.0)) if len(x[0]) != 12 else "[COLOR %s]#%d[/COLOR]| %s - %.2fGo-D" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 10000000000.0))\
+        for i, x in enumerate(links)]
 
     tabRelease = [x[1] for i, x in enumerate(links)]
     tabLiens = [(x, links[i][0], tabRelease[i]) for i, x in enumerate(tabNomLien)]
@@ -1503,7 +1505,9 @@ def getParams(paramstring, u2p=0, saisonIn=1, suite=0):
         except:
             tabNomLien += ["#%d (ind)" %(i + 1) for i, x in enumerate(paramstring)]
         """
-        tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 1000000000.0)) for i, x in enumerate(paramstring)]
+        notice(paramstring)
+        tabNomLien = ["[COLOR %s]#%d[/COLOR]| %s - %.2fGo-1F" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 1000000000.0)) if len(x[0]) != 12 else\
+              "[COLOR %s]#%d[/COLOR]| %s - %.2fGo-D" %(colorLiens(x[1]), i + 1, x[1], (int(x[2]) / 10000000000.0)) for i, x in enumerate(paramstring)]
 
         #if u2p and numId != "divers":
         #    tabNomLien += ["Casting", "Similaires", "Recommendations"]
@@ -3276,8 +3280,8 @@ def menuPbi():
     xbmcplugin.setPluginCategory(__handle__, "Choix U2Pplay")
     xbmcplugin.setContent(__handle__, 'files')
     listeChoix = [("01. Médiathéques", {"action":"movies"}, "pastebin.png", "Mediathéque Pastebin"),
-                  ("02. Import DataBase", {"action":"bd"}, "strm.png", "Import DATEBASE"),
-
+                  #("02. Import DataBase", {"action":"bd"}, "strm.png", "Import DATEBASE"),
+                  ("02. Import Skins", {"action":"importskin"}, "strm.png", "Import Configuration Skin"),
                   #("03. Création Listes", {"action":"createL"}, "debrid.png", "Création de liste Widget"),
                   #("04. Suppréssion Listes", {"action":"supL"}, "debrid.png", "Suppréssion de liste Widget"),
                   #("05. Création Listes lecture", {"action":"createLV"}, "debrid.png", "Création de liste lecture perso ou favoris"),
@@ -4274,6 +4278,37 @@ def testHKdb():
     cur.close()
     cnx.close()
     return result
+
+def importSkin():
+    skin =  __addon__.getSetting("skinhk")
+    repAddon = xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/")
+    fileSkin = xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/MyVideos119-U2P.zip")
+    cr = Crypt()
+    num = cr.cryptFile(skin, cr=0)
+    filecode = getBdRentry(num)
+    if len(filecode) == 12:
+        linkUrl = cr.urlBase + filecode
+    else:
+        linkUrl = cr.url + "/?" + filecode
+    ApikeyAlldeb, ApikeyRealdeb, ApikeyUpto = getkeyAlldebrid(), getkeyRealdebrid(), getkeyUpto()
+    if ApikeyAlldeb:
+        key = ApikeyAlldeb
+    elif ApikeyRealdeb:
+        key = ApikeyRealdeb
+    else:
+        key = Apikey1fichier
+    url, ok = cr.resolveLink(linkUrl, key)
+    resume_header = {'Range': 'bytes=%d-' % 0}
+    response = requests.get(url, headers=resume_header, stream=True,  verify=True, allow_redirects=True)
+    handle = open(fileSkin, "wb")
+    for chunk in response.iter_content(chunk_size=1024 * 30):
+        if chunk:  # filter out keep-alive new chunks
+            handle.write(chunk)
+    with zipfile.ZipFile(fileSkin, 'r') as zipObject:
+
+            zipObject.extractall(path=repAddon)
+    showInfoNotification("Import Skin ok!!")
+
 
 def importDatabase(typImport="full", debug=1, maj=0):
     repAddon = xbmcvfs.translatePath("special://home/addons/plugin.video.sendtokodiU2P/")
@@ -5323,6 +5358,26 @@ def vuMovieTrakt(params):
 def correctCertif(params):
     widget.correctCertif(params["u2p"], params["typM"])
 
+def correctTmdb(params):
+    numId, typM = params["u2p"], params["typM"]
+    mdb = loadhk3.TMDBlinks(__keyTMDB__, BDMEDIANew)
+    cnx = sqlite3.connect(BDMEDIANew)
+    cur = cnx.cursor()
+    if typM == "tvshow":
+        infos = mdb.tvshowId(numId)
+        cur.execute("REPLACE INTO seriesPub (numId, title, overview, poster, year, genres, backdrop, popu, votes, dateRelease, runTime, lang, logo, saga, certif, imdb) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", infos)
+    else:
+        infos = mdb.movieNumId(numId)
+        cur.execute("REPLACE INTO filmsPub (numId, title, overview, poster, year, genres, backdrop, popu, votes, dateRelease, runTime, lang, logo, saga, certif, imdb) \
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", infos)
+
+    cnx.commit()
+    cur.close()
+    cnx.close()
+    showInfoNotification("Infos TMDB update..")
+
+
 def newUptoPublic(params):
     folder = __addon__.getSetting("poissFolder")
     hsh = __addon__.getSetting("poissHash")
@@ -5569,6 +5624,7 @@ def router(paramstring):
         #hk3
         "loadhk3": (loadhk3.getLinks, ""), "resetBDhkNew":(loadhk3.resetBdFull, ""), "affSaisonUptofoldercrypt": (uptobox.loadSaisonsHK3, params), "visuEpisodesFolderCrypt": (uptobox.affEpisodesHK3, params),
         "loaddbhk3": (importBDhk3, ""), "suiteSerie": (suiteSerie, ""), 'vuNonVu': (gestionVuSaison, params), "gestiondb": (gestiondbhk3, ""), "loadhk3v": (loadhk3.getLinks, 1), "detailmediatheque": (detailmediatheque, ""),
+        "importskin": (importSkin, ""),
 
         #torrent
         #"torrent": (affTorrent, ""), "majrssygg": (torrent.majrssygg, ""), "rssygg": (torrent.rssygg, params), "playTorrent": (torrent.playTorrent, params),
