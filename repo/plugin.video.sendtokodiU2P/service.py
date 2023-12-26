@@ -1021,7 +1021,7 @@ def addDirectoryMenu(name, isFolder=True, parameters={}, media="" ):
     ''' Add a list item to the XBMC UI.'''
     addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
     li = xbmcgui.ListItem(label=name)
-    updateInfoTagVideo(li,media,False,False,False,False,False)
+    updateInfoTagVideo(li, media, False,False,False,False,False)
     if "Saison" in name:
         commands = []
         commands.append(('[COLOR yellow]Gestion Vus/Non-Vus[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=vuNonVu&saison=%d&u2p=%s&refresh=1)' %(media.saison, media.numId)))
@@ -5636,7 +5636,8 @@ def router(paramstring):
                     "retireriptv": (iptv.retireriptv, ""), "delDB": (iptv.removeDB, ""), "IPTVbank":(iptv.IPTVbank, ""), "addFavIptv": (iptv.addFavIptv, params), "IPTVfav": (iptv.IPTVfav, ""),
                     "iptvsupfav": (iptv.supfavIptv, params), "iptvdepfav": (iptv.iptvdepfav, params), "iptvreplay": (iptv.replay, params),  "loadFX": (iptv.loadX, params), "affChainex": (iptv.affChainesx, params),
                     "fepgx": (iptv.forceMajEpgX, ""), "menus": (iptv.menuStalker, ""), "menux": (iptv.menuXtream, ""), "loadFTV": (iptv.load, params), "searchVod": (iptv.searchVod, params), "searchVodf": (iptv.searchVod2, params),
-                    "loadXitv": (iptv.loadXitv, params), "loadXvod": (iptv.loadXvod, params), "affVodx": (iptv.affVodx, params)}
+                    "loadXitv": (iptv.loadXitv, params), "loadXvod": (iptv.loadXvod, params), "affVodx": (iptv.affVodx, params), "affdetailvodx": (iptv.affDetailVodx, params), "affSeriesx": (iptv.affSeriesx, params),
+                    "affdetailseriesx": (iptv.affDetailSeriesx, params), "affepisodesx": (iptv.affEpisodesx, params), "updatevodserie": (iptv.majVodX, "maj"), "searchVodx": (iptv.searchVodx, params)}
         dictActions.update(dictActionsIPTV)
     notice(len(dictActions))
     if params:

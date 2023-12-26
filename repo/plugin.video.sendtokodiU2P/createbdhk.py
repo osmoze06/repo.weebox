@@ -597,6 +597,7 @@ def mediasHKFilms(params):
             else:
                 d = params["nom"]
             if len(d) > 2:
+                params["search"] = d
                 movies = []
                 sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, (SELECT GROUP_CONCAT(l.link, '*') FROM filmsPubLink as l WHERE l.numId=m.numId) , m.backdrop, m.runtime, m.id \
                             FROM filmsPub as m WHERE normalizeTitle(m.title) LIKE normalizeTitle({}) ORDER BY title COLLATE NOCASE ASC".format("'%" + str(d).replace("'", "''") + "%'")
@@ -1725,7 +1726,6 @@ def affGlobal():
         xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def affMedias(typM, medias, params=""):
-
     xbmcplugin.setPluginCategory(HANDLE, typM)
     try:
         if medias[0][4] == "divers":
@@ -1738,6 +1738,7 @@ def affMedias(typM, medias, params=""):
         xbmcplugin.setContent(HANDLE, 'movies')
     i = 0
     for i, media in enumerate(medias):
+        notice(media)
         try:
             if type(media) != Media: #si c'est une saga le media est deja un Media (class)
                 media = Media(typM, *media[:-1])
@@ -1764,6 +1765,10 @@ def affMedias(typM, medias, params=""):
                         ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailT", "lien": media.link, "u2p": media.numId}, media=media)
                     else:
                         ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "affSaisonUptofoldercrypt", "u2p": media.numId}, media=media)
+    if typM == "movie" and "search" in params.keys():
+        media = ('Complément XTREAM', "Recherche dans VOD Xtream de %s" %params["search"], '2010', '', 0, '', 0.0, '', '', 0, 0)
+        media = Media(typM, *media)
+        ok = addDirectoryMedia("VOD XTREAM", isFolder=True, parameters={"action": "searchVodx", "typM": "vod", "search": params["search"]}, media=media)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)

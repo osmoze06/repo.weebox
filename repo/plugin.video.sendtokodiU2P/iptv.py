@@ -899,13 +899,21 @@ def searchVod(params):
         menuSearch(params)
 
 def menuSearch(params):
-
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, "files")
-    ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "vod", "search": params["search"]})
-    ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "series", "search": params["search"]})
+    if params["fourn"] == "xtream":
+        ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "searchVodx", "typM": "vod", "search": params["search"]})
+        ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "searchVodx", "typM": "series", "search": params["search"]})
+    else:
+        ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "vod", "search": params["search"]})
+        ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "searchVodf", "fourn": params["fourn"], "typM": "series", "search": params["search"]})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def searchVodx(params):
+    if params["typM"] == "vod":
+        affVodx(params)
+    else:
+        affSeriesx(params)
 
 def searchVod2(params):
     fournisseur = params["fourn"]
@@ -1016,13 +1024,89 @@ def loadNewFX(params):
     #xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"back"},"id":1}')
     menuXtream()
 
+def mediaVodX(media, dictCat, fournisseur):
+    num = media.get("num", "")
+    name = media.get("name", "")
+    title = media.get("title", name)
+    year = media.get("year", 0)
+    stream_id = media.get("stream_id", "")
+    stream_icon = media.get("stream_icon", "")
+    rating = media.get("rating", "")
+    added = media.get("added", "")
+    category_id = media.get("category_id", "")
+    try:
+        cat = dictCat[category_id]
+    except:
+        cat = "Sans"
+    return [num, name, title, year, stream_id, stream_icon, rating, added, cat, fournisseur]
+
+def mediaSeriesX(media, dictCat, fournisseur):
+    num = media.get("num", "")
+    name = media.get("name", "")
+    title = media.get("title", name)
+    year = media.get("releaseDate", 0)
+    serie_id = media.get("series_id", "")
+    poster = media.get("cover", "")
+    rating = media.get("rating", "")
+    added = media.get("last_modified", "")
+    category_id = media.get("category_id", "")
+    numId = media.get("tmdb_id", "0")
+    plot = media.get("plot", "")
+    runtime = media.get("episode_run_time", 0)
+    backdrop = media.get('backdrop_path', [])
+    if backdrop:
+        backdrop = backdrop[0]
+    else:
+        backdrop = ""
+    try:
+        cat = dictCat[category_id]
+    except:
+        cat = "Sans"
+    return [num, numId, name, title, plot, year, serie_id, poster, backdrop, rating, added, cat, fournisseur]
+
+def majVodX(typm="vod", aff=0):
+    itv = iptvx.IPTVXtream(1)
+    fournisseur = itv.server
+    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+
+    dictCat = {genre["category_id"]: genre["category_name"] for genre in itv.categories(itv.vodType)}
+    liste = itv.categoriesAll(itv.vodType)
+    movies = []
+    #num, name, title, year, stream_id, stream_icon, rating, added, category_name, fournisseur
+    for movie in liste[::-1]:
+        #notice(movie)
+        movies.append(mediaVodX(movie, dictCat, fournisseur))
+
+    bd.insertVodX(movies)
+
+    dictCat = {genre["category_id"]: genre["category_name"] for genre in itv.categories(itv.seriesType)}
+    liste = itv.categoriesAll(itv.seriesType)
+    movies = []
+    #num, name, title, year, stream_id, stream_icon, rating, added, category_name, fournisseur
+    for movie in liste[::-1]:
+        movies.append(mediaSeriesX(movie, dictCat, fournisseur))
+
+    bd.insertSeriesX(movies)
+
+    if typm == "vod":
+        liste = bd.getCatVodX(fournisseur)
+    elif typm == "maj":
+        showInfoNotification("Update listes VOD/Series Ok!!!")
+    else:
+        liste = bd.getCatSeriesX(fournisseur)
+
+
+    return liste
+
+
 def loadXvod(params):
-    notice("load vod")
+    notice("load cat vod")
     nomX = ADDON.getSetting("nomx1")
     #user = ADDON.getSetting("userx1")
     #passwd = ADDON.getSetting("passwordx1")
     #server = ADDON.getSetting("serverx1")
     itv = iptvx.IPTVXtream(1)
+    fournisseur = itv.server
     try:
         cc = itv.authenticate()
         notice(cc)
@@ -1038,16 +1122,332 @@ def loadXvod(params):
         dialog = xbmcgui.Dialog()
         dialog.ok("Compte Out", str(e))
 
-    dictCat = {genre["category_name"]: genre["category_id"] for genre in itv.categories(itv.vodType)}
-
     typM = itv.vodType
-    groupes = dictCat.keys()
+    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+    if params["typm"] ==  "vod":
+        groupes = bd.getCatVodX(fournisseur)
+        if not groupes:
+            groupes = majVodX()
+    else:
+        groupes = bd.getCatSeriesX(fournisseur)
+        if not groupes:
+            groupes = majVodX("series")
     xbmcplugin.setPluginCategory(HANDLE, "files")
     xbmcplugin.setContent(HANDLE, 'files')
-    for i, media in enumerate(groupes):
-        ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVodx", "numId": dictCat[media], "typM": typM})
+    for i, media in enumerate(sorted(groupes)):
+        if params["typm"] == "vod":
+            ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affVodx", "numId": media, "typM": typM})
+        else:
+            ok = addDirectoryGroupe(media, isFolder=True, parameters={"action": "affSeriesx", "numId": media, "typM": typM})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
+def affSeriesx(params):
+    typM = params["typM"]
+
+    itv = iptvx.IPTVXtream(1)
+    fournisseur = itv.server
+    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+
+    if "search" in params.keys():
+        offset = 0
+        nbMedia = 200
+        medias = bd.getListeSearchSeries(params["search"], fournisseur, nbMedia, offset)
+
+    else:
+        categorie = params["numId"]
+        nbMedia = 100
+        try:
+            offset = int(params["offset"])
+        except:
+            offset = 0
+        medias = bd.getListeCatSeries(categorie, fournisseur, nbMedia, offset)
+        #notice(medias)
+        #num, name, title, year, stream_id, stream_icon, rating, added
+        offset += nbMedia
+        params["offset"] = str(offset)
+
+    xbmcplugin.setPluginCategory(HANDLE, typM)
+    xbmcplugin.setContent(HANDLE, 'movies')
+    for i, media in enumerate(medias):
+        media = Media("seriesx", *media)
+        ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affdetailseriesx", "iptv": media.title, "typM": typM, "streamid": media.link}, media=media)
+
+    if len(medias) > 99 and "offset" in params.keys():
+        addDirNext(params)
+
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+def affDetailSeriesx(params):
+    streamid = params["streamid"]
+    itv = iptvx.IPTVXtream(1)
+    recup = itv.seriesInfoByID(streamid)
+    infos = recup["info"]
+    saisons = recup["seasons"]
+    episodes = recup["episodes"]
+    poster = infos.get("cover", "")
+    backdrop = infos.get("backdrop_path", "")
+    if backdrop:
+        backdrop = backdrop[0]
+    else:
+        backdrop = ""
+    genre = infos.get("genre", "")
+    year = infos.get('releaseDate',  '2010'),
+    if year:
+        year = year[0][-4:]
+    else:
+        year = "2010"
+    plot = infos.get("plot", "Sans synopsis")
+    cast = infos.get("cast", "")
+    director = infos.get("director", "")
+    numId = infos.get("tmdb_id", 0)
+    runtime = infos.get("duration_secs", 0)
+    popu = infos.get("rating", 0.0)
+    title = infos.get("name", params["iptv"])
+    #extension = movieData.get("container_extension", "mkv")
+
+
+    overview = "[COLOR red]%s[/COLOR]\n[B]%s[/B]\n[I]%s[/I]\n%s - %s\n%.2f - %.d mns" %(title, cast, plot[:150] + "...", year, ",".join(genre.split(",")[:2]), float(popu), int(runtime / 60))
+    infos = [title, numId, overview, year, poster, backdrop, genre, popu, cast, director, runtime]
+    lFinale = [title, overview, year, genre, backdrop, popu, numId, poster]
+    media = Media("menu", *lFinale)
+    media.typeMedia = "movie"
+
+    xbmcplugin.setPluginCategory(HANDLE, "Menu")
+    xbmcplugin.setContent(HANDLE, 'videos')
+    #("[COLOR green]Lire[/COLOR]", {"action": "playMediaIptv", "lien": link, "iptv": media.title, "typM": "movie", "fourn": "xtream"})
+    categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": "movie"}, poster)]
+    for saison in saisons:
+        if str(saison["season_number"]) in episodes.keys():
+            if saison['cover_big']:
+                p = saison['cover_big']
+            if saison['cover']:
+                p = saison['cover']
+            else:
+                p = poster
+            episodesSaison = episodes[str(saison["season_number"])]
+            categories.append(("[COLOR green]%s (%d)[/COLOR]" %(saison["name"], len(episodesSaison)), {"action": "affepisodesx", "iptv": media.title, "saison": str(saison["season_number"]), "streamid": streamid}, p))
+    for i, cat in enumerate(categories):
+        f = True
+        media.poster = cat[2]
+        addDirectoryMenuVodx(cat[0], isFolder=f, parameters=cat[1], media=media)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True)
+
+def affEpisodesx(params):
+    notice(params)
+    saison = params["saison"]
+    streamid = params["streamid"]
+    itv = iptvx.IPTVXtream(1)
+    recup = itv.seriesInfoByID(streamid)
+
+    infos = recup["info"]
+    plot = infos.get("plot", "Sans synopsis")
+    backdrop = infos.get("backdrop_path", "")
+    if backdrop:
+        backdrop = backdrop[0]
+    else:
+        backdrop = ""
+    numId = infos.get("tmdb_id", 0)
+    poster = infos.get("cover", "")
+
+    episodes = recup["episodes"]
+    episodesSaison = episodes[saison]
+    notice(episodesSaison)
+    xbmcplugin.setPluginCategory(HANDLE, "Episodes")
+    xbmcplugin.setContent(HANDLE, 'episodes')
+
+
+
+    for episode in episodesSaison:
+        epis = episode["info"]
+        isVu = 0
+        #ep = "%d-%d-%d" %(int(numId), int(saison), int(episode.split("E")[1]))
+        #if ep in vus:
+        #    isVu = 1
+        #else:
+        #    isVu = 0
+        #notice(ep)
+        #notice(isVu)
+
+        numEpisode = episode.get('episode_num', "1")
+        streamidepisode = episode.get("id", "")
+        genre = epis.get("genre", "")
+        cast = epis.get("cast", "")
+        director = epis.get("director", "")
+        backdropEpisode = epis.get("backdrop_path", [])
+        if backdropEpisode:
+            backdropEpisode = backdropEpisode[0]
+        else:
+            backdropEpisode = backdrop
+        plotEpisode = epis.get("plot", plot)
+        title = episode.get("title", "E %s" %str(numEpisode))
+        runtime = episode.get("duration_secs", 0)
+        extension = episode.get("container_extension", "mkv")
+
+        link = itv.link.format("series", streamidepisode)
+        link = link + '.' + extension
+
+        lFinale = [numEpisode, title, plotEpisode, backdropEpisode, genre, saison, runtime, link, numId, poster, isVu]
+        media = Media("episodex", *lFinale)
+        ok = addDirectoryVodx("#E%d - %s " %(int(numEpisode), title), isFolder=False, parameters={"action": "playMediaIptv", "lien": media.link, "iptv": media.title, "typM": "episode", "numEpisode": numEpisode, "fourn": "xtream"}, media=media)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True)
+
+def addDirectoryVodx(name, isFolder=True, parameters={}, media="" ):
+    ''' Add a list item to the XBMC UI.'''
+    #notice("dir vod")
+    addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
+    li = xbmcgui.ListItem(label=name)
+    try:
+        int(media.duration)
+    except:
+        media.duration = "0"
+    media.duration = int(media.duration) * 60
+    updateInfoTagVideo2(li, media)
+
+    li.setArt({'icon': media.backdrop,
+            'thumb': media.backdrop,
+            'backdrop': media.backdrop})
+    li.setProperty('IsPlayable', 'true')
+    url = sys.argv[0] + '?' + urlencode(parameters)
+    return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
+
+def affVodx(params):
+    itv = iptvx.IPTVXtream(1)
+    fournisseur = itv.server
+    bd = iptvx.BookmarkIPTVXtream(BDBOOKMARK)
+    typM = params["typM"]
+    if "search" in params.keys():
+        offset = 0
+        nbMedia = 200
+        medias = bd.getListeSearchVod(params["search"], fournisseur, nbMedia, offset)
+
+    else:
+        categorie = params["numId"]
+        nbMedia = 100
+        try:
+            offset = int(params["offset"])
+        except:
+            offset = 0
+
+        medias = bd.getListeCat(categorie, fournisseur, nbMedia, offset)
+        #notice(medias)
+        #num, name, title, year, stream_id, stream_icon, rating, added
+        offset += nbMedia
+        params["offset"] = str(offset)
+
+    xbmcplugin.setPluginCategory(HANDLE, typM)
+    xbmcplugin.setContent(HANDLE, 'movies')
+    for i, media in enumerate(medias):
+        media = Media("vodx", *media)
+        #if typM == "series":
+        #    if  media.link:
+        #        ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affEpisodes", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id, "saison": media.title}, media=media)
+        #    else:
+        #        ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affVod", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id}, media=media)
+        #else:
+        #
+        link = itv.link.format("movie", media.link)
+        #ok = addDirectoryVod("%s" %(media.title), isFolder=False, parameters={"action": "playMediaIptv", "lien": link, "iptv": media.title, "typM": typM, "fourn": "xtream"}, media=media)
+        ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affdetailvodx", "iptv": media.title, "typM": typM, "streamid": media.link}, media=media)
+
+    if len(medias) > 99 and "offset" in params.keys():
+        addDirNext(params)
+
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
+
+def affDetailVodx(params):
+    streamid = params["streamid"]
+    itv = iptvx.IPTVXtream(1)
+    recup = itv.vodInfoByID(streamid)
+    infos = recup["info"]
+    poster = infos.get("movie_image", "")
+    backdrop = infos.get("backdrop_path", "")
+    if backdrop:
+        backdrop = backdrop[0]
+    else:
+        backdrop = ""
+    genre = infos.get("genre", "")
+    year = infos.get('releasedate',  '2010'),
+    if year:
+        year = year[0][-4:]
+    else:
+        year = "2010"
+    plot = infos.get("plot", "Sans synopsis")
+    cast = infos.get("cast", "")
+    director = infos.get("director", "")
+    numId = infos.get("tmdb_id", 0)
+    runtime = infos.get("duration_secs", 0)
+    popu = infos.get("rating", 0.0)
+    movieData = recup["movie_data"]
+    title = movieData.get("name", params["iptv"])
+    extension = movieData.get("container_extension", "mkv")
+
+    overview = "[COLOR red]%s[/COLOR]\n[B]%s[/B]\n[I]%s[/I]\n%s - %s\n%.2f - %.d mns" %(title, cast, plot[:150] + "...", year, ",".join(genre.split(",")[:2]), float(popu), int(runtime / 60))
+    infos = [title, numId, overview, year, poster, backdrop, genre, popu, cast, director, runtime]
+    lFinale = [title, overview, year, genre, backdrop, popu, numId, poster]
+    media = Media("menu", *lFinale)
+    media.typeMedia = "movie"
+    link = itv.link.format("movie", streamid)
+    link = link + '.' + extension
+    xbmcplugin.setPluginCategory(HANDLE, "Menu")
+    xbmcplugin.setContent(HANDLE, 'videos')
+    categories = [("[COLOR red]Bande Annonce[/COLOR]", {"action": "ba", "u2p": numId, "typM": "movie"}), ("[COLOR green]Lire[/COLOR]", {"action": "playMediaIptv", "lien": link, "iptv": media.title, "typM": "movie", "fourn": "xtream"})]
+    for i, cat in enumerate(categories):
+        if i == 1:
+            f = False
+        else:
+            f = True
+
+        addDirectoryMenuVodx(cat[0], isFolder=f, parameters=cat[1], media=media)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True)
+
+def addDirectoryMenuVodx(name, isFolder=True, parameters={}, media="" ):
+    ''' Add a list item to the XBMC UI.'''
+    addon = xbmcaddon.Addon("plugin.video.sendtokodiU2P")
+    li = xbmcgui.ListItem(label=name)
+    updateInfoTagVideo(li, media, False,False,False,False,False)
+    li.setArt({'icon': media.backdrop,
+                "thumb": media.poster,
+                'poster':media.poster,
+                'fanart': media.backdrop
+                })
+
+    url = sys.argv[0] + '?' + urlencode(parameters)
+    return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=isFolder)
+
+
+def affVodxOld(params):
+    categorie = params["numId"]
+    typM = params["typM"]
+    itv = iptvx.IPTVXtream(1)
+    movies = itv.streamsByCategory(itv.vodType, numId)
+    notice(movies)
+    #{'num': 1, 'name': 'Miraculous - le film (2023)', 'title': 'Miraculous - le film', 'year': '2023', 'stream_type': 'movie', 'stream_id': 4742, 'stream_icon': 'https://image.tmdb.org/t/p/w600_and_h900_bestv2/iu4qpzsyBcnWhiwh1BxTAJefTmS.jpg', 'rating': 7.8, 'rating_5based': 3.9, 'added': '1699779588', 'category_id': '35', 'category_ids': [35], 'container_extension': 'mkv', 'custom_sid': '', 'direct_source': ''}
+    #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
+    xbmcplugin.setPluginCategory(HANDLE, typM)
+    xbmcplugin.setContent(HANDLE, 'movies')
+    for i, media in enumerate(sorted(medias, key=lambda x: x[8], reverse=True)):
+        media = Media("vod", *media)
+        if typM == "series":
+            if  media.link:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affEpisodes", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id, "saison": media.title}, media=media)
+            else:
+                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affVod", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id}, media=media)
+        #else:
+        #    ok = addDirectoryVod("%s" %(media.title), isFolder=False, parameters={"action": "playMediaIptv", "lien": media.link, "iptv": media.title, "typM": typM, "fourn": fournisseur}, media=media)
+
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
+    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def loadXitv(params):
     notice("load chaines")
@@ -1121,12 +1521,9 @@ def loadX(params):
     xbmcplugin.setContent(HANDLE, "files")
     #ok = addDirectoryGroupe("nomx", isFolder=True, parameters={"action": "loadFX", "numId": '1'})
     ok = addDirectoryGroupe("TV", isFolder=True, parameters={"action": "loadXitv",  "numId": '1'})
-    #ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "loadXvod",  "numId": '1'})
-
-
-    #ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "vod"})
-    #ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "getVod", "fourn": params["fourn"], "typM": "series"})
-    #ok = addDirectoryGroupe("Recherche VOD/Series", isFolder=True, parameters={"action": "searchVod", "fourn": params["fourn"], "typM": "vod"})
+    ok = addDirectoryGroupe("VOD", isFolder=True, parameters={"action": "loadXvod",  "numId": '1', "typm": "vod"})
+    ok = addDirectoryGroupe("Series", isFolder=True, parameters={"action": "loadXvod",  "numId": '1', "typm": "series"})
+    ok = addDirectoryGroupe("Recherche VOD/Series", isFolder=True, parameters={"action": "searchVod", "fourn": "xtream",})
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 
@@ -1180,8 +1577,9 @@ def addDirectoryGroupe(name, isFolder=True, parameters={}):
     commands = []
     if parameters["action"] == "affVod":
         commands.append(('[COLOR yellow]Gestion Groupes Vod/Series[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=gestfournVod&fourn=%s&typM=%s)' %(parameters["fourn"], parameters["typM"], )))
-    elif parameters["action"] in ["affChainex", "loadFX", "loadXitv", "loadXserie", "loadXvod", "affVodx", "affSeriex"]:
+    elif parameters["action"] in ["affChainex", "loadFX", "loadXitv", "loadXserie", "loadXvod", "affVodx", "affSeriex", "affSeriesx"]:
         commands.append(('[COLOR yellow]Force Maj EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=fepgx)'))
+        commands.append(('[COLOR yellow]Update VOD/Series[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=updatevodserie)'))
     else:
         commands.append(('[COLOR yellow]Maj EPG[/COLOR]', 'RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=bdepg)'))
         if "numId" in parameters.keys():
@@ -1638,31 +2036,7 @@ def IPTVfav():
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=li, isFolder=True)
     xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
-def affVodx(params):
-    numId = params["numId"]
-    typM = params["typM"]
-    itv = iptvx.IPTVXtream(1)
-    movies = itv.streamsByCategory(itv.vodType, numId)
-    notice(movies)
-    #{'num': 1, 'name': 'Miraculous - le film (2023)', 'title': 'Miraculous - le film', 'year': '2023', 'stream_type': 'movie', 'stream_id': 4742, 'stream_icon': 'https://image.tmdb.org/t/p/w600_and_h900_bestv2/iu4qpzsyBcnWhiwh1BxTAJefTmS.jpg', 'rating': 7.8, 'rating_5based': 3.9, 'added': '1699779588', 'category_id': '35', 'category_ids': [35], 'container_extension': 'mkv', 'custom_sid': '', 'direct_source': ''}
-    #"id", "name", "description", "time", "tmdb_id", 'screenshot_uri', "age", 'year', "added", actors", "director", path", 'rating_kinopoisk'
-    xbmcplugin.setPluginCategory(HANDLE, typM)
-    xbmcplugin.setContent(HANDLE, 'movies')
-    for i, media in enumerate(sorted(medias, key=lambda x: x[8], reverse=True)):
-        media = Media("vod", *media)
-        if typM == "series":
-            if  media.link:
-                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affEpisodes", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id, "saison": media.title}, media=media)
-            else:
-                ok = addDirectoryVod("%s" %(media.title), isFolder=True, parameters={"action": "affVod", "numId": numId, "fourn": fournisseur, "typM": typM, "numSerie": media.id}, media=media)
-        #else:
-        #    ok = addDirectoryVod("%s" %(media.title), isFolder=False, parameters={"action": "playMediaIptv", "lien": media.link, "iptv": media.title, "typM": typM, "fourn": fournisseur}, media=media)
 
-    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
-    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
-    xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_RATING)
-    xbmcplugin.endOfDirectory(handle=HANDLE, succeeded=True, cacheToDisc=True)
 
 def affChainesx(params):
     #notice("aff chaines xtream")
@@ -1873,8 +2247,11 @@ def mapEpg(params):
 
 def playMedia(params):
     #notice("playmedia iptv")
-    #notice(params)
-    typM = ""
+    notice(params)
+    try:
+        typM = params["typM"]
+    except:
+        typM = "live"
     fournisseur = params["fourn"]
     if fournisseur != "xtream":
         bd = BookmarkIPTV(BDBOOKMARK)
@@ -1907,10 +2284,13 @@ def playMedia(params):
                 #    cmd = quote(linkCMD)
                 #    link = iptv.getInfos(iptv.createLink.format(cmd)).json()["js"]["cmd"].split(" ")[1]
     else:
-        if "noos" in params["lien"]:
-            link = params["lien"] + ".mp4"
+        if typM == "live":
+                if "noos" in params["lien"]:
+                    link = params["lien"] + ".mp4"
+                else:
+                    link = params["lien"] + ".ts"
         else:
-            link = params["lien"] + ".ts"
+            link = params["lien"]
 
     #infinity ott
     #{'user_info': {'username': 'rY24nReEhXAxxMwx', 'password': 'YpGq3Ua4WEmbHNTD', 'message': '', 'auth': 1, 'status': 'Active', 'exp_date': '1685788532', 'is_trial': '1', 'active_cons': '0', 'created_at': '1685702132', 'max_connections': '1', 'allowed_output_formats': ['m3u8', 'ts', 'rtmp']}, 'server_info': {'url': 'vbn123.com', 'port': '8080', 'https_port': '25463', 'server_protocol': 'http', 'rtmp_port': '25462', 'timezone': 'Europe/Paris', 'timestamp_now': 1685717604, 'time_now': '2023-06-02 16:53:24'}}
@@ -1918,7 +2298,7 @@ def playMedia(params):
     userAg = "|User-Agent=Mozilla"
     #userAg = "|User-Agent=VLC"
     #userAg = ""
-    userAg = "|User-Agent=VLC/3.0.18"
+    #userAg = "|User-Agent=VLC/3.0.18"
     result = {"url": link + userAg, "title": params["iptv"]}
     notice(link)
     #xbmc.Player().play(link)
@@ -1928,7 +2308,9 @@ def playMedia(params):
         listIt = createListItemFromVideo(result)
         #mplay = MyDialog()
         #mplay.play(result["url"])
-        if "replay" in params.keys() or typM in ["vod", "episode"]:
+
+        notice(typM)
+        if "replay" in params.keys() or typM in ["vod", "episode", "VOD"]:
             xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)
         else:
             #xbmcplugin.setResolvedUrl(HANDLE, True, listitem=listIt)

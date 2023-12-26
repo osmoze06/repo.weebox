@@ -336,15 +336,45 @@ class Media:
           self.link = argvs[14]
           self.episodes = argvs[15]
 
+        elif  self.typeMedia == "vodx":
+          #num, name, title, year, stream_id, stream_icon, rating, added
+          self.year = argvs[3]
+          self.duration = "0"
+          self.popu = argvs[6]
+          self.backdrop = ""
+          self.poster = argvs[5]
+          self.title= argvs[1]
+          self.overview = ""
+          self.added = argvs[7]
+          self.link = argvs[4]
+
+        elif  self.typeMedia == "seriesx":
+          #num, name, title, year, stream_id, stream_icon, rating, added
+          self.year = argvs[3]
+          self.duration = "0"
+          self.popu = argvs[6]
+          self.backdrop = argvs[9]
+          self.poster = argvs[5]
+          self.title= argvs[1]
+          self.overview = argvs[8]
+          self.added = argvs[7]
+          self.link = argvs[4]
+
         elif self.typeMedia == "menu":
           #[Title, overview, year, genre, backdrop, popu]
           self.year = argvs[2]
           self.duration = ""
           self.popu = argvs[5]
           if argvs[4]:
-            self.backdrop += argvs[4]
+            if "http" in argvs[4]:
+              self.backdrop = argvs[4]
+            else:
+              self.backdrop += argvs[4]
           if argvs[7]:
-            self.poster += argvs[7]
+            if "http" in argvs[7]:
+              self.poster = argvs[7]
+            else:
+              self.poster += argvs[7]
           self.genre = argvs[3]
           self.title= argvs[0]
           self.overview = argvs[1]
@@ -413,6 +443,24 @@ class Media:
           self.saison = argvs[-3]
           self.vu = argvs[-1]
           #notice(self.backdrop)
+
+        #numEpisode, title, plotEpisode, backdropEpisode, genre, saison, runtime, streamidepisode, numid, poster, isvu
+        elif self.typeMedia == "episodex":
+          self.year = ""
+          self.duration = argvs[6]
+          self.popu = ""
+          self.backdrop = argvs[3]
+          self.poster = argvs[9]
+          self.genre = argvs[5]
+          self.title= argvs[1]
+          self.overview = argvs[2]
+          self.numId = argvs[8]
+          self.link = argvs[7]
+          self.episode = argvs[0]
+          self.saison = argvs[5]
+          self.vu = argvs[10]
+          #notice(self.backdrop)
+
 
         elif self.typeMedia == "cast":
           #('Artemis Pebdani', 'Additional Voices (voice)', '/ctwVQYbcOuTIQJ866fi3AhzqKBM.jpg', numId)

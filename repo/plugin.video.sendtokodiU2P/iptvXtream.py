@@ -50,6 +50,39 @@ class BookmarkIPTVXtream:
           UNIQUE (numId, num, fournisseur))
             """)
 
+        cur.execute("""CREATE TABLE IF NOT EXISTS vodX(
+          num INTEGER,
+          name TEXT,
+          title TEXT,
+          year TEXT,
+          stream_id INTEGER,
+          stream_icon TEXT,
+          rating TEXT,
+          added TEXT,
+          category_name TEXT,
+          fournisseur TEXT,
+          UNIQUE (stream_id))
+            """)
+
+        #num, numId, name, title, plot, year, serie_id, poster, backdrop, rating, added, cat, fournisseur
+        cur.execute("""CREATE TABLE IF NOT EXISTS seriesX(
+          num INTEGER,
+          numId TEXT,
+          name TEXT,
+          title TEXT,
+          plot TEXT,
+          year TEXT,
+          serie_id INTEGER,
+          poster TEXT,
+          backdrop TEXT,
+          rating TEXT,
+          added TEXT,
+          category_name TEXT,
+          fournisseur TEXT,
+          UNIQUE (serie_id))
+            """)
+
+
         cur.execute("""CREATE TABLE IF NOT EXISTS fav(
           `id`    INTEGER PRIMARY KEY,
           pos INTEGER,
@@ -152,6 +185,85 @@ class BookmarkIPTVXtream:
         cur.close()
         cnx.close()
         return liste
+
+    def insertVodX(self, tab, delete=1):
+        #num, name, title, year, stream_id, stream_icon, rating, added, category_name, fournisseur,
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        if delete:
+            cur.execute("DELETE FROM vodX")
+            cnx.commit()
+        cur.executemany('REPLACE INTO vodX (num, name, title, year, stream_id, stream_icon, rating, added, category_name, fournisseur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', tab)
+        cnx.commit()
+        cur.close()
+        cnx.close()
+
+    def getCatVodX(self, fournisseur):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT DISTINCT(category_name) FROM vodX WHERE fournisseur=?", (fournisseur,))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return [x[0] for x in liste]
+
+    def insertSeriesX(self, tab, delete=1):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        if delete:
+            cur.execute("DELETE FROM seriesX")
+            cnx.commit()
+        cur.executemany('REPLACE INTO seriesX (num, numId, name, title, plot, year, serie_id, poster, backdrop, rating, added, category_name, fournisseur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', tab)
+        cnx.commit()
+        cur.close()
+        cnx.close()
+
+    def getCatSeriesX(self, fournisseur):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT DISTINCT(category_name) FROM seriesX WHERE fournisseur=?", (fournisseur,))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return [x[0] for x in liste]
+
+    def getListeCat(self, categorie, fournisseur, nbMedia, offset):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT num, name, title, year, stream_id, stream_icon, rating, added FROM vodX WHERE fournisseur=? AND category_name=? ORDER BY added DESC LIMIT ? OFFSET ? ", (fournisseur, categorie, nbMedia, offset))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return liste
+
+    def getListeSearchVod(self, search, fournisseur, nbMedia, offset):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT num, name, title, year, stream_id, stream_icon, rating, added FROM vodX WHERE fournisseur=? AND title LIKE ? ORDER BY added DESC LIMIT ? OFFSET ? ", (fournisseur, "%" + search + "%", nbMedia, offset))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return liste
+
+    def getListeCatSeries(self, categorie, fournisseur, nbMedia, offset):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT num, name, title, year, serie_id, poster, rating, added, plot, backdrop FROM seriesX WHERE fournisseur=? AND category_name=? ORDER BY added DESC LIMIT ? OFFSET ? ", (fournisseur, categorie, nbMedia, offset))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return liste
+
+    def getListeSearchSeries(self, search, fournisseur, nbMedia, offset):
+        cnx = sqlite3.connect(self.database)
+        cur = cnx.cursor()
+        cur.execute("SELECT num, name, title, year, serie_id, poster, rating, added, plot, backdrop FROM seriesX WHERE fournisseur=? AND title LIKE ? ORDER BY added DESC LIMIT ? OFFSET ? ", (fournisseur, "%" + search + "%", nbMedia, offset))
+        liste = cur.fetchall()
+        cur.close()
+        cnx.close()
+        return liste
+
+
 
     def retrait(self, fournisseur, mac=""):
         cnx = sqlite3.connect(self.database)
@@ -483,6 +595,20 @@ class IPTVXtream:
         r = requests.get(theURL)
         return r.json()
 
+    #get all
+    def categoriesAll(self, streamType):
+        theURL = ""
+        if streamType == self.liveType:
+            theURL = self.get_live_streams_URL()
+        elif streamType == self.vodType:
+            theURL = self.get_vod_streams_URL()
+        elif streamType == self.seriesType:
+            theURL = self.get_series_URL()
+        else:
+            theURL = ""
+        r = requests.get(theURL)
+        return r.json()
+
     #get epg
     def getEpg(self, stream_id="", limit=0):
         if stream_id and limit:
@@ -565,12 +691,39 @@ class IPTVXtream:
         URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_vod_categories')
         return URL
 
+    def get_series_URL(self):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_series')
+        return URL
+
+    def get_series_cat_URL(self):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_series_categories')
+        return URL
+
     def get_vod_streams_URL(self):
         URL = '%s/player_api.php?username=%s&password=%s&action=%s' % (self.server, self.username, self.password, 'get_vod_streams')
         return URL
 
     def get_vod_streams_URL_by_category(self, category_id):
         URL = '%s/player_api.php?username=%s&password=%s&action=%s&category_id=%s' % (self.server, self.username, self.password, 'get_vod_streams', category_id)
+        return URL
+
+    # GET VOD Info
+    def vodInfoByID(self, vod_id):
+        r = requests.get(self.get_VOD_info_URL_by_ID(vod_id))
+        return r.json()
+
+    #"get_vod_info"
+    def get_VOD_info_URL_by_ID(self, vod_id):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s&vod_id=%s' % (self.server, self.username, self.password, 'get_vod_info', vod_id)
+        return URL
+
+    # GET SERIES Info
+    def seriesInfoByID(self, series_id):
+        r = requests.get(self.get_series_info_URL_by_ID(series_id))
+        return r.json()
+
+    def get_series_info_URL_by_ID(self, series_id):
+        URL = '%s/player_api.php?username=%s&password=%s&action=%s&series_id=%s' % (self.server, self.username, self.password, 'get_series_info', series_id)
         return URL
 
 

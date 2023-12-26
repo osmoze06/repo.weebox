@@ -145,7 +145,7 @@
     <!-- Skins -->
     <category label="Skins">
         <setting label="Étape 1" type="lsep" />
-        <setting label="Importer un skin" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=bd)" />
+        <setting label="Importer un skin" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=importskin)" />
         <setting label="Étape 2" type="lsep" />
         <setting label="Configurer le skin importé" type="action" action="RunPlugin(plugin://plugin.video.sendtokodiU2P/?action=choixskin)" />
     </category>
