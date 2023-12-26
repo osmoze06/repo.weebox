@@ -688,7 +688,7 @@ def mediasHKFilms(params):
                         + orderDefault + " LIMIT {} OFFSET {}".format(limit, offset)
             movies = extractMedias(bd=BDREPONEW,sql=sql)
         #affichage
-        if movies:
+        if movies or famille in ["Search", "Recherche"]:
             affMedias(typM, movies, params=params)
 
     elif "groupes" in params.keys():
@@ -988,6 +988,7 @@ def mediasHKSeries(params):
             else:
                 d = params["nom"]
             if len(d) > 2:
+                params["search"] = d
                 sql = "SELECT m.title, m.overview, m.year, m.poster, m.numId, m.genres, m.popu, m.backdrop, m.runtime, m.id \
                                 FROM seriesPub as m WHERE normalizeTitle(m.title) LIKE normalizeTitle({}) ORDER BY title COLLATE NOCASE ASC".format("'%" + str(d).replace("'", "''") + "%'")
                 movies = extractMedias(sql=sql)
@@ -1738,7 +1739,7 @@ def affMedias(typM, medias, params=""):
         xbmcplugin.setContent(HANDLE, 'movies')
     i = 0
     for i, media in enumerate(medias):
-        notice(media)
+        #notice(media)
         try:
             if type(media) != Media: #si c'est une saga le media est deja un Media (class)
                 media = Media(typM, *media[:-1])
@@ -1765,10 +1766,34 @@ def affMedias(typM, medias, params=""):
                         ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "detailT", "lien": media.link, "u2p": media.numId}, media=media)
                     else:
                         ok = addDirectoryMedia("%s" %(media.title), isFolder=True, parameters={"action": "affSaisonUptofoldercrypt", "u2p": media.numId}, media=media)
-    if typM == "movie" and "search" in params.keys():
-        media = ('Complément XTREAM', "Recherche dans VOD Xtream de %s" %params["search"], '2010', '', 0, '', 0.0, '', '', 0, 0)
-        media = Media(typM, *media)
-        ok = addDirectoryMedia("VOD XTREAM", isFolder=True, parameters={"action": "searchVodx", "typM": "vod", "search": params["search"]}, media=media)
+    if"search" in params.keys():
+        #xtream
+        try:
+            media = ('#IPTV XTREAM', "Recherche dans VOD/series Xtream de %s" %params["search"], '2010', '', 0, '', 0.0, '', '', 0, 0)
+            media = Media(typM, *media)
+            if typM == "movie":
+                ok = addDirectoryMedia("VOD XTREAM", isFolder=True, parameters={"action": "searchVodx", "typM": "vod", "search": params["search"]}, media=media)
+            else:
+                ok = addDirectoryMedia("SERIES XTREAM", isFolder=True, parameters={"action": "searchVodx", "typM": "series", "search": params["search"]}, media=media)
+
+        except: pass
+        #stalker
+        try:
+            cnx = sqlite3.connect(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db'))
+            cur = cnx.cursor()
+            sql = "SELECT url, nom FROM nomAdresse"
+            cur.execute(sql)
+            dictAdr = {x[0]: x[1] for x in cur.fetchall()}
+            cur.close()
+            cnx.close()
+            for fournisseur, nom in dictAdr.items():
+                media = ('#IPTV STALKER #%s' %nom, "Recherche dans VOD/Series Stalker de %s (%s)" %(params["search"], nom), '2010', '', 0, '', 0.0, '', '', 0, 0)
+                media = Media(typM, *media)
+                if typM == "movie":
+                    ok = addDirectoryMedia("VOD Stalker %s" %nom, isFolder=True, parameters={"action": "searchVodf", "fourn": fournisseur, "typM": "vod", "search": params["search"]}, media=media)
+                else:
+                    ok = addDirectoryMedia("SERIES XTREAM", isFolder=True, parameters={"action": "searchVodf", "fourn": fournisseur, "typM": "series", "search": params["search"]}, media=media)
+        except: pass
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_UNSORTED)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_VIDEO_YEAR)
     xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)

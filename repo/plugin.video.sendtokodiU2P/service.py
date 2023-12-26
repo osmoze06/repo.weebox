@@ -1305,7 +1305,7 @@ def affLiens2(params):
 
     links = getVerifLinks(numId)
 
-    notice(links)
+    #notice(links)
     #[('6Ai4sfJOSD', '720.HDlight-Light.French', '1883287480')]
     """
     tabLinkIn = [(x.split("#")[0].split("@")[0], x.split("#")[0].split("@")[1]) for x in paramstring]
@@ -1323,7 +1323,7 @@ def affLiens2(params):
 
     tabRelease = [x[1] for i, x in enumerate(links)]
     tabLiens = [(x, links[i][0], tabRelease[i]) for i, x in enumerate(tabNomLien)]
-    notice(tabLiens)
+    #notice(tabLiens)
     affLiens(numId, "movie", tabLiens)
 
 
@@ -1342,10 +1342,36 @@ def affLiens(numId, typM, liste):
     for l in liste:
         l = list(l)
         l += movie[0]
+        notice(l)
         media = Media("lien", *l)
         media.typeMedia = typM
         if typM == "movie":
             addDirectoryFilms("%s" %(l[0]), isFolder=False, parameters={"action": "playHK", "lien": media.link, "u2p": media.numId}, media=media)
+    #xtream
+
+    try:
+        media = ['#IPTV XTREAM', "Recherche dans VOD/series Xtream de", '', '#IPTV XTREAM', "Recherche dans VOD/series Xtream de %s" %l[3], '0', '', 0, '', 0.0, '', 0, 0]
+        #media = ('#IPTV XTREAM', "Recherche dans VOD/series Xtream de %s" %params["search"], '2010', '', 0, '', 0.0, '', '', 0, 0)
+        media = Media("lien", *media)
+        ok = addDirectoryFilms("VOD XTREAM", isFolder=True, parameters={"action": "searchVodx", "typM": "vod", "search": l[3]}, media=media)
+
+    except: pass
+    #stalker
+    try:
+        cnx = sqlite3.connect(xbmcvfs.translatePath('special://home/userdata/addon_data/plugin.video.sendtokodiU2P/iptv.db'))
+        cur = cnx.cursor()
+        sql = "SELECT url, nom FROM nomAdresse"
+        cur.execute(sql)
+        dictAdr = {x[0]: x[1] for x in cur.fetchall()}
+        cur.close()
+        cnx.close()
+        for fournisseur, nom in dictAdr.items():
+            #media = ('#IPTV STALKER #%s' %nom, "Recherche dans VOD/Series Stalker de %s (%s)" %(params["search"], nom), '2010', '', 0, '', 0.0, '', '', 0, 0)
+            media = ['#IPTV STALKER', "Recherche dans VOD/series Stalker de", '', '#IPTV STALKER', "Recherche dans VOD/series STALKER de %s" %l[3], '0', '', 0, '', 0.0, '', 0, 0]
+            media = Media("lien", *media)
+            ok = addDirectoryFilms("VOD Stalker %s" %nom, isFolder=True, parameters={"action": "searchVodf", "fourn": fournisseur, "typM": "vod", "search": l[3]}, media=media)
+    except: pass
+
     xbmcplugin.endOfDirectory(handle=__handle__, succeeded=True, cacheToDisc=True)
 
 def orderLiens(dictResos, paramstring):

@@ -86,7 +86,7 @@ Remerciements : Rayflix, Arias800, Sigmund pour leur aide.
             <screenshot>screenshot-03.jpg</screenshot>
         </assets>		
     </extension>
-</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="1.0.0.beta19" provider-name="noway">
+</addon><addon id="plugin.video.sendtokodiU2P" name="U2Pplay" version="1.0.0.beta20" provider-name="noway">
   <requires>
     <trycatch>
       <try>
