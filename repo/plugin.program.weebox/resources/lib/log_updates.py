@@ -6,7 +6,7 @@ import urllib.request
 
 
 # Téléchargement du fichier texte
-sources_download = 'http://weeclic.ddns.net/libreelec/clients/log_updates.txt'											
+sources_download = 'http://kbusuttil.free.fr/txt/log_updates.txt'											
 sources_loc = xbmcvfs.translatePath('special://home/downloads/log_updates.txt')											
 urllib.request.urlretrieve(sources_download, sources_loc)
 
@@ -19,6 +19,6 @@ with open(path, 'r', encoding='utf-8') as f:
 
 # Création de la fenêtre Kodi
 dialog = xbmcgui.Dialog()
-dialog.textviewer('[COLOR deepskyblue]WEEBOX[/COLOR] - MISE A JOUR', content)
+dialog.textviewer('[COLOR deepskyblue]BAZOLAND[/COLOR] - MISE A JOUR', content)
 
 sys.exit()

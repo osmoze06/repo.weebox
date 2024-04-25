@@ -5,13 +5,13 @@ import xbmcvfs
 import sys
 
 kodi_version = xbmc.getInfoLabel("System.BuildVersion")
-latest_version = "20.2"
+latest_version = "20.5"
 
 if kodi_version < latest_version:
     message = "Votre version de Kodi : " + kodi_version +"\nVoulez-vous télécharger la dernière version de Kodi ?"
     choice = xbmcgui.Dialog().yesno("Info Version Kodi", message)
     if choice:
-        url = "https://kodi.mirror.garr.it/releases/android/arm/kodi-20.2-Nexus-armeabi-v7a.apk"
+        url = "https://mirror.umd.edu/xbmc/releases/android/arm/kodi-20.5-Nexus-armeabi-v7a.apk"
         file_name = "/storage/emulated/0/Download/KODI.apk"
         progress = xbmcgui.DialogProgress()
         progress.create("Téléchargement", "Téléchargement en cours...")
