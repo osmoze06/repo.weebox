@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="plugin.program.weebox" version="0.4.0" name="WEEBOX" provider-name="Osmoze06">
+<addons><addon id="plugin.program.weebox" version="0.4.1" name="WEEBOX" provider-name="Osmoze06">
 	<requires>
 		<import addon="script.module.requests" />
 	</requires>

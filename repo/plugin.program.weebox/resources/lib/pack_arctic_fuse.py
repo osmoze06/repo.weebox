@@ -33,8 +33,8 @@ destination_dir1 = xbmcvfs.translatePath('special://home/userdata/addon_data')
 source_dir2 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/addons/skin.arctic.fuse')
 destination_dir2 = xbmcvfs.translatePath('special://home/addons/skin.arctic.fuse')
 
-source_file1 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/guisettings.xml')
-destination_file1 = xbmcvfs.translatePath('special://home/userdata/guisettings.xml')
+source_file1 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/advancedsettings.xml')
+destination_file1 = xbmcvfs.translatePath('special://home/userdata/advancedsettings.xml')
 
 source_file2 = xbmcvfs.translatePath('special://home/downloads/skin_save/01/language_kodi/strings.po')
 destination_file2 = xbmcvfs.translatePath('special://home/addons/resource.language.fr_fr/resources/strings.po')
